@@ -100,7 +100,7 @@ void Run::DrawBestTangent()
 
 void Run::DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_step)
 {
-   if (event_number>0) {
+   if (event_number>=0) {
       GetEntry(event_number);
    } else {
       GetNext();
