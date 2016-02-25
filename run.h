@@ -20,7 +20,7 @@ class Run
       void DrawHits();
       void MakeTangents(int cid1, int cid2, double z1, double z2);
       void PrintTangents();
-      void FindBestTangent(int cid1, int cid2, double z_step);
+      bool FindBestTangent(int cid1, int cid2, double z_step);
       void DrawBestTangent();
       void DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_step);
 

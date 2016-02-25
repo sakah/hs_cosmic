@@ -65,16 +65,14 @@ void Run::PrintTangents()
    track_.PrintTangents(wiremap, xt_);
 }
 
-void Run::FindBestTangent(int cid1, int cid2, double z_step)
+bool Run::FindBestTangent(int cid1, int cid2, double z_step)
 {
    WireMap& wiremap = chamber_.GetWireMap();
    bool found = finder_.FindBestTrack(chamber_, xt_, cid1, cid2, z_step);
-   if (found) {
-      Track& min_track = finder_.GetBestTrack();
-      min_track.PrintTrack(wiremap, xt_);
-      int min_itan = min_track.GetMinTangentNumber();
-      chamber_.DrawHitsWithTrack(event_, xt_, min_track, min_itan);
+   if (!found) {
+      return false;
    }
+   return true;
 }
 
 void Run::DrawBestTangent()
@@ -93,8 +91,15 @@ void Run::DrawBestTangent()
 
 void Run::DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_step)
 {
-   GetEntry(event_number);
-   FindBestTangent(cid1, cid2, z_step);
+   if (event_number>0) {
+      GetEntry(event_number);
+   } else {
+      GetNext();
+   }
+   bool found = FindBestTangent(cid1, cid2, z_step);
+   if (!found) {
+      printf("cannot find tangent...\n");
+      return;
+   }
    DrawBestTangent();
 }
-

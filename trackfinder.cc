@@ -127,6 +127,10 @@ int TrackFinder::MakeTracks(Chamber& chamber, XTcurve& xt, int cid1, int cid2, d
          continue;
       }
 
+      if (num_tracks_>=MAX_TRACK) {
+         break;
+      }
+
       Track& track = tracks_[num_tracks_];
       track.SetHit(1, hit1);
       track.SetHit(2, hit2);
