@@ -112,3 +112,47 @@ void Run::DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_st
    }
    DrawBestTangent();
 }
+
+TH1F* Run::FillResidual(const char* hname, int nx, double xmin, double xmax, int cid1, int cid2, double z_step, int cid3, int max_event)
+{
+   WireMap& wiremap = chamber_.GetWireMap();
+   TH1F* h1 = new TH1F(hname, hname, nx, xmin, xmax);
+   Long64_t num_total = event_.GetEntries();
+   if (max_event < num_total) {
+      num_total = max_event;
+   }
+   printf("num_total %lld\n", num_total);
+   for (Long64_t iev=0; iev<num_total; iev++) {
+      GetEntry(iev);
+      bool found = FindBestTangent(cid1, cid2, z_step);
+      if (found) {
+         printf("iev %lld\n", iev);
+         h1->Fill(finder_.GetBestTrack().GetResidualOfMinTangent(wiremap, xt_, cid3));
+      }
+   }
+   h1->Draw();
+   return h1;
+}
+
+TH2F* Run::FillXT(const char* hname, int nx, double xmin, double xmax, int ny, double ymin, double ymax, int cid1, int cid2, double z_step, int cid3, int max_event)
+{
+   WireMap& wiremap = chamber_.GetWireMap();
+   TH2F* h2 = new TH2F(hname, hname, nx, xmin, xmax, ny, ymin, ymax);
+   Long64_t num_total = event_.GetEntries();
+   if (max_event < num_total) {
+      num_total = max_event;
+   }
+   printf("num_total %lld\n", num_total);
+   for (Long64_t iev=0; iev<num_total; iev++) {
+      GetEntry(iev);
+      bool found = FindBestTangent(cid1, cid2, z_step);
+      if (found) {
+         printf("iev %lld\n", iev);
+         double fitR = finder_.GetBestTrack().GetResidualOfMinTangent(wiremap, xt_, cid3);
+         double dT = finder_.GetBestTrack().GetHit(cid3).GetDriftTimeFromT0();
+         h2->Fill(fitR, dT);
+      }
+   }
+   h2->Draw();
+   return h2;
+}

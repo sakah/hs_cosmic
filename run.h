@@ -1,6 +1,9 @@
 #ifndef _RUN_H
 #define _RUN_H
 
+#include "TH1F.h"
+#include "TH2F.h"
+
 #include "event.h"
 #include "chamber.h"
 #include "line.h"
@@ -24,6 +27,8 @@ class Run
       bool FindBestTangent(int cid1, int cid2, double z_step);
       void DrawBestTangent();
       void DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_step);
+      TH1F* FillResidual(const char* hname, int nx, double xmin, double xmax, int cid1, int cid2, double z_step, int cid3, int max_event);
+      TH2F* FillXT(const char* hname, int nx, double xmin, double xmax, int ny, double ymin, double ymax, int cid1, int cid2, double z_step, int cid3, int max_event);
 
    private:
       ConstXTcurve xt_;
@@ -31,6 +36,7 @@ class Run
       Event event_;
       Track track_;
       TrackFinder finder_;
+
 };
 
 #endif

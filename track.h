@@ -26,6 +26,10 @@ class Track
       Hit& GetHit(int cid);
       void PrintTangents(WireMap& wiremap, XTcurve& xt);
       void DrawTangents();
+      double GetXFromLine(WireMap& wiremap, int cid, Line& line);
+      double GetXFromMinTangent(WireMap& wiremap, int cid);
+      double GetResidualOfLine(WireMap& wiremap, XTcurve& xt, int cid, Line& line);
+      double GetResidualOfMinTangent(WireMap& wiremap, XTcurve& xt, int cid);
       void PrintTrack(WireMap& wiremap, XTcurve& xt);
 
    private:

@@ -37,6 +37,11 @@ double Hit::GetDriftTime()
    return drift_time_;
 }
 
+double Hit::GetDriftTimeFromT0()
+{
+   return drift_time_ - t0_;
+}
+
 double Hit::GetT0()
 {
    return t0_;

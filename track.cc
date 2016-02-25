@@ -169,13 +169,60 @@ void Track::DrawTangents()
    }
 }
 
+double Track::GetXFromLine(WireMap& wiremap, int cid, Line& line)
+{
+   Hit& hit = hits_[cid];
+   if (!hit.HasHit()) return -1000;
+   int icell = hit.GetCellNumber();
+   Line& wire = wiremap.GetWire(cid, icell);
+   TVector3 pA;
+   TVector3 pB;
+   double dist = wire.GetClosestPoints(line, pA, pB);
+   double fitx = pB.X();
+   TVector3 pW = wire.GetPosAtZ(pA.Z());
+   double xwire = pW.X();
+   if (g_debug_track>0) {
+      printf("pB: "); pB.Print();
+      printf("pW: "); pW.Print();
+   }
+   if (fitx < xwire) {
+      return -dist;
+   }
+   return dist;
+}
+
+double Track::GetXFromMinTangent(WireMap& wiremap, int cid)
+{
+   return GetXFromLine(wiremap, cid, GetMinTangent());
+}
+
+double Track::GetResidualOfLine(WireMap& wiremap, XTcurve& xt, int cid, Line& line)
+{
+   Hit& hit = hits_[cid];
+   return TMath::Abs(GetXFromLine(wiremap, cid, line)) - hit.GetHitR(xt);
+}
+
+double Track::GetResidualOfMinTangent(WireMap& wiremap, XTcurve& xt, int cid)
+{
+   return GetResidualOfLine(wiremap, xt, cid, GetMinTangent());
+}
+
 void Track::PrintTrack(WireMap& wiremap, XTcurve& xt)
 {
    printf("min_itan_ %d\n", min_itan_);
    printf("min_chi2  %lf\n", GetChi2OfMinTangent(wiremap, xt));
+   Line& min_tangent = GetMinTangent();
    for (int cid=0; cid<MAX_LAYER; cid++) {
-      if (!hits_[cid].HasHit()) continue;
-      hits_[cid].PrintHit(xt);
+      Hit& hit = hits_[cid];
+      if (!hit.HasHit()) continue;
+      int icell = hit.GetCellNumber();
+      Line& wire = wiremap.GetWire(cid, icell);
+      double fitX = GetXFromMinTangent(wiremap, cid);
+      double fitR = min_tangent.GetDistance(wire);
+      double dT = hit.GetDriftTime() - hit.GetT0();
+      double hitR = hit.GetHitR(xt);
+      printf("cid %2d icell %2d t0 %3.2f drift_time %6.2f dT %6.2f --> hitR %6.2f fitR %6.2f fitX %6.2f hitZ %6.2f fitR-hitR %6.2f\n",
+            cid, icell, hit.GetT0(), hit.GetDriftTime(), dT, hitR, fitR, fitX, hit.GetZ(), fitR-hitR);
    }
 }
 

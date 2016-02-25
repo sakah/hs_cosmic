@@ -25,11 +25,13 @@ class TrackFinder
       void SetMaxZ(double z);
       void SetMinZ1(double z);
       void SetMinZ2(double z);
+      void SetMaxTracks(int max_tracks);
       double GetMaxRadius();
       double GetMinZ();
       double GetMaxZ();
       double GetMinZ1();
       double GetMinZ2();
+      int GetMaxTracks();
 
    private:
       bool has_found_;
@@ -41,6 +43,7 @@ class TrackFinder
       double max_z_;
       double min_z1_;
       double min_z2_;
+      int max_tracks_;
 };
 
 #endif

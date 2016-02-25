@@ -12,6 +12,7 @@ class Hit
       int GetChanNumber();
       int GetLeftRight();
       double GetDriftTime();
+      double GetDriftTimeFromT0();
       double GetT0();
       double GetZ();
       double GetHitR(XTcurve& xt);

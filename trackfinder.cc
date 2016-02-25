@@ -11,6 +11,8 @@ TrackFinder::TrackFinder()
    max_z_ = +200;
    min_z1_ = 0;
    min_z2_ = 0;
+   max_tracks_ = 30;
+   max_tracks_ = 30;
 }
 
 bool TrackFinder::HasFound()
@@ -137,7 +139,7 @@ int TrackFinder::MakeTracks(Chamber& chamber, XTcurve& xt, int cid1, int cid2, d
          continue;
       }
 
-      if (num_tracks_>=MAX_TRACK) {
+      if (num_tracks_>= max_tracks_) {
          break;
       }
 
@@ -186,6 +188,11 @@ void TrackFinder::SetMinZ2(double min_z2)
    min_z2_ = min_z2;
 }
 
+void TrackFinder::SetMaxTracks(int max_tracks)
+{
+   max_tracks_ = max_tracks;
+}
+
 double TrackFinder::GetMaxRadius()
 {
    return max_r_;
@@ -209,5 +216,10 @@ double TrackFinder::GetMinZ1()
 double TrackFinder::GetMinZ2()
 {
    return min_z2_;
+}
+
+int TrackFinder::GetMaxTracks()
+{
+   return max_tracks_;
 }
 
