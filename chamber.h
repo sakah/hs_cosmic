@@ -28,10 +28,14 @@ class Chamber
       void PrintHits(XTcurve& xt);
       void DrawHits(Event& event, XTcurve& xt);
       void DrawHitsWithTrack(Event& event, XTcurve& xt, Track& track, int itan);
+      void SetT0(int bd, double t0);
+      double GetT0(int bd);
+      double GetT0(int cid, int icell);
       
    private:
       WireMap wiremap_;
       Hit hits_[MAX_LAYER][MAX_CELL][MAX_CELL_HIT];
+      double t0_[MAX_BOARD];
 };
 
 #endif

@@ -107,11 +107,3 @@ char* Event::GetRootPath()
 {
    return root_path_;
 }
-void Event::SetT0(double t0)
-{
-   t0_ = t0;
-}
-double Event::GetT0()
-{
-   return t0_;
-}

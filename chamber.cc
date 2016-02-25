@@ -27,7 +27,7 @@ void Chamber::GetEvent(Event& event)
          hit.SetCellNumber(icell);
          hit.SetChanNumber(ch);
          hit.SetDriftTime(event.GetDriftTime(ch, ihit));
-         hit.SetT0(event.GetT0()); // not set here
+         hit.SetT0(GetT0(cid, icell));
          hit.SetZ(wiremap_.GetZRO());
       }
    }
@@ -215,4 +215,20 @@ void Chamber::DrawHitsWithTrack(Event& event, XTcurve& xt, Track& track, int ita
       e->SetFillStyle(4000);
       e->Draw();
    }
+}
+
+void Chamber::SetT0(int bd, double t0)
+{
+   t0_[bd] = t0;
+}
+
+double Chamber::GetT0(int bd)
+{
+   return t0_[bd];
+}
+
+double Chamber::GetT0(int cid, int icell)
+{
+   int bd = wiremap_.GetBoardNumber(cid, icell);
+   return t0_[bd];
 }

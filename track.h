@@ -33,10 +33,6 @@ class Track
       Line tangents_[4]; // made by two circles 
       int min_itan_;
       double sigma_;
-      int min_cid1_;
-      int min_cid2_;
-      double min_z1_;
-      double min_z2_;
 
       void CalcPointsOnTangentials(
             double x2, double r1, double r2,

@@ -116,6 +116,13 @@ int TrackFinder::MakeTracks(Chamber& chamber, XTcurve& xt, int cid1, int cid2, d
    for (int icellhit5=0; icellhit5<m5; icellhit5++) { int icell5 = chamber.GetHitCellNumber(5, icellhit5); Hit& hit5 = chamber.GetHit(5, icell5, 0);
    for (int icellhit6=0; icellhit6<m6; icellhit6++) { int icell6 = chamber.GetHitCellNumber(6, icellhit6); Hit& hit6 = chamber.GetHit(6, icell6, 0);
    for (int icellhit7=0; icellhit7<m7; icellhit7++) { int icell7 = chamber.GetHitCellNumber(7, icellhit7); Hit& hit7 = chamber.GetHit(7, icell7, 0);
+      hit1.SetT0(chamber.GetT0(1, icell1));
+      hit2.SetT0(chamber.GetT0(2, icell2));
+      hit3.SetT0(chamber.GetT0(3, icell3));
+      hit4.SetT0(chamber.GetT0(4, icell4));
+      hit5.SetT0(chamber.GetT0(5, icell5));
+      hit6.SetT0(chamber.GetT0(6, icell6));
+      hit7.SetT0(chamber.GetT0(7, icell7));
       double hitR1 = hit1.GetHitR(xt);
       double hitR2 = hit2.GetHitR(xt);
       double hitR3 = hit3.GetHitR(xt);

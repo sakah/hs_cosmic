@@ -16,6 +16,7 @@ class Run
       Run(const char* root_file_path);
       void GetNext();
       void GetEntry(Long64_t event_number);
+      void SetT0(double t0_0, double t0_1);
       void PrintHits();
       void DrawHits();
       void MakeTangents(int cid1, int cid2, double z1, double z2);

@@ -24,8 +24,6 @@ class Event
       int GetDriftTime(int ch, int ihit);
       int GetClockNumberDriftTime(int ch, int ihit);
       char* GetRootPath();
-      void SetT0(double t0);
-      double GetT0();
 
    private:
       TFile* f_;
@@ -38,7 +36,6 @@ class Event
       int tdcNhit_[MAX_CH];
       int driftTime_[MAX_CH][MAX_SAMPLE];
       int clockNumberDriftTime_[MAX_CH][MAX_SAMPLE];
-      double t0_;
 };
 
 #endif

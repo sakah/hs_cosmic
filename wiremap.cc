@@ -43,6 +43,7 @@ void WireMap::Read(const char* path)
       layer_numbers_[gch] = l;
       cell_numbers_[gch] = w;
       chan_numbers_[l][w] = gch;
+      board_numbers_[l][w] = b;
       num_cells_[l]++;
       wires_[l][w].MakeLine(TVector3(xro, yro, zro_), TVector3(xhv, yhv, zhv_));
    }
@@ -82,6 +83,11 @@ int WireMap::GetCellNumber(int ch)
 int WireMap::GetChanNumber(int cid, int icell)
 {
    return chan_numbers_[cid][icell];
+}
+
+int WireMap::GetBoardNumber(int cid, int icell)
+{
+   return board_numbers_[cid][icell];
 }
 
 Line& WireMap::GetWire(int cid, int icell)

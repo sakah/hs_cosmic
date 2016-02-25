@@ -16,6 +16,7 @@ class WireMap
       int GetLayerNumber(int ch);
       int GetCellNumber(int ch);
       int GetChanNumber(int cid, int icell);
+      int GetBoardNumber(int cid, int icell);
       Line& GetWire(int cid, int icell);
 
    private:
@@ -26,6 +27,7 @@ class WireMap
       int layer_numbers_[MAX_CH];
       int cell_numbers_[MAX_CH];
       int chan_numbers_[MAX_LAYER][MAX_CELL];
+      int board_numbers_[MAX_LAYER][MAX_CELL];
       Line wires_[MAX_LAYER][MAX_CELL];
 };
 

@@ -173,6 +173,10 @@ void Track::PrintTrack(WireMap& wiremap, XTcurve& xt)
 {
    printf("min_itan_ %d\n", min_itan_);
    printf("min_chi2  %lf\n", GetChi2OfMinTangent(wiremap, xt));
+   for (int cid=0; cid<MAX_LAYER; cid++) {
+      if (!hits_[cid].HasHit()) continue;
+      hits_[cid].PrintHit(xt);
+   }
 }
 
 void Track::CalcPointsOnTangentials(

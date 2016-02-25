@@ -12,7 +12,6 @@ Run::Run(const char* root_file_path)
    xt_.SetDriftVelocity(0.040);
    chamber_.ReadWireMap("wirepos.proto4.sw.ver7.txt");
    event_.OpenRootFile(root_file_path);
-   event_.SetT0(-850);
 }
 
 void Run::GetNext()
@@ -26,6 +25,12 @@ void Run::GetEntry(Long64_t event_number)
 {
    event_.GetEntry(event_number);
    chamber_.GetEvent(event_);
+}
+
+void Run::SetT0(double t0_0, double t0_1)
+{
+   chamber_.SetT0(0, t0_0);
+   chamber_.SetT0(1, t0_1);
 }
 
 void Run::PrintHits()
@@ -55,6 +60,7 @@ void Run::MakeTangents(int cid1, int cid2, double z1, double z2)
    for (int cid=1; cid<=7; cid++) {
       int icell = chamber_.GetHitCellNumber(cid, 0);
       Hit& hit = chamber_.GetHit(cid, icell, 0);
+      hit.SetT0(chamber_.GetT0(cid, icell));
       track_.SetHit(cid, hit);
    }
 
