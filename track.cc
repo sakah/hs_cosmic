@@ -1,5 +1,4 @@
 #include "track.h"
-
 #include "TMath.h"
 
 Track::Track()
@@ -53,8 +52,10 @@ void Track::MakeTangents(WireMap& wiremap, XTcurve& xt, int cid1, int cid2, doub
    wirepos1_2D.SetZ(0.0);
    wirepos2_2D.SetZ(0.0);
    TVector3 relpos = wirepos2_2D-wirepos1_2D;
-   wirepos1.Print();
-   wirepos2.Print();
+   if (g_debug_track>0) {
+      wirepos1.Print();
+      wirepos2.Print();
+   }
    double x2 = relpos.Mag();
    double r1 = hit1.GetHitR(xt);
    double r2 = hit2.GetHitR(xt);
@@ -79,12 +80,14 @@ void Track::MakeTangents(WireMap& wiremap, XTcurve& xt, int cid1, int cid2, doub
       tangents_[i].Trans2D(wirepos1, relang);
    }
 
-   printf("--- wirepos1 ---\n");
-   wirepos1.Print();
-   printf("--- wirepos2 ---\n");
-   wirepos2.Print();
-   printf("--- relang ---\n");
-   printf("%f (deg)\n", relang/TMath::Pi()*180);
+   if (g_debug_track>0) {
+      printf("--- wirepos1 ---\n");
+      wirepos1.Print();
+      printf("--- wirepos2 ---\n");
+      wirepos2.Print();
+      printf("--- relang ---\n");
+      printf("%f (deg)\n", relang/TMath::Pi()*180);
+   }
 }
 
 Line& Track::GetTangent(int itan)
@@ -191,9 +194,11 @@ void Track::CalcPointsOnTangentials(
    yL2 = TMath::Sqrt(r1*r1 - (r1*r1-r1*r2)/x2*(r1*r1-r1*r2)/x2);
    xR2 = ((x2*x2-r2*r2+r1*r2)/x2);
    yR2 = TMath::Sqrt(r2*r2 - (-r2*r2+r1*r2)/x2*(-r2*r2+r1*r2)/x2);
-   printf("xR1 %lf yR1 %lf\n", xR1, yR1);
-   printf("xL1 %lf yL1 %lf\n", xL1, yL1);
-   printf("xR2 %lf yR2 %lf\n", xR2, yR2);
-   printf("xL2 %lf yL2 %lf\n", xL2, yL2);
+   if (g_debug_track>0) {
+      printf("xR1 %lf yR1 %lf\n", xR1, yR1);
+      printf("xL1 %lf yL1 %lf\n", xL1, yL1);
+      printf("xR2 %lf yR2 %lf\n", xR2, yR2);
+      printf("xL2 %lf yL2 %lf\n", xL2, yL2);
+   }
 }
 

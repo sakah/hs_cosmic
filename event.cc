@@ -46,7 +46,7 @@ void Event::GetNext(bool skip_empty_event)
       if (!empty_event) break;
       num_skip++;
    }
-   printf("num_skip %d event_number %lld\n", num_skip, event_number_);
+   printf("event_number %lld num_skip %d\n", event_number_, num_skip);
 }
 
 void Event::GetEntry(Long64_t event_number)

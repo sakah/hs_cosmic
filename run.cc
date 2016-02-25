@@ -2,6 +2,9 @@
 
 Run::Run()
 {
+   g_debug_line = 0;
+   g_debug_track = 0;
+   g_debug_trackfinder = 0;
 }
 
 Run::Run(const char* root_file_path)
@@ -81,7 +84,7 @@ void Run::DrawBestTangent()
       printf("track not found yet..\n");
       return;
    }
-      
+
    WireMap& wiremap = chamber_.GetWireMap();
    Track& min_track = finder_.GetBestTrack();
    min_track.PrintTrack(wiremap, xt_);

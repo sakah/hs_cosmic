@@ -1,5 +1,6 @@
 #include "trackfinder.h"
 
+
 TrackFinder::TrackFinder()
 {
    has_found_ = false;
@@ -59,7 +60,9 @@ bool TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid
             min_z1_ = z1;
             min_z2_ = z2;
          }
-         printf("z1 %f z2 %f chi2 %f min_chi2 %f min_itrack %d min_z1_ %f min_z2_ %f\n", z1, z2, chi2, min_chi2, min_itrack, min_z1_, min_z2_);
+         if (g_debug_trackfinder>0) {
+            printf("z1 %f z2 %f chi2 %f min_chi2 %f min_itrack %d min_z1_ %f min_z2_ %f\n", z1, z2, chi2, min_chi2, min_itrack, min_z1_, min_z2_);
+         }
       }
    }
    min_itrack_ = min_itrack;

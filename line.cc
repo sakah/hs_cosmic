@@ -113,18 +113,20 @@ double Line::GetClosestPoints(Line& other, TVector3& pA, TVector3& pB)
 	double uz = p21z + t2*nvz2 - t1*nvz1;
 	dist = sqrt(ux*ux+uy*uy+uz*uz);
 
-   //fprintf(stdout,"calc_closest px1 %lf py1 %lf pz1 %lf\n",px1, py1, pz1);
-   //fprintf(stdout,"calc_closest vx1 %lf vy1 %lf vz1 %lf\n",vx1, vy1, vz1);
-   //fprintf(stdout,"calc_closest px2 %lf py2 %lf pz2 %lf\n",px2, py2, pz2);
-   //fprintf(stdout,"calc_closest vx2 %lf vy2 %lf vz2 %lf\n",vx2, vy2, vz2);
-   //fprintf(stdout,"calc_closest D1 %lf D2 %lf V %lf t1 %lf t2 %lf dist %lf\n",D1,D2,V,t1,t2,dist);
+   if (g_debug_line>0) {
+      fprintf(stdout,"calc_closest px1 %lf py1 %lf pz1 %lf\n",px1, py1, pz1);
+      fprintf(stdout,"calc_closest vx1 %lf vy1 %lf vz1 %lf\n",vx1, vy1, vz1);
+      fprintf(stdout,"calc_closest px2 %lf py2 %lf pz2 %lf\n",px2, py2, pz2);
+      fprintf(stdout,"calc_closest vx2 %lf vy2 %lf vz2 %lf\n",vx2, vy2, vz2);
+      fprintf(stdout,"calc_closest D1 %lf D2 %lf V %lf t1 %lf t2 %lf dist %lf\n",D1,D2,V,t1,t2,dist);
+   }
 
-	double x1 = px1 + t1*nvx1;
-	double y1 = py1 + t1*nvy1;
-	double z1 = pz1 + t1*nvz1;
-	double x2 = px2 + t2*nvx2;
-	double y2 = py2 + t2*nvy2;
-	double z2 = pz2 + t2*nvz2;
+   double x1 = px1 + t1*nvx1;
+   double y1 = py1 + t1*nvy1;
+   double z1 = pz1 + t1*nvz1;
+   double x2 = px2 + t2*nvx2;
+   double y2 = py2 + t2*nvy2;
+   double z2 = pz2 + t2*nvz2;
 
    pA.SetXYZ(x1, y1, z1);
    pB.SetXYZ(x2, y2, z2);

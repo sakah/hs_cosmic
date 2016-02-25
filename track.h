@@ -6,6 +6,8 @@
 #include "wiremap.h"
 #include "xtcurve.h"
 
+int g_debug_track;
+
 class Track
 {
    public:
