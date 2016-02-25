@@ -11,8 +11,7 @@ TrackFinder::TrackFinder()
    max_z_ = +200;
    min_z1_ = 0;
    min_z2_ = 0;
-   max_tracks_ = 30;
-   max_tracks_ = 30;
+   max_tracks_ = 10;
 }
 
 bool TrackFinder::HasFound()
