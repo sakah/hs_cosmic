@@ -131,7 +131,7 @@ void Chamber::PrintHits(XTcurve& xt)
 
 void Chamber::DrawHits(Event& event, XTcurve& xt)
 {
-   TCanvas*c1 = new TCanvas("c1", "", 700, 700);
+   TCanvas*c1 = new TCanvas("c1-chamber-drawhits", "", 700, 700);
    TH2F* h2 = new TH2F("h2", Form("%s Event# %lld", event.GetRootPath(), event.GetEventNumber()), 
          100, -100, 100, 100, 480, 680);
    h2->SetStats(0);
@@ -179,7 +179,7 @@ void Chamber::DrawHits(Event& event, XTcurve& xt)
 
 void Chamber::DrawHitsWithTrack(Event& event, XTcurve& xt, Track& track, int itan)
 {
-   TCanvas*c1 = new TCanvas("c1", "", 700, 700);
+   TCanvas*c1 = new TCanvas("c1-chamber-drawhitswithtrack", "", 700, 700);
    TH2F* h2 = new TH2F("h2", Form("%s Event# %lld", event.GetRootPath(), event.GetEventNumber()), 
          100, -100, 100, 100, 480, 680);
    h2->SetStats(0);
