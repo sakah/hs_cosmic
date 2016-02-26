@@ -161,3 +161,27 @@ TVector3 Line::GetPosAtZ(double z)
    double y = y1 + (z-z1)/(z2-z1)*(y2-y1);
    return TVector3(x, y, z);
 }
+
+void Line::GetSlopeAndOffsetOnXY(double& slope, double& offset)
+{
+   double x1 = p1_.X();
+   double y1 = p1_.Y();
+   double x2 = p2_.X();
+   double y2 = p2_.Y();
+   double dx = x2-x1;
+   double dy = y2-y1;
+   slope = dy/dx;
+   offset = y1 - slope*x1;
+}
+
+void Line::GetSlopeAndOffsetOnZX(double& slope, double& offset)
+{
+   double z1 = p1_.Z();
+   double x1 = p1_.X();
+   double z2 = p2_.Z();
+   double x2 = p2_.X();
+   double dz = z2-z1;
+   double dx = x2-x1;
+   slope = dx/dz;
+   offset = x1 - slope*z1;
+}

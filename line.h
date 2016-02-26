@@ -17,6 +17,8 @@ class Line
       double GetClosestPoints(Line& other, TVector3& pA, TVector3& pB);
       double GetDistance(Line& other);
       TVector3 GetPosAtZ(double z);
+      void GetSlopeAndOffsetOnZX(double& slope, double& offset);
+      void GetSlopeAndOffsetOnXY(double& slope, double& offset);
 
    private:
       TVector3 p1_;
