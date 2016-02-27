@@ -4,3 +4,4 @@ root/
 *.so
 *.pcm
 *.d
+*.root
