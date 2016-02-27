@@ -131,6 +131,7 @@ void OutputROOT::SetTrackData(Chamber& chamber, XTcurve& xt, Track& track)
 void OutputROOT::Fill()
 {
    t_->Fill();
+   t_->AutoSave();
 }
 
 void OutputROOT::Write()
