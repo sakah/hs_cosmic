@@ -147,6 +147,5 @@ void Run::DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int 
    WireMap& wiremap = chamber_.GetWireMap();
    Track& min_track = finder_.GetBestTrack();
    Line& fit_line = min_track.GetFitLine();
-   fit_line.PrintLine();
    chamber_.DrawTrack(event_, xt_, min_track, fit_line);
 }

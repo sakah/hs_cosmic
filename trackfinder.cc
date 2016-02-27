@@ -6,8 +6,8 @@ TrackFinder::TrackFinder()
    num_tracks_ = 0;
    min_itrack_ = -1;
    max_r_ = 10.0; // 10.0 mm
-   min_z_ = -200;
-   max_z_ = +200;
+   min_z_ = -400;
+   max_z_ = +400;
    min_z1_ = 0;
    min_z2_ = 0;
    max_tracks_ = 4;

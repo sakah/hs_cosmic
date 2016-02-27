@@ -277,11 +277,11 @@ void Line::GetABCDEF(double& A, double& B, double& C, double& D, double& E, doub
       }
    }
 
-   //if (g_debug_line) {
+   if (g_debug_line) {
       printf("x1 %lf y1 %lf z1 %lf\n", x1, y1, z1);
       printf("x2 %lf y2 %lf z2 %lf\n", x2, y2, z2);
       printf("A  %lf B  %lf C  %lf D %lf E %lf F %lf\n", A,B,C,D,E,F);
-   //}
+   }
 }
 
 TVector3& Line::GetP1()
