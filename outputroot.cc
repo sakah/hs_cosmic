@@ -55,7 +55,7 @@ void OutputROOT::SetRootFile(const char* path)
    t_->Branch("hit_icell",          hit_icell_,        "hit_icell[9][15]/I");
    t_->Branch("hit_q",              hit_q_,            "hit_q[9][15]/D");
    t_->Branch("hit_num_hittdcs",    hit_num_hittdcs_,  "hit_num_hittdcs[9][15]/I");
-   t_->Branch("hit_drift_time",     hit_drift_time_,   "hit_drit_time[9][15]/D");
+   t_->Branch("hit_drift_time",     hit_drift_time_,   "hit_drit_time[9][15][10]/D");
 
    t_->Branch("trackfinder_num_tracks", &trackfinder_num_tracks_, "trackfinder_num_tracks/I");
 
