@@ -89,11 +89,12 @@ bool Run::FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_st
    }
 
    WireMap& wiremap = chamber_.GetWireMap();
-   bool found = finder_.FindBestTrack(chamber_, xt_, cid1, cid2, z_step);
-   finder_.PrintTracks(wiremap, xt_);
-   if (!found) {
+   int num_tracks = finder_.SetTracks(chamber_, xt_);
+   if (num_tracks==0) {
       return false;
    }
+   finder_.FindBestTrack(chamber_, xt_, cid1, cid2, z_step);
+   finder_.PrintTracks(wiremap, xt_);
    return true;
 }
 
@@ -184,13 +185,13 @@ void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_i
 
       output_.SetHitData(event_, chamber_);
 
-      bool found = finder_.FindBestTrack(chamber_, xt_, cid1, cid2, z_step);
+      int num_tracks = finder_.SetTracks(chamber_, xt_);
       //finder_.PrintTracks(wiremap, xt_);
 
       output_.SetTrackFinderData(finder_);
-      int num_found_tracks = finder_.GetNumTracks();
 
-      if (found) {
+      if (num_tracks>0) {
+         finder_.FindBestTrack(chamber_, xt_, cid1, cid2, z_step);
          Track& track = finder_.GetBestTrack();
          for (int test_cid=1; test_cid<=7; test_cid++) {
             //printf("test_cid %d\n", test_cid);
@@ -201,7 +202,7 @@ void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_i
          }
       }
 
-      printf("iev %lld num_found_tracks %d etime %d\n", iev, num_found_tracks, time(NULL)-prev_time);
+      printf("iev %lld num_tracks %d etime %d\n", iev, num_tracks, time(NULL)-prev_time);
       output_.SetElapstedTime(time(NULL)-prev_time);
       prev_time = time(NULL);
       output_.Fill();

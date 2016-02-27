@@ -11,13 +11,13 @@ class TrackFinder
 {
    public:
       TrackFinder();
-      bool HasFound();
-      bool FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2);
-      bool FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z_step);
+      int SetTracks(Chamber& chamber, XTcurve& xt);
+      void FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2);
+      void FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z_step);
+      void MakeTangents(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2);
       Track& GetBestTrack();
       int GetNumTracks();
       void PrintTracks(WireMap& wiremap, XTcurve& xt);
-      int MakeTracks(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2);
       void SetMaxRadius(double max_r);
       void SetMinZ(double z);
       void SetMaxZ(double z);
@@ -32,7 +32,6 @@ class TrackFinder
       int GetMaxTracks();
 
    private:
-      bool has_found_;
       int num_tracks_;
       Track tracks_[MAX_TRACK];
       int min_itrack_;
