@@ -1,4 +1,4 @@
-#include "OutputROOT.h"
+#include "outputroot.h"
 #include <time.h>
 
 OutputROOT::OutputROOT()
