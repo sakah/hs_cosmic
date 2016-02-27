@@ -13,6 +13,63 @@ void Line::MakeLine(TVector3 p1, TVector3 p2)
    p2_ = p2;
 }
 
+void Line::MakeLine(double A, double B, double C, double D, double E, double F)
+{
+   // Line in 3D space is described in the following
+   // Ax + By + C = 0; normal to vector (A,B) and distance from origin (x,y)=(0,0) is C/sqrt(A*A+B*B)
+   // Dy + Ez + F = 0; normal to vector (D,E) and distance from origin (y,z)=(0,0) is F/sqrt(D*D+E*E)
+   // Here B>0 and E>0
+   
+   // firstly normalize
+   TVector3 xy(A, B, 0);
+   TVector3 yz(D, E, 0);
+   TVector3 nxy = xy.Unit();
+   TVector3 nyz = yz.Unit();
+   A = nxy.X();
+   B = nxy.Y();
+   D = nyz.X();
+   E = nyz.Y();
+
+   double x1;
+   double y1;
+   double z1;
+   double x2;
+   double y2;
+   double z2;
+   double abs_A = TMath::Abs(A);
+   double abs_E = TMath::Abs(E);
+
+   // Ax + By + C = 0
+   // Dy + Ez + F = 0
+   if (abs_A>0.0001) {
+      if (abs_E>0.001) {
+         y1 = 0.000;
+         y2 = 100.0;
+         x1 = (-B*y1 - C)/A;
+         x2 = (-B*y2 - C)/A;
+         z1 = (-D*y1 - F)/E;
+         z2 = (-D*y2 - F)/E;
+      } else {
+         z1 = 0.000;
+         z2 = 100.0;
+         y1 = (-E*z1 - F)/D;
+         y2 = (-E*z2 - F)/D;
+         x1 = (-B*y1 - C)/A;
+         x2 = (-B*y2 - C)/A;
+      }
+   } else {
+      x1 = 0.000;
+      x2 = 100.0;
+      y1 = (-A*x1-C)/B;
+      y2 = (-A*x2-C)/B;
+      z1 = (-D*y1 - F)/E;
+      z2 = (-D*y2 - F)/E;
+   }
+   
+   p2_.SetXYZ(x1, y1, z1);
+   p1_.SetXYZ(x2, y2, z2);
+}
+
 TVector3 Line::Trans2DPoint(TVector3& p, TVector3& pos, double ang)
 {
    double px = p.X();
@@ -113,7 +170,7 @@ double Line::GetClosestPoints(Line& other, TVector3& pA, TVector3& pB)
 	double uz = p21z + t2*nvz2 - t1*nvz1;
 	dist = sqrt(ux*ux+uy*uy+uz*uz);
 
-   if (g_debug_line>0) {
+   if (g_debug_line) {
       fprintf(stdout,"calc_closest px1 %lf py1 %lf pz1 %lf\n",px1, py1, pz1);
       fprintf(stdout,"calc_closest vx1 %lf vy1 %lf vz1 %lf\n",vx1, vy1, vz1);
       fprintf(stdout,"calc_closest px2 %lf py2 %lf pz2 %lf\n",px2, py2, pz2);
@@ -162,26 +219,77 @@ TVector3 Line::GetPosAtZ(double z)
    return TVector3(x, y, z);
 }
 
-void Line::GetSlopeAndOffsetOnXY(double& slope, double& offset)
+void Line::GetACDF(double& A, double& C, double& D, double& F)
 {
-   double x1 = p1_.X();
-   double y1 = p1_.Y();
-   double x2 = p2_.X();
-   double y2 = p2_.Y();
-   double dx = x2-x1;
-   double dy = y2-y1;
-   slope = dy/dx;
-   offset = y1 - slope*x1;
+   double B;
+   double E;
+   GetABCDEF(A,B,C,D,E,F);
 }
 
-void Line::GetSlopeAndOffsetOnZX(double& slope, double& offset)
+void Line::GetABCDEF(double& A, double& B, double& C, double& D, double& E, double& F)
 {
-   double z1 = p1_.Z();
+   // Ax + By + C = 0
+   // Dy + Ez + F = 0
+   // Here B>0 and E>0
+   
    double x1 = p1_.X();
-   double z2 = p2_.Z();
+   double y1 = p1_.Y();
+   double z1 = p1_.Z();
    double x2 = p2_.X();
-   double dz = z2-z1;
+   double y2 = p2_.Y();
+   double z2 = p2_.Z();
    double dx = x2-x1;
-   slope = dx/dz;
-   offset = x1 - slope*z1;
+   double dy = y2-y1;
+   double dz = z2-z1;
+   double abs_dx = TMath::Abs(dx);
+   double abs_dy = TMath::Abs(dy);
+   if (abs_dx>0.0001) {
+      B = 1.0/TMath::Sqrt((dy/dx)*(dy/dx)+1);
+      A = -dy/dx*B;
+      C = -A*x1 - B*y1;
+   } else {
+      A = 1.0/TMath::Sqrt((dx/dy)*(dx/dy)+1);
+      B = -dx/dy*A;
+      C = -A*x1 - B*y1;
+      if (B<0) {
+         A -= A;
+         B -= B;
+         C -= C;
+      }
+   }
+   // A -> D
+   // B -> E
+   // C -> F
+   // x -> y
+   // y -> z
+   if (abs_dy>0.0001) {
+      E = 1.0/TMath::Sqrt((dz/dy)*(dz/dy)+1);
+      D = -dz/dy*E;
+      F = -D*y1 - E*z1;
+   } else {
+      D = 1.0/TMath::Sqrt((dy/dz)*(dy/dz)+1);
+      E = -dy/dz*D;
+      F = -D*y1 - E*z1;
+      if (E<0) {
+         D -= D;
+         E -= E;
+         F -= F;
+      }
+   }
+
+   //if (g_debug_line) {
+      printf("x1 %lf y1 %lf z1 %lf\n", x1, y1, z1);
+      printf("x2 %lf y2 %lf z2 %lf\n", x2, y2, z2);
+      printf("A  %lf B  %lf C  %lf D %lf E %lf F %lf\n", A,B,C,D,E,F);
+   //}
+}
+
+TVector3& Line::GetP1()
+{
+   return p1_;
+}
+
+TVector3& Line::GetP2()
+{
+   return p2_;
 }

@@ -7,8 +7,6 @@
 #include "xtcurve.h"
 #include "chamber.h"
 
-int g_debug_trackfinder;
-
 class TrackFinder
 {
    public:

@@ -1,6 +1,10 @@
 #ifndef _PARAM_H
 #define _PARAM_H
 
+#define g_debug_line 0
+#define g_debug_track 0
+#define g_debug_trackfinder 0
+
 enum
 {
    MAX_BOARD=2,

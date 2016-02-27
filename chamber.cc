@@ -177,7 +177,7 @@ void Chamber::DrawHits(Event& event, XTcurve& xt)
    }
 }
 
-void Chamber::DrawHitsWithTrack(Event& event, XTcurve& xt, Track& track, int itan)
+void Chamber::DrawTrack(Event& event, XTcurve& xt, Track& track, Line& line)
 {
    TCanvas*c1 = new TCanvas("c1-chamber-drawhitswithtrack", "", 700, 700);
    TH2F* h2 = new TH2F("h2", Form("%s Event# %lld", event.GetRootPath(), event.GetEventNumber()), 
@@ -191,11 +191,10 @@ void Chamber::DrawHitsWithTrack(Event& event, XTcurve& xt, Track& track, int ita
       //hit.PrintHit(xt);
       int icell = hit.GetCellNumber();
       Line& wire = wiremap_.GetWire(cid, icell);
-      Line& tangent = track.GetTangent(itan);
-      tangent.DrawLine(kRed);
+      line.DrawLine(kRed);
       TVector3 pA;
       TVector3 pB;
-      wire.GetClosestPoints(tangent, pA, pB);
+      wire.GetClosestPoints(line, pA, pB);
       double zA = pA.Z();
       //if (cid==1) zA=100;
       //if (cid==7) zA=200;

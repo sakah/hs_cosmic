@@ -9,45 +9,52 @@
 #include "TMinuit.h"
 #include "TFitter.h"
 
-int g_debug_track;
-
 class Track
 {
    public:
       Track();
       void SetHit(int cid, Hit& hit);
       void SetSigma(double sigma);
-      void SetHitZWithTangent(WireMap& wiremap, int itan);
-      void SetHitZWithMinTangent(WireMap& wiremap);
+      void SetHitZWithLine(WireMap& wiremap, Line& line);
+      void SetHitZWithMinTangent(WireMap& wiremap, XTcurve& xt);
       void MakeTangents(WireMap& wiremap, XTcurve& xt, int cid1, int cid2, double z1, double z2);
       Line& GetTangent(int itan);
-      Line& GetMinTangent();
-      int GetMinTangentNumber();
       double GetChi2OfLine(WireMap& wiremap, XTcurve& xt, Line& line);
-      double GetChi2OfMinTangent(WireMap& wiremap, XTcurve& xt);
+      Line& GetMinTangent(WireMap& wiremap, XTcurve& xt);
       double GetSigma();
       Hit& GetHit(int cid);
       void PrintTangents(WireMap& wiremap, XTcurve& xt);
       void DrawTangents();
       double GetXFromLine(WireMap& wiremap, int cid, Line& line);
-      double GetXFromMinTangent(WireMap& wiremap, int cid);
+      double GetXFromMinTangent(WireMap& wiremap, XTcurve& xt, int cid);
       double GetResidualOfLine(WireMap& wiremap, XTcurve& xt, int cid, Line& line);
       double GetResidualOfMinTangent(WireMap& wiremap, XTcurve& xt, int cid);
-      void PrintTrack(WireMap& wiremap, XTcurve& xt);
+      void PrintTrackWithLine(WireMap& wiremap, XTcurve& xt, Line& line);
 
-      void InitFit(WireMap& wiremap, XTcurve& xt);
-      void DoFit();
+      void InitFit(WireMap& wiremap, XTcurve& xt, int test_cid);
+      void DoFit(WireMap& wiremap, XTcurve& xt);
       void PrintFitResults();
+      int GetNumHits();
+      int GetNumBindingConditions();
+      int GetNumParameters();
+      int GetNDF();
+      Line& GetInitialLine();
+      Line& GetFitLine();
+      void SetTestLayerNumber(int test_cid);
+      int GetTestLayerNumber();
 
    private:
       Hit hits_[MAX_LAYER];
       Line tangents_[4]; // made by two circles 
-      int min_itan_;
+
+      int test_cid_; // this layers' hit is not included in hits
       double sigma_;
       TFitter* minuit_;
+      Line ini_line_;
       Line fit_line_;
-      double fit_min_pars[4];
-      double fit_err_pars[4];
+      double ini_pars_[4];
+      double fit_min_pars_[4];
+      double fit_err_pars_[4];
       double fit_chi2_;
       double fit_edm_;
       double fit_errdef_;

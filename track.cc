@@ -5,9 +5,8 @@ static Track *Track_obj;
 
 Track::Track()
 {
-   min_itan_ = -1;
    sigma_ = 0.2; // 200um
-   
+   test_cid_ = -1;  // use all of hits in fitting
 } 
 
 void Track::SetHit(int cid, Hit& hit)
@@ -20,7 +19,7 @@ void Track::SetSigma(double sigma)
    sigma_ = sigma;
 }
 
-void Track::SetHitZWithTangent(WireMap& wiremap, int itan)
+void Track::SetHitZWithLine(WireMap& wiremap, Line& line)
 {
    for (int cid=0; cid<MAX_LAYER; cid++) {
       Hit& hit = hits_[cid];
@@ -28,14 +27,13 @@ void Track::SetHitZWithTangent(WireMap& wiremap, int itan)
       Line& wire = wiremap.GetWire(cid, icell);
       TVector3 pA;
       TVector3 pB;
-      Line& tangent = GetTangent(itan);
-      wire.GetClosestPoints(tangent, pA, pB);
+      wire.GetClosestPoints(line, pA, pB);
       hit.SetZ(pA.Z());
    }
 }
-void Track::SetHitZWithMinTangent(WireMap& wiremap)
+void Track::SetHitZWithMinTangent(WireMap& wiremap, XTcurve& xt)
 {
-   SetHitZWithTangent(wiremap, min_itan_);
+   SetHitZWithLine(wiremap, GetMinTangent(wiremap, xt));
 }
 
 void Track::MakeTangents(WireMap& wiremap, XTcurve& xt, int cid1, int cid2, double z1, double z2)
@@ -83,7 +81,7 @@ void Track::MakeTangents(WireMap& wiremap, XTcurve& xt, int cid1, int cid2, doub
       tangents_[i].Trans2D(wirepos1, relang);
    }
 
-   if (g_debug_track>0) {
+   if (g_debug_track) {
       printf("--- wirepos1 ---\n");
       wirepos1.Print();
       printf("--- wirepos2 ---\n");
@@ -96,16 +94,6 @@ void Track::MakeTangents(WireMap& wiremap, XTcurve& xt, int cid1, int cid2, doub
 Line& Track::GetTangent(int itan)
 {
    return tangents_[itan];
-}
-
-Line& Track::GetMinTangent()
-{
-   return tangents_[min_itan_];
-}
-
-int Track::GetMinTangentNumber()
-{
-   return min_itan_;
 }
 
 double Track::GetChi2OfLine(WireMap& wiremap, XTcurve& xt, Line& line)
@@ -128,20 +116,23 @@ double Track::GetChi2OfLine(WireMap& wiremap, XTcurve& xt, Line& line)
       //printf("cid %d hitR %f fitR %f hitZ %f fitZ %f dr %f chi2 %f\n", cid, hitR, fitR, hitZ, fitZ, dr, chi2);
       chi2 += (dr/sigma_)*(dr/sigma_);
    }
+   //printf("==> chi2 %f\n", chi2);
    return chi2;
 }
 
-double Track::GetChi2OfMinTangent(WireMap& wiremap, XTcurve& xt)
+Line& Track::GetMinTangent(WireMap& wiremap, XTcurve& xt)
 {
+   int min_itan=0;
    double min_chi2 = 1e10;
    for (int itan=0; itan<4; itan++) {
-      double chi2 = GetChi2OfLine(wiremap, xt, GetMinTangent());
+      double chi2 = GetChi2OfLine(wiremap, xt, GetTangent(itan));
+      //printf("itan %d chi2 %f\n", itan, chi2);
       if (chi2 < min_chi2) {
          min_chi2 = chi2;
-         min_itan_ = itan;
+         min_itan = itan;
       }
    }
-   return min_chi2;
+   return tangents_[min_itan];
 }
 
 double Track::GetSigma()
@@ -183,7 +174,7 @@ double Track::GetXFromLine(WireMap& wiremap, int cid, Line& line)
    double fitx = pB.X();
    TVector3 pW = wire.GetPosAtZ(pA.Z());
    double xwire = pW.X();
-   if (g_debug_track>0) {
+   if (g_debug_track) {
       printf("pB: "); pB.Print();
       printf("pW: "); pW.Print();
    }
@@ -193,9 +184,9 @@ double Track::GetXFromLine(WireMap& wiremap, int cid, Line& line)
    return dist;
 }
 
-double Track::GetXFromMinTangent(WireMap& wiremap, int cid)
+double Track::GetXFromMinTangent(WireMap& wiremap, XTcurve& xt, int cid)
 {
-   return GetXFromLine(wiremap, cid, GetMinTangent());
+   return GetXFromLine(wiremap, cid, GetMinTangent(wiremap, xt));
 }
 
 double Track::GetResidualOfLine(WireMap& wiremap, XTcurve& xt, int cid, Line& line)
@@ -206,21 +197,20 @@ double Track::GetResidualOfLine(WireMap& wiremap, XTcurve& xt, int cid, Line& li
 
 double Track::GetResidualOfMinTangent(WireMap& wiremap, XTcurve& xt, int cid)
 {
-   return GetResidualOfLine(wiremap, xt, cid, GetMinTangent());
+   return GetResidualOfLine(wiremap, xt, cid, GetMinTangent(wiremap, xt));
 }
 
-void Track::PrintTrack(WireMap& wiremap, XTcurve& xt)
+void Track::PrintTrackWithLine(WireMap& wiremap, XTcurve& xt, Line& line)
 {
-   printf("min_itan_ %d\n", min_itan_);
-   printf("min_chi2  %lf\n", GetChi2OfMinTangent(wiremap, xt));
-   Line& min_tangent = GetMinTangent();
+   printf("line's chi2  %lf\n", GetChi2OfLine(wiremap, xt, line));
+   Line& min_tangent = GetMinTangent(wiremap, xt);
    for (int cid=0; cid<MAX_LAYER; cid++) {
       Hit& hit = hits_[cid];
       if (!hit.HasHit()) continue;
       int icell = hit.GetCellNumber();
       Line& wire = wiremap.GetWire(cid, icell);
-      double fitX = GetXFromMinTangent(wiremap, cid);
-      double fitR = min_tangent.GetDistance(wire);
+      double fitX = GetXFromLine(wiremap, cid, line);
+      double fitR = line.GetDistance(wire);
       double dT = hit.GetDriftTime() - hit.GetT0();
       double hitR = hit.GetHitR(xt);
       printf("cid %2d icell %2d t0 %3.2f drift_time %6.2f dT %6.2f --> hitR %6.2f fitR %6.2f fitX %6.2f hitZ %6.2f fitR-hitR %6.2f\n",
@@ -231,34 +221,35 @@ void Track::PrintTrack(WireMap& wiremap, XTcurve& xt)
 WireMap* g_wiremap_ptr;
 XTcurve* g_xt_ptr;
 Line* g_fit_line;
-void Track::InitFit(WireMap& wiremap, XTcurve& xt)
+void Track::InitFit(WireMap& wiremap, XTcurve& xt, int test_cid)
 {
    Track_obj = this;
    minuit_ = new TFitter(4);
    minuit_->SetFCN(Track::MinuitFunction);
+   SetTestLayerNumber(test_cid);
+
    g_wiremap_ptr = &wiremap;
    g_xt_ptr = &xt;
    g_fit_line = &fit_line_;
 }
 
-void Track::DoFit()
+void Track::DoFit(WireMap& wiremap, XTcurve& xt)
 {
-   // y = ax + b @z=0
-   // x = cz + d @y=0
-   double a_ini;
-   double b_ini;
-   double c_ini;
-   double d_ini;
-   fit_line_.GetSlopeAndOffsetOnXY(a_ini, b_ini);
-   fit_line_.GetSlopeAndOffsetOnZX(c_ini, d_ini);
-   double a_step = 1.0;
-   double b_step = 1.0;
-   double c_step = 1.0;
-   double d_step = 1.0;
-   minuit_->SetParameter(0,"a",a_ini,a_step,0,0);
-   minuit_->SetParameter(1,"b",a_ini,b_step,0,0);
-   minuit_->SetParameter(2,"c",a_ini,c_step,0,0);
-   minuit_->SetParameter(3,"d",a_ini,d_step,0,0);
+   ini_line_ = GetMinTangent(wiremap, xt);
+   ini_line_.GetACDF(ini_pars_[0], ini_pars_[1], ini_pars_[2], ini_pars_[3]);
+
+   double A_ini = ini_pars_[0];
+   double C_ini = ini_pars_[1];
+   double D_ini = ini_pars_[2];
+   double F_ini = ini_pars_[3];
+   double A_step = 1.0;
+   double C_step = 1.0;
+   double D_step = 1.0;
+   double F_step = 1.0;
+   minuit_->SetParameter(0,"A",A_ini,A_step,-1,1);
+   minuit_->SetParameter(1,"C",C_ini,C_step,0,0);
+   minuit_->SetParameter(2,"D",D_ini,D_step,-1,1);
+   minuit_->SetParameter(3,"F",F_ini,F_step,0,0);
 
    double arglist[10];
    arglist[0] = 0;
@@ -268,33 +259,125 @@ void Track::DoFit()
 
    // get result
    for (int i=0; i<4; i++) {
-      fit_min_pars[i] = minuit_->GetParameter(i);
-      fit_err_pars[i] = minuit_->GetParError(i);
+      fit_min_pars_[i] = minuit_->GetParameter(i);
+      fit_err_pars_[i] = minuit_->GetParError(i);
    }
    minuit_->GetStats(fit_chi2_,fit_edm_,fit_errdef_,fit_nvpar_,fit_nparx_);
+
+#if 0
+   double a,b,c,d,e,f;
+   fit_line_.GetABCDEF(a,b,c,d,e,f);
+   printf("A) %f %f %f %f %f %f\n", a,b,c,d,e,f);
+   double A = fit_min_pars_[0];
+   double B = TMath::Sqrt(1-A*A);
+   double C = fit_min_pars_[1];
+   double D = fit_min_pars_[2];
+   double E = TMath::Sqrt(1-D*D);
+   double F = fit_min_pars_[3];
+   fit_line_.MakeLine(A,B,C,D,E,F);
+   printf("B) %f %f %f %f %f %f\n", A,B,C,D,E,F);
+   printf("make line after fitting\n");
+   fit_line_.PrintLine();
+#endif
+
+   // update line (extend line) for drawing purpose
+   Hit& hit1 = hits_[1];
+   Hit& hit7 = hits_[7];
+   Line& wire1 = wiremap.GetWire(1, hit1.GetCellNumber());
+   Line& wire7 = wiremap.GetWire(7, hit7.GetCellNumber());
+   TVector3 pA1;
+   TVector3 pB1;
+   TVector3 pA7;
+   TVector3 pB7;
+   fit_line_.GetClosestPoints(wire1, pA1, pB1);
+   fit_line_.GetClosestPoints(wire7, pA7, pB7);
+   Line newline;
+   newline.MakeLine(pA1, pA7);
+   //printf("pA1 "); pA1.Print();
+   //printf("pA7 "); pA7.Print();
+   double dx1 = ini_line_.GetP2().X()- ini_line_.GetP1().X();
+   double dy1 = ini_line_.GetP2().Y()- ini_line_.GetP1().Y();
+   double dz1 = ini_line_.GetP2().Z()- ini_line_.GetP1().Z();
+   double dx2 = fit_line_.GetP2().X()- fit_line_.GetP1().X();
+   double dy2 = fit_line_.GetP2().Y()- fit_line_.GetP1().Y();
+   double dz2 = fit_line_.GetP2().Z()- fit_line_.GetP1().Z();
+   //printf("dx1 %f dy1 %f dz1 %f dy1/dx1 %f dy1/dx1 %f\n", dx1, dy1, dz1, dy1/dx1, dy1/dz1);
+   //printf("dx2 %f dy2 %f dz1 %f dy2/dx2 %f dy1/dx1 %f\n", dx2, dy2, dz2, dy2/dx2, dy2/dz2);
+   fit_line_ = newline;
+
+   //printf("comapre with iniline and fitline\n");
+   //ini_line_.PrintLine();
+   //fit_line_.PrintLine();
+
+   // apply hits
+   SetHitZWithLine(wiremap, fit_line_);
 }
+
 void Track::PrintFitResults()
 {
-   int ndf = 4 - fit_nvpar_;
-   printf("fit_chi2_ / ndf  = %f (%f / %d)\n", fit_chi2_/ndf, fit_chi2_, ndf);
-   for (int i=0; i<4; i++) printf("fit_pars: %6.2f +/- %6.2f\n", fit_min_pars[i], fit_err_pars[i]);
+   char ch = 'A';
+   for (int i=0; i<4; i++) {
+      if (i==0) ch = 'A';
+      if (i==1) ch = 'C';
+      if (i==2) ch = 'D';
+      if (i==3) ch = 'F';
+      printf("[%c] ini_par %8.2f => fit_par %8.2f +/- %8.2f\n", ch, ini_pars_[i], fit_min_pars_[i], fit_err_pars_[i]);
+   }
+   printf("fit_chi2_ / ndf  = %f (%f / %d)\n", fit_chi2_/GetNDF(), fit_chi2_, GetNDF());
+}
+
+int Track::GetNumHits()
+{
+   int num_hits = 0;
+   for (int cid=0; cid<MAX_LAYER; cid++) {
+      num_hits += hits_[cid].HasHit();
+   }
+   return num_hits;
+}
+
+int Track::GetNumBindingConditions()
+{
+   // one hit (x,y,z) makes two equations
+   return GetNumHits()*2;
+}
+
+int Track::GetNumParameters()
+{
+   // line in 3D space can be described with 4 parameters
+   return 4;
+}
+
+int Track::GetNDF()
+{
+   return GetNumBindingConditions() - GetNumParameters();
+}
+
+Line& Track::GetInitialLine()
+{
+   return ini_line_;
+}
+
+Line& Track::GetFitLine()
+{
+   return fit_line_;
 }
 
 void Track::MinuitFunction(int& nDim, double* gout, double& result, double par[], int flg)
 {
-   // y = ax + b @z=0
-   // x = cz + d @y=0
-   double a = par[0];
-   double b = par[1];
-   double c = par[2];
-   double d = par[3];
-   TVector3 pos1(1, a + b, 0);
-   TVector3 pos2(c + d, 0, 1);
-
-   Track_obj->fit_line_.MakeLine(pos1, pos2);
+   // Line in 3D space is described in the following
+   // Ax + By + C = 0; normal to vector (A,B) and distance from origin (x,y)=(0,0) is C/sqrt(A*A+B*B)
+   // Dy + Ez + F = 0; normal to vector (D,E) and distance from origin (y,z)=(0,0) is F/sqrt(D*D+E*E)
+   // vector (A,B) and (D,E) is normalized
+   
+   double A = par[0];
+   double B = TMath::Sqrt(1-A*A);
+   double C = par[1];
+   double D = par[2];
+   double E = TMath::Sqrt(1-D*D);
+   double F = par[3];
+   Track_obj->fit_line_.MakeLine(A,B,C,D,E,F);
    result = Track_obj->GetChi2OfLine(*g_wiremap_ptr, *g_xt_ptr, *g_fit_line);
 }
-
 
 void Track::CalcPointsOnTangentials(
       double x2, double r1, double r2,
@@ -323,3 +406,15 @@ void Track::CalcPointsOnTangentials(
    }
 }
 
+void Track::SetTestLayerNumber(int test_cid)
+{
+    test_cid_ = test_cid;
+    if (test_cid!=-1) {
+       hits_[test_cid_].SetHitFlag(false);
+    }
+}
+
+int Track::GetTestLayerNumber()
+{
+   return test_cid_;
+}

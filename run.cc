@@ -2,9 +2,6 @@
 
 Run::Run()
 {
-   g_debug_line = 0;
-   g_debug_track = 0;
-   g_debug_trackfinder = 0;
 }
 
 Run::Run(const char* root_file_path)
@@ -59,6 +56,9 @@ void Run::MakeTangents(int cid1, int cid2, double z1, double z2)
 
    for (int cid=1; cid<=7; cid++) {
       int icell = chamber_.GetHitCellNumber(cid, 0);
+      if (cid==1) {
+         icell = chamber_.GetHitCellNumber(cid, 1);
+      }
       Hit& hit = chamber_.GetHit(cid, icell, 0);
       hit.SetT0(chamber_.GetT0(cid, icell));
       track_.SetHit(cid, hit);
@@ -74,85 +74,79 @@ void Run::PrintTangents()
    track_.PrintTangents(wiremap, xt_);
 }
 
-bool Run::FindBestTangent(int cid1, int cid2, double z_step)
+void Run::DrawTangents()
 {
-   WireMap& wiremap = chamber_.GetWireMap();
-   bool found = finder_.FindBestTrack(chamber_, xt_, cid1, cid2, z_step);
-   if (!found) {
-      return false;
-   }
-   return true;
+   DrawHits();
+   track_.DrawTangents();
 }
 
-void Run::DrawBestTangent()
-{
-   if (!finder_.HasFound()) {
-      printf("track not found yet..\n");
-      return;
-   }
-
-   WireMap& wiremap = chamber_.GetWireMap();
-   Track& min_track = finder_.GetBestTrack();
-   min_track.PrintTrack(wiremap, xt_);
-   int min_itan = min_track.GetMinTangentNumber();
-   chamber_.DrawHitsWithTrack(event_, xt_, min_track, min_itan);
-}
-
-void Run::DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_step)
+bool Run::FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_step)
 {
    if (event_number>=0) {
       GetEntry(event_number);
    } else {
       GetNext();
    }
-   bool found = FindBestTangent(cid1, cid2, z_step);
+
+   WireMap& wiremap = chamber_.GetWireMap();
+   bool found = finder_.FindBestTrack(chamber_, xt_, cid1, cid2, z_step);
+   finder_.PrintTracks(wiremap, xt_);
    if (!found) {
-      printf("cannot find tangent...\n");
+      return false;
+   }
+   return true;
+}
+
+void Run::DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_step)
+{
+   bool found = FindBestTangent(event_number, cid1, cid2, z_step);
+   if (!found) {
+      printf("tangent cannot be found...\n");
       return;
    }
-   DrawBestTangent();
+   WireMap& wiremap = chamber_.GetWireMap();
+   Track& min_track = finder_.GetBestTrack();
+   min_track.PrintTrackWithLine(wiremap, xt_, min_track.GetMinTangent(wiremap, xt_));
+   Line& min_tangent = min_track.GetMinTangent(wiremap, xt_);
+   chamber_.DrawTrack(event_, xt_, min_track, min_tangent);
 }
 
-TH1F* Run::FillResidual(const char* hname, int nx, double xmin, double xmax, int cid1, int cid2, double z_step, int cid3, int max_event)
+bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid)
 {
    WireMap& wiremap = chamber_.GetWireMap();
-   TH1F* h1 = new TH1F(hname, hname, nx, xmin, xmax);
-   Long64_t num_total = event_.GetEntries();
-   if (max_event < num_total) {
-      num_total = max_event;
+
+   if (event_number>=0) {
+      GetEntry(event_number);
+   } else {
+      GetNext();
    }
-   printf("num_total %lld\n", num_total);
-   for (Long64_t iev=0; iev<num_total; iev++) {
-      GetEntry(iev);
-      bool found = FindBestTangent(cid1, cid2, z_step);
-      if (found) {
-         printf("iev %lld\n", iev);
-         h1->Fill(finder_.GetBestTrack().GetResidualOfMinTangent(wiremap, xt_, cid3));
-      }
+
+   bool found = FindBestTangent(event_number, cid1, cid2, z_step);
+   if (!found) {
+      printf("tangent cannot be found...\n");
+      return false;
    }
-   h1->Draw();
-   return h1;
+   Track& min_track = finder_.GetBestTrack();
+   min_track.PrintTrackWithLine(wiremap, xt_, min_track.GetMinTangent(wiremap, xt_));
+
+   min_track.InitFit(wiremap, xt_, test_cid);
+   min_track.DoFit(wiremap, xt_);
+   min_track.PrintFitResults();
+   min_track.PrintTrackWithLine(wiremap, xt_, min_track.GetFitLine());
+   return true;
 }
 
-TH2F* Run::FillXT(const char* hname, int nx, double xmin, double xmax, int ny, double ymin, double ymax, int cid1, int cid2, double z_step, int cid3, int max_event)
+void Run::DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid)
 {
+   bool done = DoFit(event_number, cid1, cid2, z_step, test_cid);
+   if (!done) {
+      printf("fit cannot be done\n");
+      return;
+   }
+
    WireMap& wiremap = chamber_.GetWireMap();
-   TH2F* h2 = new TH2F(hname, hname, nx, xmin, xmax, ny, ymin, ymax);
-   Long64_t num_total = event_.GetEntries();
-   if (max_event < num_total) {
-      num_total = max_event;
-   }
-   printf("num_total %lld\n", num_total);
-   for (Long64_t iev=0; iev<num_total; iev++) {
-      GetEntry(iev);
-      bool found = FindBestTangent(cid1, cid2, z_step);
-      if (found) {
-         printf("iev %lld\n", iev);
-         double fitR = finder_.GetBestTrack().GetResidualOfMinTangent(wiremap, xt_, cid3);
-         double dT = finder_.GetBestTrack().GetHit(cid3).GetDriftTimeFromT0();
-         h2->Fill(fitR, dT);
-      }
-   }
-   h2->Draw();
-   return h2;
+   Track& min_track = finder_.GetBestTrack();
+   Line& fit_line = min_track.GetFitLine();
+   fit_line.PrintLine();
+   chamber_.DrawTrack(event_, xt_, min_track, fit_line);
 }

@@ -27,7 +27,7 @@ class Chamber
       Hit& GetHit(int cid, int icell, int ihit);
       void PrintHits(XTcurve& xt);
       void DrawHits(Event& event, XTcurve& xt);
-      void DrawHitsWithTrack(Event& event, XTcurve& xt, Track& track, int itan);
+      void DrawTrack(Event& event, XTcurve& xt, Track& track, Line& line);
       void SetT0(int bd, double t0);
       double GetT0(int bd);
       double GetT0(int cid, int icell);
