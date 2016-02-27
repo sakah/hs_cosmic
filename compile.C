@@ -7,5 +7,6 @@
    gROOT->ProcessLine(".L track.cc+O");
    gROOT->ProcessLine(".L chamber.cc+O");
    gROOT->ProcessLine(".L trackfinder.cc+O");
+   gROOT->ProcessLine(".L outputroot.cc+O");
    gROOT->ProcessLine(".L run.cc+O");
 }

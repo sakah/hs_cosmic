@@ -1,4 +1,5 @@
 #include "trackfinder.h"
+#include <time.h>
 
 TrackFinder::TrackFinder()
 {
@@ -152,7 +153,7 @@ int TrackFinder::MakeTracks(Chamber& chamber, XTcurve& xt, int cid1, int cid2, d
       }
 
       if (num_tracks_>= max_tracks_) {
-         break;
+         goto end;
       }
 
       Track& track = tracks_[num_tracks_];
@@ -164,6 +165,7 @@ int TrackFinder::MakeTracks(Chamber& chamber, XTcurve& xt, int cid1, int cid2, d
       track.SetHit(6, hit6);
       track.SetHit(7, hit7);
       track.MakeTangents(wiremap, xt, cid1, cid2, z1, z2);
+      //printf("num_tracks %d time %d max_tracks %d\n", num_tracks_, time(NULL), max_tracks_);
       num_tracks_++;
    } 
    } 
@@ -172,6 +174,7 @@ int TrackFinder::MakeTracks(Chamber& chamber, XTcurve& xt, int cid1, int cid2, d
    } 
    } 
    } 
+end:
    return num_tracks_;
 }
 

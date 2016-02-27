@@ -149,3 +149,65 @@ void Run::DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int 
    Line& fit_line = min_track.GetFitLine();
    chamber_.DrawTrack(event_, xt_, min_track, fit_line);
 }
+
+void Run::Loop(const char* output_root_path, Long64_t max_events)
+{
+   output_.SetRootFile(output_root_path);
+
+   double t0_0 = -835;
+   double t0_1 = -835;
+
+   int cid1 = 1;
+   int cid2 = 7;
+   double z_step = 10.0; // 10 mm
+   WireMap& wiremap = chamber_.GetWireMap();
+
+   Long64_t total = event_.GetEntries();
+   if (max_events==-1) {
+      max_events = total;
+   } else {
+      if (total<max_events) {
+         max_events = total;
+      }
+   }
+   printf("input_root_path %s\n", event_.GetRootPath());
+   printf("output_root_path %s\n", output_root_path);
+   printf("total %lld\n", total);
+   printf("max_events %lld\n", max_events);
+
+   SetT0(t0_0, t0_1);
+
+   int prev_time = time(NULL);
+
+   for (Long64_t iev=0; iev<max_events; iev++) {
+      //printf("iev %lld\n", iev);
+
+      GetEntry(iev);
+      output_.Clear();
+
+      output_.SetHitData(event_, chamber_);
+
+      bool found = finder_.FindBestTrack(chamber_, xt_, cid1, cid2, z_step);
+      //finder_.PrintTracks(wiremap, xt_);
+
+      output_.SetTrackFinderData(finder_);
+      int num_found_tracks = finder_.GetNumTracks();
+      printf("iev %lld num_found_tracks %d\n", iev, num_found_tracks);
+
+      if (found) {
+         Track& track = finder_.GetBestTrack();
+         for (int test_cid=1; test_cid<=7; test_cid++) {
+            //printf("test_cid %d\n", test_cid);
+            track.InitFit(wiremap, xt_, test_cid, false);
+            track.DoFit(wiremap, xt_);
+            //track.PrintFitResults();
+            output_.SetTrackData(chamber_, xt_, track);
+         }
+      }
+
+      output_.SetElapstedTime(time(NULL)-prev_time);
+      prev_time = time(NULL);
+      output_.Fill();
+   }
+   output_.Write();
+}

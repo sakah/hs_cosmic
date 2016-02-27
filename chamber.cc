@@ -27,6 +27,7 @@ void Chamber::GetEvent(Event& event)
          hit.SetCellNumber(icell);
          hit.SetChanNumber(ch);
          hit.SetDriftTime(event.GetDriftTime(ch, ihit));
+         hit.SetQ(event.GetQ(ch));
          hit.SetT0(GetT0(cid, icell));
          hit.SetZ(wiremap_.GetZRO());
       }

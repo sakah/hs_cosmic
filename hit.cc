@@ -7,9 +7,11 @@ Hit::Hit()
    chan_number_ = -1;
    left_or_right_ = XTcurve::LEFT;
    drift_time_ = 0;
+   q_ = 0;
    t0_ = -840;
    z_ = 0;
    has_hit_ = false;
+   use_by_fit_ = true;
 }
 
 int Hit::GetLayerNumber()
@@ -42,6 +44,11 @@ double Hit::GetDriftTimeFromT0()
    return drift_time_ - t0_;
 }
 
+double Hit::GetQ()
+{
+   return q_;
+}
+
 double Hit::GetT0()
 {
    return t0_;
@@ -55,6 +62,11 @@ double Hit::GetZ()
 bool Hit::HasHit()
 {
    return has_hit_;
+}
+
+bool Hit::UseByFit()
+{
+   return use_by_fit_;
 }
 
 double Hit::GetHitR(XTcurve& xt)
@@ -87,6 +99,11 @@ void Hit::SetDriftTime(double drift_time)
    drift_time_ = drift_time;
 }
 
+void Hit::SetQ(double q)
+{
+   q_ = q;
+}
+
 void Hit::SetT0(double t0)
 {
    t0_ = t0;
@@ -100,6 +117,11 @@ void Hit::SetZ(double z)
 void Hit::SetHitFlag(bool has_hit)
 {
    has_hit_ = has_hit;
+}
+
+void Hit::SetUseByFitFlag(bool use_by_fit)
+{
+   use_by_fit_ = use_by_fit;
 }
 
 void Hit::PrintHit(XTcurve& xt)

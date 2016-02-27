@@ -102,6 +102,7 @@ double Track::GetChi2OfLine(WireMap& wiremap, XTcurve& xt, Line& line)
    for (int cid=0; cid<MAX_LAYER; cid++) {
       Hit& hit = hits_[cid];
       if (!hit.HasHit()) continue;
+      if (!hit.UseByFit()) continue;
       int icell = hit.GetCellNumber();
       Line& wire = wiremap.GetWire(cid, icell);
       TVector3 pA;
@@ -221,10 +222,17 @@ void Track::PrintTrackWithLine(WireMap& wiremap, XTcurve& xt, Line& line)
 WireMap* g_wiremap_ptr;
 XTcurve* g_xt_ptr;
 Line* g_fit_line;
-void Track::InitFit(WireMap& wiremap, XTcurve& xt, int test_cid)
+void Track::InitFit(WireMap& wiremap, XTcurve& xt, int test_cid, bool verbose)
 {
    Track_obj = this;
    minuit_ = new TFitter(4);
+
+   if (!verbose) {
+      Int_t ierr=0;
+      gMinuit->SetPrintLevel(-1); 
+   //   gMinuit->mnexcm("SET NOWarnings",0,0,ierr);
+   }
+
    minuit_->SetFCN(Track::MinuitFunction);
    SetTestLayerNumber(test_cid);
 
@@ -251,9 +259,9 @@ void Track::DoFit(WireMap& wiremap, XTcurve& xt)
    minuit_->SetParameter(2,"D",D_ini,D_step,-1,1);
    minuit_->SetParameter(3,"F",F_ini,F_step,0,0);
 
-   double arglist[10];
-   arglist[0] = 0;
-   minuit_->ExecuteCommand("SET PRINT",arglist,2);
+   //double arglist[10];
+   //arglist[0] = 0;
+   //minuit_->ExecuteCommand("SET PRINT",arglist,1);
    minuit_->ExecuteCommand("SIMPLEX",0,0);
    minuit_->ExecuteCommand("MIGRAD",0,0);
 
@@ -409,8 +417,12 @@ void Track::CalcPointsOnTangentials(
 void Track::SetTestLayerNumber(int test_cid)
 {
     test_cid_ = test_cid;
-    if (test_cid!=-1) {
-       hits_[test_cid_].SetHitFlag(false);
+    for (int cid=0; cid<MAX_LAYER; cid++) {
+       // clear 
+       hits_[cid].SetUseByFitFlag(true);
+       if (test_cid!=-1) {
+          hits_[test_cid_].SetUseByFitFlag(false);
+       }
     }
 }
 

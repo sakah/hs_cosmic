@@ -31,7 +31,7 @@ class Track
       double GetResidualOfMinTangent(WireMap& wiremap, XTcurve& xt, int cid);
       void PrintTrackWithLine(WireMap& wiremap, XTcurve& xt, Line& line);
 
-      void InitFit(WireMap& wiremap, XTcurve& xt, int test_cid);
+      void InitFit(WireMap& wiremap, XTcurve& xt, int test_cid, bool verbose=true);
       void DoFit(WireMap& wiremap, XTcurve& xt);
       void PrintFitResults();
       int GetNumHits();

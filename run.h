@@ -11,6 +11,7 @@
 #include "track.h"
 #include "xtcurve.h"
 #include "trackfinder.h"
+#include "outputroot.h"
 
 class Run
 {
@@ -29,6 +30,9 @@ class Run
       void DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_step);
       bool DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid);
       void DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid);
+      void SetOutputROOT(const char* output_root_path);
+      void WriteOutputROOT();
+      void Loop(const char* output_root_path, Long64_t max_events=-1);
 
    private:
       ConstXTcurve xt_;
@@ -36,6 +40,8 @@ class Run
       Event event_;
       Track track_;
       TrackFinder finder_;
+      bool save_output_;
+      OutputROOT output_;
 
 };
 
