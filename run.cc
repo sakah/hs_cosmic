@@ -150,7 +150,7 @@ void Run::DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int 
    chamber_.DrawTrack(event_, xt_, min_track, fit_line);
 }
 
-void Run::Loop(const char* output_root_path, Long64_t max_events)
+void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_iev)
 {
    output_.SetRootFile(output_root_path);
 
@@ -163,23 +163,20 @@ void Run::Loop(const char* output_root_path, Long64_t max_events)
    WireMap& wiremap = chamber_.GetWireMap();
 
    Long64_t total = event_.GetEntries();
-   if (max_events==-1) {
-      max_events = total;
-   } else {
-      if (total<max_events) {
-         max_events = total;
-      }
+   if (last_iev >= total) {
+      last_iev = total -1;
    }
    printf("input_root_path %s\n", event_.GetRootPath());
    printf("output_root_path %s\n", output_root_path);
    printf("total %lld\n", total);
-   printf("max_events %lld\n", max_events);
+   printf("start_iev %lld\n", start_iev);
+   printf("last_iev %lld\n", last_iev);
 
    SetT0(t0_0, t0_1);
 
    int prev_time = time(NULL);
 
-   for (Long64_t iev=0; iev<max_events; iev++) {
+   for (Long64_t iev=start_iev; iev<=last_iev; iev++) {
       //printf("iev %lld\n", iev);
 
       GetEntry(iev);

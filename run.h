@@ -32,7 +32,7 @@ class Run
       void DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid);
       void SetOutputROOT(const char* output_root_path);
       void WriteOutputROOT();
-      void Loop(const char* output_root_path, Long64_t max_events=-1);
+      void Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_iev);
 
    private:
       ConstXTcurve xt_;
