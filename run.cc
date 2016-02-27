@@ -189,7 +189,6 @@ void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_i
 
       output_.SetTrackFinderData(finder_);
       int num_found_tracks = finder_.GetNumTracks();
-      printf("iev %lld num_found_tracks %d\n", iev, num_found_tracks);
 
       if (found) {
          Track& track = finder_.GetBestTrack();
@@ -202,6 +201,7 @@ void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_i
          }
       }
 
+      printf("iev %lld num_found_tracks %d etime %d\n", iev, num_found_tracks, time(NULL)-prev_time);
       output_.SetElapstedTime(time(NULL)-prev_time);
       prev_time = time(NULL);
       output_.Fill();
