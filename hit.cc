@@ -1,4 +1,5 @@
 #include "hit.h"
+#include <stdio.h>
 
 Hit::Hit()
 {
