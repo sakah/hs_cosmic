@@ -29,8 +29,6 @@ class Run
       void DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_step);
       bool DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid);
       void DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid);
-      TH1F* FillResidual(const char* hname, int nx, double xmin, double xmax, int cid1, int cid2, double z_step, int cid3, int max_event);
-      TH2F* FillXT(const char* hname, int nx, double xmin, double xmax, int ny, double ymin, double ymax, int cid1, int cid2, double z_step, int cid3, int max_event);
 
    private:
       ConstXTcurve xt_;
