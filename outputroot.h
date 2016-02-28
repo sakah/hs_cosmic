@@ -26,12 +26,39 @@ class OutputROOT
       void Write();
       void SetElapstedTime(int etime);
 
+      // for reading
+      void OpenRootFile(const char* path);
+      int GetEntries();
+      void GetEntry(int event_number);
+      void PrintEntry();
+
+      int    GetElapstedTime();
+      int    GetEventNumber();
+      int    GetNumHitCells(int cid);
+      int    GetHitCellNumber(int cid, int ihitcell);
+      double GetHitQ(int cid, int ihitcell);
+      int    GetHitNumTdcHits(int cid, int ihitcell);
+      double GetHitDriftTime(int cid, int ihitcell, int ihittdc);
+      int    GetTrackfinderNumTracks();
+      double GetTrackChi2(int test_cid);
+      double GetTrackNDF(int test_cid);
+      int    GetTrackCellNumber(int test_cid, int cid);
+      double GetTrackCellQ(int test_cid, int cid);
+      int    GetTrackCellNumTdcHits(int test_cid, int cid);
+      double GetTrackHitT(int test_cid, int cid);
+      double GetTrackFitT0(int test_cid, int cid);
+      double GetTrackFitdT(int test_cid, int cid);
+      double GetTrackHitR(int test_cid, int cid);
+      double GetTrackFitX(int test_cid, int cid);
+      double GetTrackResR(int test_cid, int cid);
+      double GetTrackFitZ(int test_cid, int cid);
+
    private:
       TFile* f_;
       TTree* t_;
       int    etime_; // time from last event
 
-      int    iev_;
+      int    iev_; // [-2,147,483,648, 2,147,483,647] = okay until 2G events
       int    hit_num_hitcells_[MAX_LAYER];
       int    hit_icell_[MAX_LAYER][MAX_CELL];
       double hit_q_[MAX_LAYER][MAX_CELL];

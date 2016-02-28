@@ -145,3 +145,184 @@ void OutputROOT::SetElapstedTime(int etime)
 {
    etime_ = etime;
 }
+
+void OutputROOT::OpenRootFile(const char* path)
+{
+   f_ = new TFile(path);
+   t_ = (TTree*)f_->Get("t");
+   if (t_==NULL) {
+      fprintf(stderr, "ERROR: tree is not foudn...\n");
+      return;
+   }
+   t_->SetBranchAddress("etime",             &etime_);
+
+   t_->SetBranchAddress("iev",               &iev_);
+   t_->SetBranchAddress("hit_num_hitcells",   hit_num_hitcells_);
+   t_->SetBranchAddress("hit_icell",          hit_icell_);
+   t_->SetBranchAddress("hit_q",              hit_q_);
+   t_->SetBranchAddress("hit_num_hittdcs",    hit_num_hittdcs_);
+   t_->SetBranchAddress("hit_drift_time",     hit_drift_time_);
+
+   t_->SetBranchAddress("trackfinder_num_tracks", &trackfinder_num_tracks_);
+
+   t_->SetBranchAddress("track_chi2",         track_chi2_);
+   t_->SetBranchAddress("track_ndf",          track_ndf_);
+   t_->SetBranchAddress("track_icell",        track_icell_);
+   t_->SetBranchAddress("track_q",            track_q_);
+   t_->SetBranchAddress("track_num_hittdcs",  track_num_hittdcs_);
+   t_->SetBranchAddress("track_hitT",         track_hitT_);
+   t_->SetBranchAddress("track_fitT0",        track_fitT0_);
+   t_->SetBranchAddress("track_fitdT",        track_fitdT_);
+   t_->SetBranchAddress("track_hitR",         track_hitR_);
+   t_->SetBranchAddress("track_fitX",         track_fitX_);
+   t_->SetBranchAddress("track_resR",         track_resR_);
+   t_->SetBranchAddress("track_fitZ",         track_fitZ_);
+}
+
+int OutputROOT::GetEntries()
+{
+   return t_->GetEntries();
+}
+
+void OutputROOT::GetEntry(int event_number)
+{
+   t_->GetEntry(event_number);
+}
+
+void OutputROOT::PrintEntry()
+{
+   printf("iev   %d\n",  iev_);
+   printf("etime %d\n", etime_);
+
+   for (int cid=0; cid<MAX_LAYER; cid++) {
+      printf("cid %d hit_num_hitcells %d\n", cid, hit_num_hitcells_[cid]);
+      for (int ihitcell=0; ihitcell<hit_num_hitcells_[cid]; ihitcell++) {
+         printf("cid %d ihitcell %d hit_icell        %d\n", cid, ihitcell, hit_icell_[cid][ihitcell]);
+         printf("cid %d ihitcell %d hit_q            %f\n", cid, ihitcell, hit_q_[cid][ihitcell]);
+         printf("cid %d ihitcell %d hit_num_hittdcs  %d\n", cid, ihitcell, hit_num_hittdcs_[cid][ihitcell]);
+         for (int ihittdc=0; ihittdc<hit_num_hittdcs_[cid][ihitcell]; ihittdc++) {
+            printf("cid %d ihitcell %d ihittdc %d hit_drift_time %f\n", cid, ihitcell, ihittdc, hit_drift_time_[cid][ihitcell][ihittdc]);
+         }
+      }
+      printf("cid %d trackfinder_num_tracks %d\n", cid, trackfinder_num_tracks_);
+   }
+
+   // skip guard layers
+   for (int test_cid=1; test_cid<MAX_LAYER-1; test_cid++) {
+      printf("test_cid %d track_chi2 %f\n", test_cid, track_chi2_[test_cid]);
+      printf("test_cid %d track_ndf  %f\n", test_cid, track_ndf_[test_cid]);
+      for (int cid=1; cid<MAX_LAYER-1; cid++) {
+         printf("test_cid %d cid %d track_icell       %d\n", test_cid, cid, track_icell_[test_cid][cid]);
+         printf("test_cid %d cid %d track_q           %f\n", test_cid, cid, track_q_[test_cid][cid]);
+         printf("test_cid %d cid %d track_num_hittdcs %d\n", test_cid, cid, track_num_hittdcs_[test_cid][cid]);
+         printf("test_cid %d cid %d track_hitT        %f\n", test_cid, cid, track_hitT_[test_cid][cid]);
+         printf("test_cid %d cid %d track_fitT0       %f\n", test_cid, cid, track_fitT0_[test_cid][cid]);
+         printf("test_cid %d cid %d track_fitdT       %f\n", test_cid, cid, track_fitdT_[test_cid][cid]);
+         printf("test_cid %d cid %d track_hitR        %f\n", test_cid, cid, track_hitR_[test_cid][cid]);
+         printf("test_cid %d cid %d track_fitX        %f\n", test_cid, cid, track_fitX_[test_cid][cid]);
+         printf("test_cid %d cid %d track_resR        %f\n", test_cid, cid, track_resR_[test_cid][cid]);
+         printf("test_cid %d cid %d track_fitZ        %f\n", test_cid, cid, track_fitZ_[test_cid][cid]);
+      }
+   }
+}
+
+int    OutputROOT::GetElapstedTime()
+{
+   return etime_;
+}
+
+int    OutputROOT::GetEventNumber()
+{
+   return iev_;
+}
+
+int    OutputROOT::GetNumHitCells(int cid)
+{
+   return hit_num_hitcells_[cid];
+}
+
+int    OutputROOT::GetHitCellNumber(int cid, int ihitcell)
+{
+   return hit_icell_[cid][ihitcell];
+}
+
+double OutputROOT::GetHitQ(int cid, int ihitcell)
+{
+   return hit_q_[cid][ihitcell];
+}
+
+int    OutputROOT::GetHitNumTdcHits(int cid, int ihitcell)
+{
+   return hit_num_hittdcs_[cid][ihitcell];
+}
+
+double OutputROOT::GetHitDriftTime(int cid, int ihitcell, int ihittdc)
+{
+   return hit_drift_time_[cid][ihitcell][ihittdc];
+}
+
+int    OutputROOT::GetTrackfinderNumTracks()
+{
+   return trackfinder_num_tracks_;
+}
+
+double OutputROOT::GetTrackChi2(int test_cid)
+{
+   return track_chi2_[test_cid];
+}
+
+double OutputROOT::GetTrackNDF(int test_cid)
+{
+   return track_ndf_[test_cid];
+}
+
+int    OutputROOT::GetTrackCellNumber(int test_cid, int cid)
+{
+   return track_icell_[test_cid][cid];
+}
+
+double OutputROOT::GetTrackCellQ(int test_cid, int cid)
+{
+   return track_q_[test_cid][cid];
+}
+
+int    OutputROOT::GetTrackCellNumTdcHits(int test_cid, int cid)
+{
+   return track_num_hittdcs_[test_cid][cid];
+}
+
+double OutputROOT::GetTrackHitT(int test_cid, int cid)
+{
+   return track_hitT_[test_cid][cid];
+}
+
+double OutputROOT::GetTrackFitT0(int test_cid, int cid)
+{
+   return track_fitT0_[test_cid][cid];
+}
+
+double OutputROOT::GetTrackFitdT(int test_cid, int cid)
+{
+   return track_fitdT_[test_cid][cid];
+}
+
+double OutputROOT::GetTrackHitR(int test_cid, int cid)
+{
+   return track_hitR_[test_cid][cid];
+}
+
+double OutputROOT::GetTrackFitX(int test_cid, int cid)
+{
+   return track_fitX_[test_cid][cid];
+}
+
+double OutputROOT::GetTrackResR(int test_cid, int cid)
+{
+   return track_resR_[test_cid][cid];
+}
+
+double OutputROOT::GetTrackFitZ(int test_cid, int cid)
+{
+   return track_fitZ_[test_cid][cid];
+}
+
