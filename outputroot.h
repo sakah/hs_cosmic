@@ -47,7 +47,7 @@ class OutputROOT
       int    GetTrackCellNumTdcHits(int test_cid, int cid);
       double GetTrackHitT(int test_cid, int cid);
       double GetTrackFitT0(int test_cid, int cid);
-      double GetTrackFitdT(int test_cid, int cid);
+      double GetTrackHitdT(int test_cid, int cid);
       double GetTrackHitR(int test_cid, int cid);
       double GetTrackFitX(int test_cid, int cid);
       double GetTrackResR(int test_cid, int cid);
@@ -74,7 +74,7 @@ class OutputROOT
       int    track_num_hittdcs_[MAX_LAYER][MAX_CELL];
       double track_hitT_[MAX_LAYER][MAX_LAYER]; // [test_cid][layer]
       double track_fitT0_[MAX_LAYER][MAX_LAYER]; // [test_cid][layer]
-      double track_fitdT_[MAX_LAYER][MAX_LAYER]; // [test_cid][layer]
+      double track_hitdT_[MAX_LAYER][MAX_LAYER]; // [test_cid][layer]
       double track_hitR_[MAX_LAYER][MAX_LAYER]; // [test_cid][layer]
       double track_fitX_[MAX_LAYER][MAX_LAYER]; // [test_cid][layer]
       double track_resR_[MAX_LAYER][MAX_LAYER]; // [test_cid][layer]
