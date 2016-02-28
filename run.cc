@@ -112,7 +112,7 @@ void Run::DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_st
    chamber_.DrawTrack(event_, xt_, min_track, min_tangent);
 }
 
-bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid)
+bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid, int fit_func_type)
 {
    WireMap& wiremap = chamber_.GetWireMap();
 
@@ -130,16 +130,25 @@ bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int te
    Track& min_track = finder_.GetBestTrack();
    min_track.PrintTrackWithLine(wiremap, xt_, min_track.GetMinTangent(wiremap, xt_));
 
-   min_track.InitFit(wiremap, xt_, test_cid);
+   min_track.InitFit(wiremap, xt_, test_cid, fit_func_type);
    min_track.DoFit(wiremap, xt_);
    min_track.PrintFitResults();
    min_track.PrintTrackWithLine(wiremap, xt_, min_track.GetFitLine());
    return true;
 }
 
-void Run::DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid)
+void Run::DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid, char* fit_func_name)
 {
-   bool done = DoFit(event_number, cid1, cid2, z_step, test_cid);
+   int fit_func_type;
+   if (strcmp(fit_func_name, "FIT_FUNC_TYPE_FIX_T0")==0) {
+      fit_func_type = Track::FIT_FUNC_TYPE_FIX_T0;
+   } else if (strcmp(fit_func_name, "FIT_FUNC_TYPE_FIX_T0")==0) {
+      fit_func_type = Track::FIT_FUNC_TYPE_FREE_T0;
+   } else {
+      fprintf(stderr, "ERROR: unknown fit_func_name %s\n", fit_func_name);
+      return;
+   }
+   bool done = DoFit(event_number, cid1, cid2, z_step, test_cid, fit_func_type);
    if (!done) {
       printf("fit cannot be done\n");
       return;
@@ -151,8 +160,18 @@ void Run::DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int 
    chamber_.DrawTrack(event_, xt_, min_track, fit_line);
 }
 
-void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_iev)
+void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_iev, char* fit_func_name)
 {
+   int fit_func_type;
+   if (strcmp(fit_func_name, "FIT_FUNC_TYPE_FIX_T0")==0) {
+      fit_func_type = Track::FIT_FUNC_TYPE_FIX_T0;
+   } else if (strcmp(fit_func_name, "FIT_FUNC_TYPE_FIX_T0")==0) {
+      fit_func_type = Track::FIT_FUNC_TYPE_FREE_T0;
+   } else {
+      fprintf(stderr, "ERROR: unknown fit_func_name %s\n", fit_func_name);
+      exit(1);
+   }
+
    output_.SetRootFile(output_root_path);
 
    double t0_0 = -835;
@@ -196,7 +215,7 @@ void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_i
          Track& track = finder_.GetBestTrack();
          for (int test_cid=1; test_cid<=7; test_cid++) {
             //printf("test_cid %d\n", test_cid);
-            track.InitFit(wiremap, xt_, test_cid, false);
+            track.InitFit(wiremap, xt_, test_cid, fit_func_type, false);
             track.DoFit(wiremap, xt_);
             //track.PrintFitResults();
             output_.SetTrackData(chamber_, xt_, track);

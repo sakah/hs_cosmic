@@ -28,9 +28,9 @@ class Run
       void DrawTangents();
       bool FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_step);
       void DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_step);
-      bool DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid);
-      void DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid);
-      void Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_iev);
+      bool DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid, int fit_func_type);
+      void DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid, char* fit_func_name);
+      void Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_iev, char* fit_func_name);
 
    private:
       ConstXTcurve xt_;
