@@ -12,6 +12,10 @@
 class Track
 {
    public:
+      enum {
+         FIT_FUNC_TYPE_FIX_T0,
+         FIT_FUNC_TYPE_FREE_T0,
+      };
       Track();
       void SetHit(int cid, Hit& hit);
       void SetSigma(double sigma);
@@ -31,17 +35,20 @@ class Track
       double GetResidualOfMinTangent(WireMap& wiremap, XTcurve& xt, int cid);
       void PrintTrackWithLine(WireMap& wiremap, XTcurve& xt, Line& line);
 
-      void InitFit(WireMap& wiremap, XTcurve& xt, int test_cid, bool verbose=true);
+      void InitFit(WireMap& wiremap, XTcurve& xt, int test_cid, int fit_func_type, bool verbose=true);
       void DoFit(WireMap& wiremap, XTcurve& xt);
       void PrintFitResults();
       int GetNumHits();
       int GetNumHitsUseByFit();
+      int GetTestLayerNumber();
       int GetNumParameters();
+      int GetFitFuncType();
       int GetNDF();
       Line& GetInitialLine();
       Line& GetFitLine();
+      void SetNumParameters(int num_params);
       void SetTestLayerNumber(int test_cid);
-      int GetTestLayerNumber();
+      void SetFitFuncType(int fit_func_type);
 
    private:
       Hit hits_[MAX_LAYER];
@@ -49,12 +56,14 @@ class Track
 
       int test_cid_; // this layers' hit is not included in hits
       double sigma_;
+      int fit_func_type_;
+      int fit_num_params_;
       TFitter* minuit_;
       Line ini_line_;
       Line fit_line_;
-      double ini_pars_[4];
-      double fit_min_pars_[4];
-      double fit_err_pars_[4];
+      double ini_pars_[5];
+      double fit_min_pars_[5];
+      double fit_err_pars_[5];
       double fit_chi2_;
       double fit_edm_;
       double fit_errdef_;
@@ -72,7 +81,8 @@ class Track
             double& xL2,
             double& yL2);
 
-      static void MinuitFunction(int& nDim, double* gout, double& result, double par[], int flg);
+      static void MinuitFunction_with_fix_t0(int& nDim, double* gout, double& result, double par[], int flg);
+      static void MinuitFunction_with_free_t0(int& nDim, double* gout, double& result, double par[], int flg);
 
 };
 
