@@ -1,5 +1,9 @@
 #include "analysis.h"
 
+#include "TF1.h"
+#include "TPad.h"
+#include "TPaveStats.h"
+
 Analysis::Analysis()
 {
 }
@@ -62,87 +66,141 @@ void Analysis::EndOfEvent()
    // impliment in derived class
 }
 
+TGraph* Analysis::MakeGraph(int n, double* x, double* y, int style, int color)
+{
+   TGraph* gr = new TGraph(n, x, y);
+   gr->SetMarkerStyle(style);
+   gr->SetMarkerColor(color);
+   gr->SetLineColor(color);
+   return gr;
+}
+
+void Analysis::RedrawStatBox(double x1, double y1, double x2, double y2)
+{
+   gPad->Modified();
+   gPad->Update();
+   TPaveStats* stats = (TPaveStats*)gPad->GetPrimitive("stats");
+   if (stats) {
+      stats->SetX1NDC(x1);
+      stats->SetY1NDC(y1);
+      stats->SetX2NDC(x2);
+      stats->SetY2NDC(y2);
+      stats->Draw();
+   }
+}
+
 //______________________________
 
-AnaResRVSHitR::AnaResRVSHitR()
+AnaResXVSHitX::AnaResXVSHitX()
 {
 }
 
-void AnaResRVSHitR::BeginOfEvent()
+void AnaResXVSHitX::BeginOfEvent()
 {
    for (int test_cid=0; test_cid<MAX_LAYER; test_cid++) {
-      h2_resR_VS_hitR_[test_cid] = new TH2F(Form("%s_resR_VS_hitR_%d", name_, test_cid), "", 100, 0, 10, 100, -2, 2);
-      for (int ihitR=0; ihitR<20; ihitR++) {
-         h1_resR_[test_cid][ihitR] = new TH1F(Form("%s_resR_%d_%d", name_, test_cid, ihitR), "", 100, -2, 2);
+      h2_fitX_VS_hitX_[test_cid] = new TH2F(Form("%s_fitX_VS_hitX_%d", name_, test_cid), ";hitX [mm];fitX [mm]", 200, -10, 10, 200, -10, 10);
+      h2_resX_VS_hitX_[test_cid] = new TH2F(Form("%s_resX_VS_hitX_%d", name_, test_cid), ";hitX [mm];fitX [mm]", 200, -10, 10, 100, -2, 2);
+      for (int ihitX=0; ihitX<100; ihitX++) {
+         h1_resX_[test_cid][ihitX] = new TH1F(Form("%s_resX_%d_%d", name_, test_cid, ihitX), ";fitX-hitX [mm];", 100, -2, 2);
       }
    }
 }
 
-bool AnaResRVSHitR::LoopEvent()
+bool AnaResXVSHitX::LoopEvent()
 {
    for (int test_cid=1; test_cid<MAX_LAYER-1; test_cid++) {
+      double fitX = outroot_.GetTrackFitX(test_cid, test_cid);
       double hitR = outroot_.GetTrackHitR(test_cid, test_cid);
-      double resR = outroot_.GetTrackResR(test_cid, test_cid);
-      h2_resR_VS_hitR_[test_cid]->Fill(hitR, resR);
+      double hitX = hitR;
+      if (fitX<0) hitX = -hitR;
+      double resX = fitX - hitX;
+      h2_resX_VS_hitX_[test_cid]->Fill(hitX, resX);
+      h2_fitX_VS_hitX_[test_cid]->Fill(hitX, fitX);
 
-      int ihitR = 0;
-      for (int i=0; i<20; i++) {
-         if (hitR>=i*0.5 && hitR<(i+1)*0.5) ihitR=i;
+      int ihitX = 0;
+      for (int i=0; i<100; i++) {
+         if (hitX>=(i-50)*0.2 && hitX<(i-50+1)*0.2) ihitX=i;
       }
-      h1_resR_[test_cid][ihitR]->Fill(resR);
+      h1_resX_[test_cid][ihitX]->Fill(resX);
    }
    return true;
 }
 
-void AnaResRVSHitR::EndOfEvent()
+void AnaResXVSHitX::EndOfEvent()
 {
    for (int test_cid=1; test_cid<MAX_LAYER-1; test_cid++) {
-      double x[20];
-      double y1[20];
-      double y2[20];
-      for (int ihitR=0; ihitR<20; ihitR++) {
-         x[ihitR] = ihitR*0.5;
-         TH1F* h1 = h1_resR_[test_cid][ihitR];
-         y1[ihitR] = h1->GetMean();
+      double x[100];
+      double y1[100];
+      double y2[100];
+      double y3[100];
+      for (int ihitX=0; ihitX<100; ihitX++) {
+         x[ihitX] = (ihitX-50)*0.2;
+         TH1F* h1 = h1_resX_[test_cid][ihitX];
+         y1[ihitX] = h1->GetMean();
          int imax = h1->GetMaximumBin();
-         y2[ihitR] = h1->GetXaxis()->GetBinCenter(imax);
+         y2[ihitX] = h1->GetXaxis()->GetBinCenter(imax);
+         h1->Fit("gaus", "0", "", y2[ihitX]-0.5, y2[ihitX]+0.5);
+         y3[ihitX] = h1->GetFunction("gaus")->GetParameter(1);
       }
-      gr_resR_mean_VS_hitR_[test_cid] = new TGraph(20, x, y1);
-      gr_resR_peak_VS_hitR_[test_cid] = new TGraph(20, x, y2);
-
-      gr_resR_mean_VS_hitR_[test_cid]->SetMarkerStyle(20);
-      gr_resR_peak_VS_hitR_[test_cid]->SetMarkerStyle(20);
+      gr_resX_VS_hitX_mean_[test_cid] = MakeGraph(100, x, y1, 20, kBlack);
+      gr_resX_VS_hitX_peak_[test_cid] = MakeGraph(100, x, y2, 20, kRed);
+      gr_resX_VS_hitX_fit_ [test_cid] = MakeGraph(100, x, y3, 20, kMagenta);
    }
 } 
 
-TH2F* AnaResRVSHitR::GetResRVSHitR(int test_cid)
+TH2F* AnaResXVSHitX::GetFitXVSHitX(int test_cid)
 {
-   return h2_resR_VS_hitR_[test_cid];
+   return h2_fitX_VS_hitX_[test_cid];
 }
 
-TH1F* AnaResRVSHitR::GetResR(int test_cid, int ihitR)
+TH2F* AnaResXVSHitX::GetResXVSHitX(int test_cid)
 {
-   return h1_resR_[test_cid][ihitR];
+   return h2_resX_VS_hitX_[test_cid];
 }
 
-TGraph* AnaResRVSHitR::GetResRVSHitRMean(int test_cid)
+TH1F* AnaResXVSHitX::GetResX(int test_cid, int ihitX)
 {
-   return gr_resR_mean_VS_hitR_[test_cid];
+   return h1_resX_[test_cid][ihitX];
 }
 
-TGraph* AnaResRVSHitR::GetResRVSHitRPeak(int test_cid)
+TGraph* AnaResXVSHitX::GetResXVSHitXMean(int test_cid)
 {
-   return gr_resR_peak_VS_hitR_[test_cid];
+   return gr_resX_VS_hitX_mean_[test_cid];
 }
 
-void AnaResRVSHitR::DrawResRVSHitRMean(int test_cid)
+TGraph* AnaResXVSHitX::GetResXVSHitXPeak(int test_cid)
 {
-   GetResRVSHitR(test_cid)->Draw("colz");
-   GetResRVSHitRMean(test_cid)->Draw("pl same");
+   return gr_resX_VS_hitX_peak_[test_cid];
 }
 
-void AnaResRVSHitR::DrawResRVSHitRPeak(int test_cid)
+TGraph* AnaResXVSHitX::GetResXVSHitXFit(int test_cid)
 {
-   GetResRVSHitR(test_cid)->Draw("colz");
-   GetResRVSHitRPeak(test_cid)->Draw("pl same");
+   return gr_resX_VS_hitX_fit_[test_cid];
+}
+
+void AnaResXVSHitX::DrawResXVSHitXMean(int test_cid)
+{
+   GetResXVSHitX(test_cid)->Draw("colz");
+   GetResXVSHitXMean(test_cid)->Draw("pl same");
+   RedrawStatBox(0.1, 0.7, 0.4, 0.9);
+}
+
+void AnaResXVSHitX::DrawResXVSHitXPeak(int test_cid)
+{
+   GetResXVSHitX(test_cid)->Draw("colz");
+   GetResXVSHitXPeak(test_cid)->Draw("pl same");
+   RedrawStatBox(0.1, 0.7, 0.4, 0.9);
+}
+
+void AnaResXVSHitX::DrawResXVSHitXFit(int test_cid)
+{
+   GetResXVSHitX(test_cid)->Draw("colz");
+   GetResXVSHitXFit(test_cid)->Draw("pl same");
+   RedrawStatBox(0.1, 0.7, 0.4, 0.9);
+}
+
+void AnaResXVSHitX::DrawFitXVSHitX(int test_cid)
+{
+   GetFitXVSHitX(test_cid)->Draw("colz");
+   RedrawStatBox(0.1, 0.7, 0.4, 0.9);
 }

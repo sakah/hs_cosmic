@@ -23,29 +23,38 @@ class Analysis
       OutputROOT outroot_;
       char name_[128]; // set uniq name according to path
 
+      TGraph* MakeGraph(int n, double* x, double* y, int style, int color);
+      void RedrawStatBox(double x1, double y1, double x2, double y2);
+
    private:
       int num_events_; // total number of analized events
 };
 
-class AnaResRVSHitR : public Analysis
+class AnaResXVSHitX : public Analysis
 {
    public:
-      AnaResRVSHitR();
+      AnaResXVSHitX();
       virtual void BeginOfEvent();
       virtual bool LoopEvent();
       virtual void EndOfEvent();
-      TH2F* GetResRVSHitR(int test_cid);
-      TH1F* GetResR(int test_cid, int ihitR);
-      TGraph* GetResRVSHitRMean(int test_cid);
-      TGraph* GetResRVSHitRPeak(int test_cid);
-      void DrawResRVSHitRMean(int test_cid);
-      void DrawResRVSHitRPeak(int test_cid);
+      TH2F* GetFitXVSHitX(int test_cid);
+      TH2F* GetResXVSHitX(int test_cid);
+      TH1F* GetResX(int test_cid, int ihitX);
+      TGraph* GetResXVSHitXMean(int test_cid);
+      TGraph* GetResXVSHitXPeak(int test_cid);
+      TGraph* GetResXVSHitXFit(int test_cid);
+      void DrawResXVSHitXMean(int test_cid);
+      void DrawResXVSHitXPeak(int test_cid);
+      void DrawResXVSHitXFit(int test_cid);
+      void DrawFitXVSHitX(int test_cid);
 
    private:
-      TH2F* h2_resR_VS_hitR_[MAX_LAYER]; // [test_cid]
-      TH1F* h1_resR_[MAX_LAYER][20]; // [test_cid]
-      TGraph* gr_resR_mean_VS_hitR_[MAX_LAYER];
-      TGraph* gr_resR_peak_VS_hitR_[MAX_LAYER];
+      TH2F* h2_fitX_VS_hitX_[MAX_LAYER]; // [test_cid]
+      TH2F* h2_resX_VS_hitX_[MAX_LAYER]; // [test_cid]
+      TH1F* h1_resX_[MAX_LAYER][100]; // [test_cid]
+      TGraph* gr_resX_VS_hitX_mean_[MAX_LAYER];
+      TGraph* gr_resX_VS_hitX_peak_[MAX_LAYER];
+      TGraph* gr_resX_VS_hitX_fit_[MAX_LAYER];
 };
 
 #endif
