@@ -69,9 +69,9 @@ struct Test1
 //___________________
 struct Test2
 {
-   AnaResXVSHitX ana16;
-   AnaResXVSHitX ana24;
-   AnaResXVSHitX ana27;
+   AnaResXVSFitX ana16;
+   AnaResXVSFitX ana24;
+   AnaResXVSFitX ana27;
    Test2()
    {
       ana16.OpenRootFile("cosmic_root_out/freet0/run16.root");
