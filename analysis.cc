@@ -64,7 +64,7 @@ AnaResRVSHitR::AnaResRVSHitR()
 void AnaResRVSHitR::BeginOfEvent()
 {
    for (int test_cid=0; test_cid<MAX_LAYER; test_cid++) {
-      h2_resR_VS_hitR_[test_cid] = new TH2F(Form("resR_VS_hitR_%d", test_cid), "", 100, 0, 10, 100, -2, 2);
+      h2_resR_VS_hitR_[test_cid] = new TH2F(Form("%s_resR_VS_hitR_%d", name_, test_cid), "", 100, 0, 10, 100, -2, 2);
    }
 }
 

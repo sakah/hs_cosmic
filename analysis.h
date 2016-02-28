@@ -20,8 +20,6 @@ class Analysis
 
    protected:
       OutputROOT outroot_;
-
-   private:
       char name_[128]; // set uniq name according to path
 };
 
