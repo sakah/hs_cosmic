@@ -35,7 +35,7 @@ class Track
       void DoFit(WireMap& wiremap, XTcurve& xt);
       void PrintFitResults();
       int GetNumHits();
-      int GetNumBindingConditions();
+      int GetNumHitsUseByFit();
       int GetNumParameters();
       int GetNDF();
       Line& GetInitialLine();

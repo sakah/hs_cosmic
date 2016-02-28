@@ -343,10 +343,17 @@ int Track::GetNumHits()
    return num_hits;
 }
 
-int Track::GetNumBindingConditions()
+int Track::GetNumHitsUseByFit()
 {
-   // one hit (x,y,z) makes two equations
-   return GetNumHits()*2;
+   int num_hits = 0;
+   for (int cid=0; cid<MAX_LAYER; cid++) {
+      bool has_hit = hits_[cid].HasHit();
+      bool use_by_fit = hits_[cid].UseByFit();
+      if (has_hit && use_by_fit) {
+         num_hits++;
+      }
+   }
+   return num_hits;
 }
 
 int Track::GetNumParameters()
@@ -357,7 +364,7 @@ int Track::GetNumParameters()
 
 int Track::GetNDF()
 {
-   return GetNumBindingConditions() - GetNumParameters();
+   return GetNumHitsUseByFit() - GetNumParameters();
 }
 
 Line& Track::GetInitialLine()
