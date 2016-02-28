@@ -9,4 +9,5 @@
    gROOT->ProcessLine(".L trackfinder.cc+O");
    gROOT->ProcessLine(".L outputroot.cc+O");
    gROOT->ProcessLine(".L run.cc+O");
+   gROOT->ProcessLine(".L analysis.cc+O");
 }
