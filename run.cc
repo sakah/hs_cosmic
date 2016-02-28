@@ -224,7 +224,7 @@ void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_i
 
       int etime = time(NULL)-prev_time;
       int atime = time(NULL)-start_time;
-      double rate = atime/(iev-start_iev+1);
+      double rate = (iev-start_iev+1)/(atime+0.1);
       printf("iev %lld num_tracks %d etime %d atime %d rate %3.2f Hz\n", iev, num_tracks, etime, atime, rate);
       output_.SetElapstedTime(etime);
       prev_time = time(NULL);
