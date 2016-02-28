@@ -142,7 +142,7 @@ void Run::DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int 
    int fit_func_type;
    if (strcmp(fit_func_name, "FIT_FUNC_TYPE_FIX_T0")==0) {
       fit_func_type = Track::FIT_FUNC_TYPE_FIX_T0;
-   } else if (strcmp(fit_func_name, "FIT_FUNC_TYPE_FIX_T0")==0) {
+   } else if (strcmp(fit_func_name, "FIT_FUNC_TYPE_FREE_T0")==0) {
       fit_func_type = Track::FIT_FUNC_TYPE_FREE_T0;
    } else {
       fprintf(stderr, "ERROR: unknown fit_func_name %s\n", fit_func_name);
@@ -165,7 +165,7 @@ void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_i
    int fit_func_type;
    if (strcmp(fit_func_name, "FIT_FUNC_TYPE_FIX_T0")==0) {
       fit_func_type = Track::FIT_FUNC_TYPE_FIX_T0;
-   } else if (strcmp(fit_func_name, "FIT_FUNC_TYPE_FIX_T0")==0) {
+   } else if (strcmp(fit_func_name, "FIT_FUNC_TYPE_FREE_T0")==0) {
       fit_func_type = Track::FIT_FUNC_TYPE_FREE_T0;
    } else {
       fprintf(stderr, "ERROR: unknown fit_func_name %s\n", fit_func_name);
