@@ -127,7 +127,7 @@ void AnaResXVSFitX::LoopEvent(int iev)
 
       int ifitX = 0;
       for (int i=0; i<100; i++) {
-         if (hitX>=(i-50)*0.2 && hitX<(i-50+1)*0.2) ifitX=i;
+         if (fitX>=(i-50)*0.2 && fitX<(i-50+1)*0.2) ifitX=i;
       }
       h1_hitdT_[test_cid][ifitX]->Fill(hitdT);
       h1_hitX_[test_cid][ifitX]->Fill(hitX);
