@@ -43,9 +43,9 @@ class AnaResXVSFitX : public Analysis
       TH2F* GetHitXVSFitX(int test_cid);
       TH2F* GetResXVSFitX(int test_cid);
 
-      TH1F* GetHitdT(int test_cid, int ifitX);
-      TH1F* GetHitX(int test_cid, int ifitX);
-      TH1F* GetResX(int test_cid, int ifitX);
+      TH1F* GetHitdT(int test_cid, double fitX);
+      TH1F* GetHitX(int test_cid, double fitX);
+      TH1F* GetResX(int test_cid, double fitX);
 
       TGraph* GetHitdTVSFitXMean(int test_cid);
       TGraph* GetHitdTVSFitXPeak(int test_cid);
@@ -92,6 +92,9 @@ class AnaResXVSFitX : public Analysis
       TGraph* gr_resX_VS_fitX_mean_[MAX_LAYER];
       TGraph* gr_resX_VS_fitX_peak_[MAX_LAYER];
       TGraph* gr_resX_VS_fitX_fit_[MAX_LAYER];
+
+      int GetIdxFitX(double fitX);
+      double GetFitXAt(int ifitX);
 
 };
 

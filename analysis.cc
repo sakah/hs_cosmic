@@ -125,10 +125,7 @@ void AnaResXVSFitX::LoopEvent(int iev)
       h2_hitX_VS_fitX_[test_cid]->Fill(fitX, hitX);
       h2_resX_VS_fitX_[test_cid]->Fill(fitX, resX);
 
-      int ifitX = 0;
-      for (int i=0; i<100; i++) {
-         if (fitX>=(i-50)*0.2 && fitX<(i-50+1)*0.2) ifitX=i;
-      }
+      int ifitX = GetIdxFitX(fitX);
       h1_hitdT_[test_cid][ifitX]->Fill(hitdT);
       h1_hitX_[test_cid][ifitX]->Fill(hitX);
       h1_resX_[test_cid][ifitX]->Fill(resX);
@@ -149,7 +146,7 @@ void AnaResXVSFitX::EndOfEvent()
       double y2_resX[100];
       double y3_resX[100];
       for (int ifitX=0; ifitX<100; ifitX++) {
-         x[ifitX] = (ifitX-50)*0.2;
+         x[ifitX] = GetFitXAt(ifitX);
 
          TH1F* h1_hitdT = h1_hitdT_[test_cid][ifitX];
          TH1F* h1_hitX  = h1_hitX_[test_cid][ifitX];
@@ -201,9 +198,9 @@ TH2F* AnaResXVSFitX::GetHitdTVSFitX(int test_cid) { return h2_hitdT_VS_fitX_[tes
 TH2F* AnaResXVSFitX::GetHitXVSFitX(int test_cid)  { return h2_hitX_VS_fitX_[test_cid]; }
 TH2F* AnaResXVSFitX::GetResXVSFitX(int test_cid)  { return h2_resX_VS_fitX_[test_cid]; }
 
-TH1F* AnaResXVSFitX::GetHitdT(int test_cid, int ifitX) { return h1_hitdT_[test_cid][ifitX]; }
-TH1F* AnaResXVSFitX::GetHitX(int test_cid, int ifitX) { return h1_hitX_[test_cid][ifitX]; }
-TH1F* AnaResXVSFitX::GetResX(int test_cid, int ifitX) { return h1_resX_[test_cid][ifitX]; }
+TH1F* AnaResXVSFitX::GetHitdT(int test_cid, double fitX) { return h1_hitdT_[test_cid][GetIdxFitX(fitX)]; }
+TH1F* AnaResXVSFitX::GetHitX(int test_cid, double fitX) { return h1_hitX_[test_cid][GetIdxFitX(fitX)]; }
+TH1F* AnaResXVSFitX::GetResX(int test_cid, double fitX) { return h1_resX_[test_cid][GetIdxFitX(fitX)]; }
 
 TGraph* AnaResXVSFitX::GetHitdTVSFitXMean(int test_cid) { return gr_hitdT_VS_fitX_mean_[test_cid]; }
 TGraph* AnaResXVSFitX::GetHitdTVSFitXPeak(int test_cid) { return gr_hitdT_VS_fitX_peak_[test_cid]; }
@@ -280,3 +277,16 @@ void AnaResXVSFitX::DrawResXVSFitXFit(int test_cid)
    RedrawStatBox(0.1, 0.7, 0.4, 0.9);
 }
 
+int AnaResXVSFitX::GetIdxFitX(double fitX)
+{
+   int ifitX = 0;
+   for (int i=0; i<100; i++) {
+      if (fitX>=(i-50)*0.2 && fitX<(i-50+1)*0.2) ifitX=i;
+   }
+   return ifitX;
+}
+
+double AnaResXVSFitX::GetFitXAt(int ifitX)
+{
+   return (ifitX-50)*0.2;
+}
