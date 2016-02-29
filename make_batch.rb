@@ -11,19 +11,20 @@ def command(total, run_num, fit_func_name)
    num_each=10000
    input_root="run#{run_num}.root"
    0.step(total, num_each) do |iev|
+      iev_str="%07d"%iev
       start_iev=iev
       last_iev=iev+num_each-1
       if last_iev > total-1
          last_iev = total - 1
       end
-      output_root="run_#{run_num}_#{iev}.root"
+      output_root="run_#{run_num}_#{iev_str}.root"
       #puts "iev #{start_iev} #{last_iev}"
       cmd="#!/bin/bash\n"
       cmd+="#{$prog_dir}/main #{$inroot_dir}/#{input_root} #{$outroot_dir}/#{output_root} #{start_iev} #{last_iev} #{fit_func_name}\n"
-      File.open("batch/run_#{run_num}_#{iev}.sh", "w") do |file|
+      File.open("batch/run_#{run_num}_#{iev_str}.sh", "w") do |file|
          file.write cmd
       end
-      FileUtils.chmod(0755,"batch/run_#{run_num}_#{iev}.sh")
+      FileUtils.chmod(0755,"batch/run_#{run_num}_#{iev_str}.sh")
    end
 end
 
