@@ -121,13 +121,13 @@ AnaResXVSFitX::AnaResXVSFitX()
 void AnaResXVSFitX::BeginOfEvent()
 {
    for (int test_cid=0; test_cid<MAX_LAYER; test_cid++) {
-      h2_hitdT_VS_fitX_[test_cid] = new TH2F(Form("%s_hitdT_VS_fitX_%d", name_, test_cid), ";fitX [mm];hitdT [ns]", 200, -10, 10, 500, 0, 500);
-      h2_hitX_VS_fitX_[test_cid]  = new TH2F(Form("%s_hitX_VS_fitX_%d",  name_, test_cid), ";fitX [mm];hitX [mm]", 200, -10, 10, 200, -10, 10);
-      h2_resX_VS_fitX_[test_cid]  = new TH2F(Form("%s_resX_VS_fitX_%d",  name_, test_cid), ";fitX [mm];fitX-hitX [mm]", 200, -10, 10, 100, -2, 2);
+      h2_hitdT_VS_fitX_[test_cid] = new TH2F(Form("%s_hitdT_VS_fitX_test_cid_%d", name_, test_cid), ";fitX [mm];hitdT [ns]", 200, -10, 10, 500, 0, 500);
+      h2_hitX_VS_fitX_[test_cid]  = new TH2F(Form("%s_hitX_VS_fitX_test_cid_%d",  name_, test_cid), ";fitX [mm];hitX [mm]", 200, -10, 10, 200, -10, 10);
+      h2_resX_VS_fitX_[test_cid]  = new TH2F(Form("%s_resX_VS_fitX_test_cid_%d",  name_, test_cid), ";fitX [mm];fitX-hitX [mm]", 200, -10, 10, 100, -2, 2);
       for (int ifitX=0; ifitX<100; ifitX++) {
-         h1_hitdT_[test_cid][ifitX] = new TH1F(Form("%s_hitdT_%d_%d", name_, test_cid, ifitX), ";hitT-T0 [ns];", 500, 0, 500);
-         h1_hitX_[test_cid][ifitX]  = new TH1F(Form("%s_hitX_%d_%d",  name_, test_cid, ifitX), ";hitX [mm];",    100, -10, 10);
-         h1_resX_[test_cid][ifitX]  = new TH1F(Form("%s_resX_%d_%d",  name_, test_cid, ifitX), ";fitX-hitX [mm];", 100, -2, 2);
+         h1_hitdT_[test_cid][ifitX] = new TH1F(Form("%s_hitdT_test_cid_%d_ifitX_%d", name_, test_cid, ifitX), ";hitT-T0 [ns];", 500, 0, 500);
+         h1_hitX_[test_cid][ifitX]  = new TH1F(Form("%s_hitX_test_cid_%d_ifitX_%d",  name_, test_cid, ifitX), ";hitX [mm];",    100, -10, 10);
+         h1_resX_[test_cid][ifitX]  = new TH1F(Form("%s_resX_test_cid_%d_ifitX_%d",  name_, test_cid, ifitX), ";fitX-hitX [mm];", 100, -2, 2);
       }
    }
 }
@@ -205,17 +205,17 @@ void AnaResXVSFitX::EndOfEvent()
          if (f1_hitX)  y3_hitX[ifitX]  = f1_hitX->GetParameter(1);
          if (f1_resX)  y3_resX[ifitX]  = f1_resX->GetParameter(1);
       }
-      gr_hitdT_VS_fitX_mean_[test_cid] = MakeGraph(Form("gr_hitdT_VS_fitX_mean_test_cid_%d",test_cid), 100, x, y1_hitdT, 20, kBlack);
-      gr_hitdT_VS_fitX_peak_[test_cid] = MakeGraph(Form("gr_hitdT_VS_fitX_peak_test_cid_%d",test_cid), 100, x, y2_hitdT, 20, kRed);
-      gr_hitdT_VS_fitX_fit_ [test_cid] = MakeGraph(Form("gr_hitdT_VS_fitX_fit_test_cid_%d",test_cid), 100, x, y3_hitdT, 20, kMagenta);
+      gr_hitdT_VS_fitX_mean_[test_cid] = MakeGraph(Form("%s_gr_hitdT_VS_fitX_mean_test_cid_%d",name_,test_cid), 100, x, y1_hitdT, 20, kBlack);
+      gr_hitdT_VS_fitX_peak_[test_cid] = MakeGraph(Form("%s_gr_hitdT_VS_fitX_peak_test_cid_%d",name_,test_cid), 100, x, y2_hitdT, 20, kRed);
+      gr_hitdT_VS_fitX_fit_ [test_cid] = MakeGraph(Form("%s_gr_hitdT_VS_fitX_fit_test_cid_%d",name_,test_cid), 100, x, y3_hitdT, 20, kMagenta);
 
-      gr_hitX_VS_fitX_mean_[test_cid] = MakeGraph(Form("gr_hitX_VS_fitX_mean_test_cid_%d", test_cid), 100, x, y1_hitX, 20, kBlack);
-      gr_hitX_VS_fitX_peak_[test_cid] = MakeGraph(Form("gr_hitX_VS_fitX_peak_test_cid_%d", test_cid), 100, x, y2_hitX, 20, kRed);
-      gr_hitX_VS_fitX_fit_ [test_cid] = MakeGraph(Form("gr_hitX_VS_fitX_fit_test_cid_%d", test_cid), 100, x, y3_hitX, 20, kMagenta);
+      gr_hitX_VS_fitX_mean_[test_cid] = MakeGraph(Form("%s_gr_hitX_VS_fitX_mean_test_cid_%d", name_,test_cid), 100, x, y1_hitX, 20, kBlack);
+      gr_hitX_VS_fitX_peak_[test_cid] = MakeGraph(Form("%s_gr_hitX_VS_fitX_peak_test_cid_%d", name_,test_cid), 100, x, y2_hitX, 20, kRed);
+      gr_hitX_VS_fitX_fit_ [test_cid] = MakeGraph(Form("%s_gr_hitX_VS_fitX_fit_test_cid_%d", name_,test_cid), 100, x, y3_hitX, 20, kMagenta);
 
-      gr_resX_VS_fitX_mean_[test_cid] = MakeGraph(Form("gr_resX_VS_fitX_mean_test_cid_%d", test_cid), 100, x, y1_resX, 20, kBlack);
-      gr_resX_VS_fitX_peak_[test_cid] = MakeGraph(Form("gr_resX_VS_fitX_peak_test_cid_%d", test_cid), 100, x, y2_resX, 20, kRed);
-      gr_resX_VS_fitX_fit_ [test_cid] = MakeGraph(Form("gr_resX_VS_fitX_fit_test_cid_%d", test_cid), 100, x, y3_resX, 20, kMagenta);
+      gr_resX_VS_fitX_mean_[test_cid] = MakeGraph(Form("%s_gr_resX_VS_fitX_mean_test_cid_%d", name_,test_cid), 100, x, y1_resX, 20, kBlack);
+      gr_resX_VS_fitX_peak_[test_cid] = MakeGraph(Form("%s_gr_resX_VS_fitX_peak_test_cid_%d", name_,test_cid), 100, x, y2_resX, 20, kRed);
+      gr_resX_VS_fitX_fit_ [test_cid] = MakeGraph(Form("%s_gr_resX_VS_fitX_fit_test_cid_%d", name_,test_cid), 100, x, y3_resX, 20, kMagenta);
    }
 }
 
@@ -344,7 +344,7 @@ void AnaResXVSFitX::Save(const char* output_root_path)
       if (gr_resX_VS_fitX_peak_[test_cid])       gr_resX_VS_fitX_peak_[test_cid]->Write();
       if (gr_resX_VS_fitX_fit_[test_cid])        gr_resX_VS_fitX_fit_[test_cid]->Write();
 
-      for (int ifitX; ifitX<100; ifitX++) {
+      for (int ifitX=0; ifitX<100; ifitX++) {
          if (h1_hitdT_[test_cid][ifitX]) h1_hitdT_[test_cid][ifitX]->Write();
          if (h1_hitX_[test_cid][ifitX])  h1_hitX_[test_cid][ifitX]->Write();
          if (h1_resX_[test_cid][ifitX])  h1_resX_[test_cid][ifitX]->Write();
