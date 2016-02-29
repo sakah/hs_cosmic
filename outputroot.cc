@@ -51,6 +51,11 @@ void OutputROOT::SetRootFile(const char* path)
    t2_->Branch("cid2", &cid2_, "cid2/I");
    t2_->Branch("z_step_", &z_step_, "z_step/D");
    t2_->Branch("drift_velocity", &drift_velocity_, "drift_velocity/D");
+   //
+   // fill run parameters once
+   // ReadRunParameters should be called in advance
+   f_->cd();
+   t2_->Fill();
 }
 
 void OutputROOT::Clear()
@@ -147,6 +152,7 @@ void OutputROOT::Write()
 {
    f_->cd();
    t_->Write();
+   t2_->Write();
    f_->Close();
 }
 
