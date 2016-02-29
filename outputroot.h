@@ -47,11 +47,14 @@ class OutputROOT
       int    GetTrackCellNumTdcHits(int test_cid, int cid);
       double GetTrackHitT(int test_cid, int cid);
       double GetTrackFitT0(int test_cid, int cid);
-      double GetTrackHitdT(int test_cid, int cid);
       double GetTrackHitR(int test_cid, int cid);
       double GetTrackFitX(int test_cid, int cid);
-      double GetTrackResR(int test_cid, int cid);
       double GetTrackFitZ(int test_cid, int cid);
+      double GetTrackHitdT(int test_cid, int cid);
+      double GetTrackHitX(int test_cid, int cid);
+      double GetTrackFitR(int test_cid, int cid);
+      double GetTrackResX(int test_cid, int cid);
+      double GetTrackResR(int test_cid, int cid);
 
    private:
       TFile* f_;
@@ -74,10 +77,8 @@ class OutputROOT
       int    track_num_hittdcs_[MAX_LAYER][MAX_CELL];
       double track_hitT_[MAX_LAYER][MAX_LAYER]; // [test_cid][layer]
       double track_fitT0_[MAX_LAYER][MAX_LAYER]; // [test_cid][layer]
-      double track_hitdT_[MAX_LAYER][MAX_LAYER]; // [test_cid][layer]
       double track_hitR_[MAX_LAYER][MAX_LAYER]; // [test_cid][layer]
       double track_fitX_[MAX_LAYER][MAX_LAYER]; // [test_cid][layer]
-      double track_resR_[MAX_LAYER][MAX_LAYER]; // [test_cid][layer]
       double track_fitZ_[MAX_LAYER][MAX_LAYER]; // [test_cid][layer]
 };
 

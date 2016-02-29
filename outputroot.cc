@@ -34,10 +34,8 @@ void OutputROOT::Clear()
          track_num_hittdcs_[test_cid][cid]  = 0;
          track_hitT_[test_cid][cid]         = -1e10;
          track_fitT0_[test_cid][cid]        = -1e10;
-         track_hitdT_[test_cid][cid]        = -1e10;
          track_hitR_[test_cid][cid]         = -1e10;
          track_fitX_[test_cid][cid]         = -1e10;
-         track_resR_[test_cid][cid]         = -1e10;
          track_fitZ_[test_cid][cid]         = -1e10;
       }
    }
@@ -66,10 +64,8 @@ void OutputROOT::SetRootFile(const char* path)
    t_->Branch("track_num_hittdcs",  track_num_hittdcs_,  "track_num_hittdcs[9][9]/I");
    t_->Branch("track_hitT",         track_hitT_,         "track_hitT[9][9]/D");
    t_->Branch("track_fitT0",        track_fitT0_,        "track_fitT0[9][9]/D");
-   t_->Branch("track_hitdT",        track_hitdT_,        "track_hitdT[9][9]/D");
    t_->Branch("track_hitR",         track_hitR_,         "track_hitR[9][9]/D");
    t_->Branch("track_fitX",         track_fitX_,         "track_fitX[9][9]/D");
-   t_->Branch("track_resR",         track_resR_,         "track_resR[9][9]/D");
    t_->Branch("track_fitZ",         track_fitZ_,         "track_fitZ[9][9]/D");
 
 }
@@ -120,10 +116,8 @@ void OutputROOT::SetTrackData(Chamber& chamber, XTcurve& xt, Track& track)
       track_num_hittdcs_[test_cid][cid]  = chamber.GetNumHitsInCell(cid, icell);
       track_hitT_[test_cid][cid]         = hit.GetDriftTime();
       track_fitT0_[test_cid][cid]        = hit.GetT0();
-      track_hitdT_[test_cid][cid]        = hit.GetDriftTimeFromT0();
       track_hitR_[test_cid][cid]         = hitR;
       track_fitX_[test_cid][cid]         = fitX;
-      track_resR_[test_cid][cid]         = TMath::Abs(fitX) - hitR;
       track_fitZ_[test_cid][cid]         = hit.GetZ();
    }
 }
@@ -172,10 +166,8 @@ void OutputROOT::OpenRootFile(const char* path)
    t_->SetBranchAddress("track_num_hittdcs",  track_num_hittdcs_);
    t_->SetBranchAddress("track_hitT",         track_hitT_);
    t_->SetBranchAddress("track_fitT0",        track_fitT0_);
-   t_->SetBranchAddress("track_hitdT",        track_hitdT_);
    t_->SetBranchAddress("track_hitR",         track_hitR_);
    t_->SetBranchAddress("track_fitX",         track_fitX_);
-   t_->SetBranchAddress("track_resR",         track_resR_);
    t_->SetBranchAddress("track_fitZ",         track_fitZ_);
 }
 
@@ -217,10 +209,8 @@ void OutputROOT::PrintEntry()
          printf("test_cid %d cid %d track_num_hittdcs %d\n", test_cid, cid, track_num_hittdcs_[test_cid][cid]);
          printf("test_cid %d cid %d track_hitT        %f\n", test_cid, cid, track_hitT_[test_cid][cid]);
          printf("test_cid %d cid %d track_fitT0       %f\n", test_cid, cid, track_fitT0_[test_cid][cid]);
-         printf("test_cid %d cid %d track_hitdT       %f\n", test_cid, cid, track_hitdT_[test_cid][cid]);
          printf("test_cid %d cid %d track_hitR        %f\n", test_cid, cid, track_hitR_[test_cid][cid]);
          printf("test_cid %d cid %d track_fitX        %f\n", test_cid, cid, track_fitX_[test_cid][cid]);
-         printf("test_cid %d cid %d track_resR        %f\n", test_cid, cid, track_resR_[test_cid][cid]);
          printf("test_cid %d cid %d track_fitZ        %f\n", test_cid, cid, track_fitZ_[test_cid][cid]);
       }
    }
@@ -301,11 +291,6 @@ double OutputROOT::GetTrackFitT0(int test_cid, int cid)
    return track_fitT0_[test_cid][cid];
 }
 
-double OutputROOT::GetTrackHitdT(int test_cid, int cid)
-{
-   return track_hitdT_[test_cid][cid];
-}
-
 double OutputROOT::GetTrackHitR(int test_cid, int cid)
 {
    return track_hitR_[test_cid][cid];
@@ -316,13 +301,36 @@ double OutputROOT::GetTrackFitX(int test_cid, int cid)
    return track_fitX_[test_cid][cid];
 }
 
-double OutputROOT::GetTrackResR(int test_cid, int cid)
-{
-   return track_resR_[test_cid][cid];
-}
-
 double OutputROOT::GetTrackFitZ(int test_cid, int cid)
 {
    return track_fitZ_[test_cid][cid];
+}
+
+double OutputROOT::GetTrackHitdT(int test_cid, int cid)
+{
+   return track_hitT_[test_cid][cid] - track_fitT0_[test_cid][cid];
+}
+
+double OutputROOT::GetTrackHitX(int test_cid, int cid)
+{
+   if (track_fitX_[test_cid][cid]<0) {
+      return -track_hitR_[test_cid][cid];
+   }
+   return track_hitR_[test_cid][cid];
+}
+
+double OutputROOT::GetTrackFitR(int test_cid, int cid)
+{
+   return TMath::Abs(track_fitX_[test_cid][cid]);
+}
+
+double OutputROOT::GetTrackResX(int test_cid, int cid)
+{
+   return GetTrackFitX(test_cid, cid) - GetTrackHitX(test_cid, cid);
+}
+
+double OutputROOT::GetTrackResR(int test_cid, int cid)
+{
+   return GetTrackFitR(test_cid, cid) - GetTrackHitR(test_cid, cid);
 }
 

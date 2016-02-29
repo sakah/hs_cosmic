@@ -97,7 +97,7 @@ AnaResXVSFitX::AnaResXVSFitX()
 void AnaResXVSFitX::BeginOfEvent()
 {
    for (int test_cid=0; test_cid<MAX_LAYER; test_cid++) {
-      h2_hitdT_VS_fitX_[test_cid] = new TH2F(Form("%s_hitdT_VS_fitX_%d", name_, test_cid), ";fitX [mm];hitdT [ns]", 200, -10, 10, 200, -10, 10);
+      h2_hitdT_VS_fitX_[test_cid] = new TH2F(Form("%s_hitdT_VS_fitX_%d", name_, test_cid), ";fitX [mm];hitdT [ns]", 200, -10, 10, 500, 0, 500);
       h2_hitX_VS_fitX_[test_cid] = new TH2F(Form("%s_hitX_VS_fitX_%d", name_, test_cid), ";fitX [mm];hitX [mm]", 200, -10, 10, 200, -10, 10);
       h2_resX_VS_fitX_[test_cid] = new TH2F(Form("%s_resX_VS_fitX_%d", name_, test_cid), ";fitX [mm];fitX-hitX [mm]", 200, -10, 10, 100, -2, 2);
       for (int ihitX=0; ihitX<100; ihitX++) {
@@ -109,6 +109,7 @@ void AnaResXVSFitX::BeginOfEvent()
 void AnaResXVSFitX::LoopEvent(int iev)
 {
    for (int test_cid=1; test_cid<MAX_LAYER-1; test_cid++) {
+      double hitdT = outroot_.GetTrackHitdT(test_cid, test_cid);
       double fitX = outroot_.GetTrackFitX(test_cid, test_cid);
       double hitR = outroot_.GetTrackHitR(test_cid, test_cid);
       double chi2 = outroot_.GetTrackChi2(test_cid);
@@ -116,11 +117,12 @@ void AnaResXVSFitX::LoopEvent(int iev)
       if (ndf<0.1) continue;
       if (chi2/ndf>2.0) continue;
 
-      double hitX = hitR;
-      if (fitX<0) hitX = -hitR;
-      double resX = fitX - hitX;
-      h2_resX_VS_fitX_[test_cid]->Fill(hitX, resX);
-      h2_hitX_VS_fitX_[test_cid]->Fill(hitX, fitX);
+      double hitX = outroot_.GetTrackHitX(test_cid, test_cid);
+      double resX = outroot_.GetTrackResX(test_cid, test_cid);
+
+      h2_hitdT_VS_fitX_[test_cid]->Fill(fitX, hitdT);
+      h2_resX_VS_fitX_[test_cid]->Fill(fitX, resX);
+      h2_hitX_VS_fitX_[test_cid]->Fill(fitX, hitX);
 
       int ihitX = 0;
       for (int i=0; i<100; i++) {
