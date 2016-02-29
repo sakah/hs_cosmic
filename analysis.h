@@ -23,7 +23,7 @@ class Analysis
       OutputROOT outroot_;
       char name_[128]; // set uniq name according to path
 
-      TGraph* MakeGraph(int n, double* x, double* y, int style, int color);
+      TGraph* MakeGraph(const char*name, int n, double* x, double* y, int style, int color);
       void RedrawStatBox(double x1, double y1, double x2, double y2);
       void SetCutChi2OVNDF(double cut_chi2_ov_ndf);
 
@@ -70,6 +70,8 @@ class AnaResXVSFitX : public Analysis
       void DrawResXVSFitXMean(int test_cid);
       void DrawResXVSFitXPeak(int test_cid);
       void DrawResXVSFitXFit(int test_cid);
+
+      void Save(const char* output_root_path);
 
    private:
       TH2F* h2_hitdT_VS_fitX_[MAX_LAYER];

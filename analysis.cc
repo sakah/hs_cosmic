@@ -65,9 +65,10 @@ void Analysis::EndOfEvent()
    // impliment in derived class
 }
 
-TGraph* Analysis::MakeGraph(int n, double* x, double* y, int style, int color)
+TGraph* Analysis::MakeGraph(const char* name, int n, double* x, double* y, int style, int color)
 {
    TGraph* gr = new TGraph(n, x, y);
+   gr->SetName(name);
    gr->SetMarkerStyle(style);
    gr->SetMarkerColor(color);
    gr->SetLineColor(color);
@@ -91,6 +92,30 @@ void Analysis::RedrawStatBox(double x1, double y1, double x2, double y2)
 //______________________________
 AnaResXVSFitX::AnaResXVSFitX()
 {
+   for (int test_cid=0; test_cid<MAX_LAYER; test_cid++) {
+
+      h2_hitdT_VS_fitX_[test_cid] = NULL;
+      h2_hitX_VS_fitX_[test_cid] = NULL;
+      h2_resX_VS_fitX_[test_cid] = NULL;
+
+      gr_hitdT_VS_fitX_mean_[test_cid] = NULL;
+      gr_hitdT_VS_fitX_peak_[test_cid] = NULL;
+      gr_hitdT_VS_fitX_fit_[test_cid] = NULL;
+
+      gr_hitX_VS_fitX_mean_[test_cid] = NULL;
+      gr_hitX_VS_fitX_peak_[test_cid] = NULL;
+      gr_hitX_VS_fitX_fit_[test_cid] = NULL;
+
+      gr_resX_VS_fitX_mean_[test_cid] = NULL;
+      gr_resX_VS_fitX_peak_[test_cid] = NULL;
+      gr_resX_VS_fitX_fit_[test_cid] = NULL;
+
+      for (int ifitX; ifitX<100; ifitX++) {
+         h1_hitdT_[test_cid][ifitX] = NULL;
+         h1_hitX_[test_cid][ifitX] = NULL;
+         h1_resX_[test_cid][ifitX] = NULL;
+      }
+   }
 }
 
 void AnaResXVSFitX::BeginOfEvent()
@@ -180,17 +205,17 @@ void AnaResXVSFitX::EndOfEvent()
          if (f1_hitX)  y3_hitX[ifitX]  = f1_hitX->GetParameter(1);
          if (f1_resX)  y3_resX[ifitX]  = f1_resX->GetParameter(1);
       }
-      gr_hitdT_VS_fitX_mean_[test_cid] = MakeGraph(100, x, y1_hitdT, 20, kBlack);
-      gr_hitdT_VS_fitX_peak_[test_cid] = MakeGraph(100, x, y2_hitdT, 20, kRed);
-      gr_hitdT_VS_fitX_fit_ [test_cid] = MakeGraph(100, x, y3_hitdT, 20, kMagenta);
+      gr_hitdT_VS_fitX_mean_[test_cid] = MakeGraph(Form("gr_hitdT_VS_fitX_mean_test_cid_%d",test_cid), 100, x, y1_hitdT, 20, kBlack);
+      gr_hitdT_VS_fitX_peak_[test_cid] = MakeGraph(Form("gr_hitdT_VS_fitX_peak_test_cid_%d",test_cid), 100, x, y2_hitdT, 20, kRed);
+      gr_hitdT_VS_fitX_fit_ [test_cid] = MakeGraph(Form("gr_hitdT_VS_fitX_fit_test_cid_%d",test_cid), 100, x, y3_hitdT, 20, kMagenta);
 
-      gr_hitX_VS_fitX_mean_[test_cid] = MakeGraph(100, x, y1_hitX, 20, kBlack);
-      gr_hitX_VS_fitX_peak_[test_cid] = MakeGraph(100, x, y2_hitX, 20, kRed);
-      gr_hitX_VS_fitX_fit_ [test_cid] = MakeGraph(100, x, y3_hitX, 20, kMagenta);
+      gr_hitX_VS_fitX_mean_[test_cid] = MakeGraph(Form("gr_hitX_VS_fitX_mean_test_cid_%d", test_cid), 100, x, y1_hitX, 20, kBlack);
+      gr_hitX_VS_fitX_peak_[test_cid] = MakeGraph(Form("gr_hitX_VS_fitX_peak_test_cid_%d", test_cid), 100, x, y2_hitX, 20, kRed);
+      gr_hitX_VS_fitX_fit_ [test_cid] = MakeGraph(Form("gr_hitX_VS_fitX_fit_test_cid_%d", test_cid), 100, x, y3_hitX, 20, kMagenta);
 
-      gr_resX_VS_fitX_mean_[test_cid] = MakeGraph(100, x, y1_resX, 20, kBlack);
-      gr_resX_VS_fitX_peak_[test_cid] = MakeGraph(100, x, y2_resX, 20, kRed);
-      gr_resX_VS_fitX_fit_ [test_cid] = MakeGraph(100, x, y3_resX, 20, kMagenta);
+      gr_resX_VS_fitX_mean_[test_cid] = MakeGraph(Form("gr_resX_VS_fitX_mean_test_cid_%d", test_cid), 100, x, y1_resX, 20, kBlack);
+      gr_resX_VS_fitX_peak_[test_cid] = MakeGraph(Form("gr_resX_VS_fitX_peak_test_cid_%d", test_cid), 100, x, y2_resX, 20, kRed);
+      gr_resX_VS_fitX_fit_ [test_cid] = MakeGraph(Form("gr_resX_VS_fitX_fit_test_cid_%d", test_cid), 100, x, y3_resX, 20, kMagenta);
    }
 }
 
@@ -295,4 +320,35 @@ int AnaResXVSFitX::GetIdxFitX(double fitX)
 double AnaResXVSFitX::GetFitXAt(int ifitX)
 {
    return (ifitX-50)*0.2 + 0.2/2.0; // at bin center
+}
+
+void AnaResXVSFitX::Save(const char* output_root_path)
+{
+   TFile* f = new TFile(output_root_path, "recreate");
+
+   for (int test_cid=0; test_cid<MAX_LAYER; test_cid++) {
+
+      if (h2_hitdT_VS_fitX_[test_cid])           h2_hitdT_VS_fitX_[test_cid]->Write();
+      if (h2_hitX_VS_fitX_[test_cid])            h2_hitX_VS_fitX_[test_cid]->Write();
+      if (h2_resX_VS_fitX_[test_cid])            h2_resX_VS_fitX_[test_cid]->Write();
+
+      if (gr_hitdT_VS_fitX_mean_[test_cid])      gr_hitdT_VS_fitX_mean_[test_cid]->Write();
+      if (gr_hitdT_VS_fitX_peak_[test_cid])      gr_hitdT_VS_fitX_peak_[test_cid]->Write();
+      if (gr_hitdT_VS_fitX_fit_[test_cid])       gr_hitdT_VS_fitX_fit_[test_cid]->Write();
+
+      if (gr_hitX_VS_fitX_mean_[test_cid])       gr_hitX_VS_fitX_mean_[test_cid]->Write();
+      if (gr_hitX_VS_fitX_peak_[test_cid])       gr_hitX_VS_fitX_peak_[test_cid]->Write();
+      if (gr_hitX_VS_fitX_fit_[test_cid])        gr_hitX_VS_fitX_fit_[test_cid]->Write();
+
+      if (gr_resX_VS_fitX_mean_[test_cid])       gr_resX_VS_fitX_mean_[test_cid]->Write();
+      if (gr_resX_VS_fitX_peak_[test_cid])       gr_resX_VS_fitX_peak_[test_cid]->Write();
+      if (gr_resX_VS_fitX_fit_[test_cid])        gr_resX_VS_fitX_fit_[test_cid]->Write();
+
+      for (int ifitX; ifitX<100; ifitX++) {
+         if (h1_hitdT_[test_cid][ifitX]) h1_hitdT_[test_cid][ifitX]->Write();
+         if (h1_hitX_[test_cid][ifitX])  h1_hitX_[test_cid][ifitX]->Write();
+         if (h1_resX_[test_cid][ifitX])  h1_resX_[test_cid][ifitX]->Write();
+      }
+   }
+   f->Close();
 }
