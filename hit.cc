@@ -72,7 +72,7 @@ bool Hit::UseByFit()
 
 double Hit::GetHitR(XTcurve& xt)
 {
-   return xt.GetX(drift_time_ - t0_, left_or_right_);
+   return xt.GetR(layer_number_, drift_time_ - t0_, left_or_right_);
 }
 
 void Hit::SetLayerNumber(int layer_number)
@@ -128,7 +128,7 @@ void Hit::SetUseByFitFlag(bool use_by_fit)
 void Hit::PrintHit(XTcurve& xt)
 {
    double dT = drift_time_- t0_;
-   double hitR = xt.GetX(dT, left_or_right_);
+   double hitR = GetHitR(xt);
    printf("cid %2d icell %2d t0 %3.2f drift_time %6.2f dT %6.2f --> hitR %6.2f hitZ %6.2f\n", layer_number_, cell_number_, t0_, drift_time_, dT, hitR, z_);
 }
 
