@@ -30,10 +30,12 @@ def command(total, run_num, config_num)
    end
 end
 
-command(39322,   16, 1);
-command(1730623, 24, 1);
-command(2114226, 27, 1);
+#command(39322,   16, 1);
+#command(1730623, 24, 1);
+#command(2114226, 27, 1);
 
-command(39322,   16, 2);
-command(1730623, 24, 2);
-command(2114226, 27, 2);
+#command(39322,   16, 2);
+#command(1730623, 24, 2);
+#command(2114226, 27, 2);
+
+command(2114226, 27, 3);
