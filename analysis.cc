@@ -110,7 +110,7 @@ AnaResXVSFitX::AnaResXVSFitX()
       gr_resX_VS_fitX_peak_[test_cid] = NULL;
       gr_resX_VS_fitX_fit_[test_cid] = NULL;
 
-      for (int ifitX; ifitX<100; ifitX++) {
+      for (int ifitX=0; ifitX<100; ifitX++) {
          h1_hitdT_[test_cid][ifitX] = NULL;
          h1_hitX_[test_cid][ifitX] = NULL;
          h1_resX_[test_cid][ifitX] = NULL;
