@@ -1,0 +1,8 @@
+fit_func_name FIT_FUNC_TYPE_FREE_T0
+t0_bd0 -850
+t0_bd1 -850
+cid1 1
+cid2 7
+z_step 10.0
+drift_velocity 0.04
+xt_param_file xt_param/fitpar_run27.txt

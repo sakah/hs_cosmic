@@ -391,9 +391,13 @@ void OutputROOT::ReadRunParameters(const char* path)
       if (strstr(line, "cid2"))          sscanf(line, "cid2 %d", &cid2_);
       if (strstr(line, "z_step"))        sscanf(line, "z_step %lf", &z_step_);
       if (strstr(line, "drift_velocity"))sscanf(line, "drift_velocity %lf", &drift_velocity_);
-      if (strstr(line, "xt_param_path")) sscanf(line, "xt_param_path %s", xt_param_path_);
+      if (strstr(line, "xt_param_path")) sscanf(line, "xt_param_path %s", xt_param_path_); // relative path
    }
    fclose(fp);
+
+   if (strcmp(xt_param_path_, "USE_CONST_DRIFT_VELOCITY")!=0) {
+      sprintf(xt_param_path_, "%s/%s", __FILE__, xt_param_path_);
+   }
 
    if      (strcmp(fit_func_name_, "FIT_FUNC_TYPE_FIX_T0")==0)  { fit_func_type_ = Track::FIT_FUNC_TYPE_FIX_T0; } 
    else if (strcmp(fit_func_name_, "FIT_FUNC_TYPE_FREE_T0")==0) { fit_func_type_ = Track::FIT_FUNC_TYPE_FREE_T0; } 
