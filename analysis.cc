@@ -323,3 +323,39 @@ double AnaResXVSFitX::GetFitXAt(int ifitX)
    return (ifitX-50)*0.2 + 0.2/2.0; // at bin center
 }
 
+TF1* AnaResXVSFitX::FitHitdTVSFitXFitWithPol4(int test_cid, int left_or_right, double xmin, double xmax)
+{
+   TGraph* gr = gr_hitdT_VS_fitX_fit_[test_cid];
+   if (gr==NULL) return NULL;
+
+   gr->Fit("pol4", "", "", xmin, xmax);
+   return gr->GetFunction("pol4");
+}
+
+void AnaResXVSFitX::FitHitdTVSFitXFitWithPol4(char* output_txt)
+{
+   FILE* fp = fopen(output_txt, "w");
+   for (int test_cid=0; test_cid<MAX_LAYER; test_cid++) {
+      for (int left_or_right=0; left_or_right<2; left_or_right++) {
+         double xmin;
+         double xmax;
+         if (left_or_right==XTcurve::LEFT) {
+            xmin = -8.0;
+            xmax = 0.0;
+         } else {
+            xmin = 0.0;
+            xmax = 8.0;
+         }
+
+         TF1* f1 = FitHitdTVSFitXFitWithPol4(test_cid, left_or_right, xmin, xmax);
+         if (f1==NULL) continue;
+         double pol0 = f1->GetParameter(0);
+         double pol1 = f1->GetParameter(1);
+         double pol2 = f1->GetParameter(2);
+         double pol3 = f1->GetParameter(3);
+         double pol4 = f1->GetParameter(4);
+         fprintf(fp, "%d %d %f %f %f %f %f\n", test_cid, left_or_right, pol0, pol1, pol2, pol3, pol4);
+      }
+   }
+   fclose(fp);
+}
