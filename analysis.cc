@@ -279,14 +279,20 @@ void AnaResXVSFitX::DrawResXVSFitXFit(int test_cid)
 
 int AnaResXVSFitX::GetIdxFitX(double fitX)
 {
+   if (fitX<GetFitXAt(0)) return 0;
+   if (fitX>=GetFitXAt(99)) return 99;
+
    int ifitX = 0;
    for (int i=0; i<100; i++) {
-      if (fitX>=(i-50)*0.2 && fitX<(i-50+1)*0.2) ifitX=i;
+      if (fitX>=GetFitXAt(i) && fitX<(GetFitXAt(i+1))) {
+         ifitX=i;
+         break;
+      }
    }
    return ifitX;
 }
 
 double AnaResXVSFitX::GetFitXAt(int ifitX)
 {
-   return (ifitX-50)*0.2;
+   return (ifitX-50)*0.2 + 0.2/2.0; // at bin center
 }
