@@ -5,4 +5,4 @@ cid1 1
 cid2 7
 z_step 10.0
 drift_velocity 0.04
-xt_param_file xt_param/fitpar_run27.txt
+xt_param_path xt_param/fitpar_run27.txt
