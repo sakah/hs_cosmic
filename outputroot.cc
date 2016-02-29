@@ -6,7 +6,7 @@ OutputROOT::OutputROOT()
    strcpy(fit_func_name_, "FIT_FUNC_TYPE_FREE_T0");
    fit_func_type_ = Track::FIT_FUNC_TYPE_FREE_T0;
    t0_bd0_ = -850;
-   t0_bd0_ = -850;
+   t0_bd1_ = -850;
    cid1_ = 1;
    cid2_ = 7;
    z_step_ = 10.0; // 10.0 mm
@@ -398,7 +398,7 @@ void OutputROOT::PrintRunParameters()
 {
    printf("fit_func_name   %s\n", fit_func_name_);
    printf("t0_bd0          %5.2f [ns]\n", t0_bd0_);
-   printf("t0_bd1          %5.2f [ns]\n", t0_bd0_);
+   printf("t0_bd1          %5.2f [ns]\n", t0_bd1_);
    printf("cid1            %d\n", cid1_);
    printf("cid2            %d\n", cid2_);
    printf("z_step          %6.2f [mm]\n", z_step_);
