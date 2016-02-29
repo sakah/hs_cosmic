@@ -4,11 +4,16 @@ Run::Run()
 {
 }
 
-Run::Run(const char* root_file_path)
+Run::Run(const char* input_root_path, const char* output_root_path, const char* run_params_path)
 {
-   xt_.SetDriftVelocity(0.040);
+   output_.ReadRunParameters(run_params_path);
+   output_.SetRootFile(output_root_path);
+
+   xt_.SetDriftVelocity(output_.GetDriftVelocity());
+
    chamber_.ReadWireMap("wirepos.proto4.sw.ver7.txt");
-   event_.OpenRootFile(root_file_path);
+
+   event_.OpenRootFile(input_root_path);
 }
 
 void Run::GetNext()
@@ -112,7 +117,7 @@ void Run::DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_st
    chamber_.DrawTrack(event_, xt_, min_track, min_tangent);
 }
 
-bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid, int fit_func_type)
+bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid)
 {
    WireMap& wiremap = chamber_.GetWireMap();
 
@@ -130,25 +135,16 @@ bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int te
    Track& min_track = finder_.GetBestTrack();
    min_track.PrintTrackWithLine(wiremap, xt_, min_track.GetMinTangent(wiremap, xt_));
 
-   min_track.InitFit(wiremap, xt_, test_cid, fit_func_type);
+   min_track.InitFit(wiremap, xt_, test_cid, output_.GetFitFuncType());
    min_track.DoFit(wiremap, xt_);
    min_track.PrintFitResults();
    min_track.PrintTrackWithLine(wiremap, xt_, min_track.GetFitLine());
    return true;
 }
 
-void Run::DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid, char* fit_func_name)
+void Run::DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid)
 {
-   int fit_func_type;
-   if (strcmp(fit_func_name, "FIT_FUNC_TYPE_FIX_T0")==0) {
-      fit_func_type = Track::FIT_FUNC_TYPE_FIX_T0;
-   } else if (strcmp(fit_func_name, "FIT_FUNC_TYPE_FREE_T0")==0) {
-      fit_func_type = Track::FIT_FUNC_TYPE_FREE_T0;
-   } else {
-      fprintf(stderr, "ERROR: unknown fit_func_name %s\n", fit_func_name);
-      return;
-   }
-   bool done = DoFit(event_number, cid1, cid2, z_step, test_cid, fit_func_type);
+   bool done = DoFit(event_number, cid1, cid2, z_step, test_cid);
    if (!done) {
       printf("fit cannot be done\n");
       return;
@@ -160,26 +156,8 @@ void Run::DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int 
    chamber_.DrawTrack(event_, xt_, min_track, fit_line);
 }
 
-void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_iev, char* fit_func_name)
+void Run::Loop(Long64_t start_iev, Long64_t last_iev)
 {
-   int fit_func_type;
-   if (strcmp(fit_func_name, "FIT_FUNC_TYPE_FIX_T0")==0) {
-      fit_func_type = Track::FIT_FUNC_TYPE_FIX_T0;
-   } else if (strcmp(fit_func_name, "FIT_FUNC_TYPE_FREE_T0")==0) {
-      fit_func_type = Track::FIT_FUNC_TYPE_FREE_T0;
-   } else {
-      fprintf(stderr, "ERROR: unknown fit_func_name %s\n", fit_func_name);
-      exit(1);
-   }
-
-   output_.SetRootFile(output_root_path);
-
-   double t0_0 = -835;
-   double t0_1 = -835;
-
-   int cid1 = 1;
-   int cid2 = 7;
-   double z_step = 10.0; // 10 mm
    WireMap& wiremap = chamber_.GetWireMap();
 
    Long64_t total = event_.GetEntries();
@@ -187,10 +165,18 @@ void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_i
       last_iev = total -1;
    }
    printf("input_root_path %s\n", event_.GetRootPath());
-   printf("output_root_path %s\n", output_root_path);
+   printf("output_root_path %s\n", output_.GetRootPath());
+   printf("run_params_path %s\n", output_.GetRunParamsPath());
    printf("total %lld\n", total);
    printf("start_iev %lld\n", start_iev);
    printf("last_iev %lld\n", last_iev);
+
+
+   double t0_0  = output_.GetT0_Bd0();
+   double t0_1  = output_.GetT0_Bd1();
+   int cid1 = output_.GetLayerNumber1();
+   int cid2 = output_.GetLayerNumber2();
+   double z_step = output_.GetZstep();
 
    SetT0(t0_0, t0_1);
 
@@ -215,7 +201,7 @@ void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_i
          Track& track = finder_.GetBestTrack();
          for (int test_cid=1; test_cid<=7; test_cid++) {
             //printf("test_cid %d\n", test_cid);
-            track.InitFit(wiremap, xt_, test_cid, fit_func_type, false);
+            track.InitFit(wiremap, xt_, test_cid, output_.GetFitFuncType(), false);
             track.DoFit(wiremap, xt_);
             //track.PrintFitResults();
             output_.SetTrackData(chamber_, xt_, track);

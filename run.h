@@ -17,7 +17,7 @@ class Run
 {
    public:
       Run();
-      Run(const char* root_file_path);
+      Run(const char* input_root_path, const char* ouput_root_path, const char* run_params_path);
       void GetNext();
       void GetEntry(Long64_t event_number);
       void SetT0(double t0_0, double t0_1);
@@ -28,9 +28,9 @@ class Run
       void DrawTangents();
       bool FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_step);
       void DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_step);
-      bool DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid, int fit_func_type);
-      void DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid, char* fit_func_name);
-      void Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_iev, char* fit_func_name);
+      bool DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid);
+      void DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid);
+      void Loop(Long64_t start_iev, Long64_t last_iev);
 
    private:
       ConstXTcurve xt_;
@@ -40,7 +40,6 @@ class Run
       TrackFinder finder_;
       bool save_output_;
       OutputROOT output_;
-
 };
 
 #endif
