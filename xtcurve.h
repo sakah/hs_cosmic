@@ -9,20 +9,21 @@ class XTcurve
    public:
       enum { LEFT, RIGHT};
       XTcurve();
+      virtual void ReadParametersTextFile(const char* path);
       virtual double GetR(int cid, double T, int left_or_right);
       virtual double GetT(int cid, double X);
-      virtual void DrawXTcurve(int cid);
 };
 
 class ConstXTcurve : public XTcurve
 {
    public:
       ConstXTcurve();
-      void SetDriftVelocity(double drift_velocity);
-      double GetDriftVelocity();
+      virtual void ReadParametersTextFile(const char* path);
       virtual double GetR(int cid, double T, int left_or_right);
       virtual double GetT(int cid, double X);
-      virtual void DrawXTcurve(int cid);
+      void SetDriftVelocity(double drift_velocity);
+      double GetDriftVelocity();
+      void DrawXTcurve(int cid);
 
    private:
       double drift_velocity_; // mm/ns
@@ -32,7 +33,7 @@ class XTcurvePol4 : public XTcurve
 {
    public:
       XTcurvePol4();
-      void ReadParametersTextFile(const char* path);
+      virtual void ReadParametersTextFile(const char* path);
       virtual double GetR(int cid, double T, int left_or_right);
       virtual double GetT(int cid, double X);
       virtual void DrawXTcurve(int cid);

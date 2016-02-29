@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "TCanvas.h"
 #include "TLine.h"
@@ -9,6 +10,10 @@
 
 //__________________________________________________
 XTcurve::XTcurve()
+{
+}
+
+void XTcurve::ReadParametersTextFile(const char* path)
 {
 }
 
@@ -22,24 +27,13 @@ double XTcurve::GetT(int cid, double X)
    return 0;
 }
 
-void XTcurve::DrawXTcurve(int cid)
-{
-   // do nothing
-}
-
 //__________________________________________________
 ConstXTcurve::ConstXTcurve()
 {
 }
 
-void ConstXTcurve::SetDriftVelocity(double drift_velocity)
+void ConstXTcurve::ReadParametersTextFile(const char* path)
 {
-   drift_velocity_ = drift_velocity;
-}
-
-double ConstXTcurve::GetDriftVelocity()
-{
-   return drift_velocity_;
 }
 
 double ConstXTcurve::GetR(int cid, double T, int left_or_right)
@@ -50,6 +44,16 @@ double ConstXTcurve::GetR(int cid, double T, int left_or_right)
 double ConstXTcurve::GetT(int cid, double X)
 {
    return X/drift_velocity_;
+}
+
+void ConstXTcurve::SetDriftVelocity(double drift_velocity)
+{
+   drift_velocity_ = drift_velocity;
+}
+
+double ConstXTcurve::GetDriftVelocity()
+{
+   return drift_velocity_;
 }
 
 void ConstXTcurve::DrawXTcurve(int cid)

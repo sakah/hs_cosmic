@@ -9,6 +9,9 @@ Run::Run(const char* input_root_path, const char* output_root_path, const char* 
    output_.ReadRunParameters(run_params_path);
    output_.SetRootFile(output_root_path);
 
+   if (strcmp(output_.GetXTParamPath(), "USE_CONST_DRIFT_VELOCITY")!=0) {
+      xt_.ReadParametersTextFile(output_.GetXTParamPath());
+   }
    xt_.SetDriftVelocity(output_.GetDriftVelocity());
 
    chamber_.ReadWireMap("wirepos.proto4.sw.ver7.txt");

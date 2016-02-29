@@ -66,6 +66,7 @@ class OutputROOT
       int GetLayerNumber2();
       double GetZstep();
       double GetDriftVelocity();
+      char* GetXTParamPath();
 
    private:
       char out_root_path_[1280];
@@ -104,6 +105,7 @@ class OutputROOT
       int cid2_;
       double z_step_; // [mm]
       double drift_velocity_; // [mm/ns]
+      char xt_param_path_[512];
 };
 
 #endif

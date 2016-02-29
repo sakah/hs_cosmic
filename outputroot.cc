@@ -10,6 +10,7 @@ OutputROOT::OutputROOT()
    cid1_ = 1;
    cid2_ = 7;
    z_step_ = 10.0; // 10.0 mm
+   strcpy(xt_param_path_, "USE_CONST_DRIFT_VELOCITY");
    drift_velocity_ = 0.04;
 }
 
@@ -390,12 +391,12 @@ void OutputROOT::ReadRunParameters(const char* path)
       if (strstr(line, "cid2"))          sscanf(line, "cid2 %d", &cid2_);
       if (strstr(line, "z_step"))        sscanf(line, "z_step %lf", &z_step_);
       if (strstr(line, "drift_velocity"))sscanf(line, "drift_velocity %lf", &drift_velocity_);
+      if (strstr(line, "xt_param_path")) sscanf(line, "xt_param_path %s", xt_param_path_);
    }
    fclose(fp);
 
    if      (strcmp(fit_func_name_, "FIT_FUNC_TYPE_FIX_T0")==0)  { fit_func_type_ = Track::FIT_FUNC_TYPE_FIX_T0; } 
    else if (strcmp(fit_func_name_, "FIT_FUNC_TYPE_FREE_T0")==0) { fit_func_type_ = Track::FIT_FUNC_TYPE_FREE_T0; } 
-
 
    PrintRunParameters();
 }
@@ -409,6 +410,7 @@ void OutputROOT::PrintRunParameters()
    printf("cid2            %d\n", cid2_);
    printf("z_step          %6.2f [mm]\n", z_step_);
    printf("drift_velocity  %6.2f [mm/ns]\n", drift_velocity_);
+   printf("xt_param_path   %s\n", xt_param_path_);
 }
 
 const char* OutputROOT::GetRootPath()
@@ -456,3 +458,7 @@ double OutputROOT::GetDriftVelocity()
    return drift_velocity_;
 }
 
+char* OutputROOT::GetXTParamPath()
+{
+   return xt_param_path_;
+}
