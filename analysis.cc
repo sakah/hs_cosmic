@@ -159,6 +159,10 @@ void AnaResXVSFitX::EndOfEvent()
          y1_hitX[ifitX]  = h1_hitX->GetMean();
          y1_resX[ifitX]  = h1_resX->GetMean();
 
+         double rms_hitdT = h1_hitdT->GetRMS();
+         double rms_hitX  = h1_hitX->GetRMS();
+         double rms_resX  = h1_resX->GetRMS();
+
          int imax_hitdT = h1_hitdT->GetMaximumBin();
          int imax_hitX  = h1_hitX->GetMaximumBin();
          int imax_resX  = h1_resX->GetMaximumBin();
@@ -167,9 +171,9 @@ void AnaResXVSFitX::EndOfEvent()
          y2_hitX[ifitX]  = h1_hitX->GetXaxis()->GetBinCenter(imax_hitX);
          y2_resX[ifitX]  = h1_resX->GetXaxis()->GetBinCenter(imax_resX);
 
-         h1_hitdT->Fit("gaus", "0", "", y2_hitdT[ifitX]-0.5, y2_hitdT[ifitX]+0.5);
-         h1_hitX-> Fit("gaus", "0", "", y2_hitX[ifitX]-0.5,  y2_hitX[ifitX]+0.5);
-         h1_resX-> Fit("gaus", "0", "", y2_resX[ifitX]-0.5,  y2_resX[ifitX]+0.5);
+         h1_hitdT->Fit("gaus", "", "", y2_hitdT[ifitX]-rms_hitdT, y2_hitdT[ifitX]+rms_hitdT);
+         h1_hitX-> Fit("gaus", "", "", y2_hitX[ifitX]-rms_hitX,   y2_hitX[ifitX]+rms_hitX);
+         h1_resX-> Fit("gaus", "", "", y2_resX[ifitX]-rms_resX,   y2_resX[ifitX]+rms_resX);
 
          TF1* f1_hitdT = h1_hitdT->GetFunction("gaus");
          TF1* f1_hitX  = h1_hitX ->GetFunction("gaus");
