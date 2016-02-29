@@ -203,7 +203,7 @@ void OutputROOT::OpenRootFile(const char* root_path)
    t2_->SetBranchAddress("t0_bd1", &t0_bd1_);
    t2_->SetBranchAddress("cid1", &cid1_);
    t2_->SetBranchAddress("cid2", &cid2_);
-   t2_->SetBranchAddress("z_step", &z_step_);
+   t2_->SetBranchAddress("z_step_", &z_step_);
    t2_->SetBranchAddress("drift_velocity", &drift_velocity_);
    t2_->GetEntry(0);
    PrintRunParameters();
