@@ -15,13 +15,13 @@ void Analysis::OpenRootFile(const char* path)
    // get basename of root file
    // ../../root_path/run16.root
    // -> name_ = run16
-   char* p1 = strrchr(path, '/');
-   char* p2 = strrchr(path, '.');
+   const char* p1 = strrchr(path, '/');
+   const char* p2 = strrchr(path, '.');
    if (p1==NULL) { p1 = (char*)path; }
    else { p1++; }
    p2--;
    int i=0;
-   for (char* p = p1; p<=p2; p++) {
+   for (const char* p = p1; p<=p2; p++) {
       name_[i++] = *p;
    }
    name_[i] = '\0';
