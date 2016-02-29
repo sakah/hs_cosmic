@@ -38,27 +38,61 @@ class AnaResXVSFitX : public Analysis
       virtual void BeginOfEvent();
       virtual void LoopEvent(int iev);
       virtual void EndOfEvent();
+
       TH2F* GetHitdTVSFitX(int test_cid);
       TH2F* GetHitXVSFitX(int test_cid);
       TH2F* GetResXVSFitX(int test_cid);
-      TH1F* GetResX(int test_cid, int ihitX);
+
+      TH1F* GetHitdT(int test_cid, int ifitX);
+      TH1F* GetHitX(int test_cid, int ifitX);
+      TH1F* GetResX(int test_cid, int ifitX);
+
+      TGraph* GetHitdTVSFitXMean(int test_cid);
+      TGraph* GetHitdTVSFitXPeak(int test_cid);
+      TGraph* GetHitdTVSFitXFit(int test_cid);
+
+      TGraph* GetHitXVSFitXMean(int test_cid);
+      TGraph* GetHitXVSFitXPeak(int test_cid);
+      TGraph* GetHitXVSFitXFit(int test_cid);
+
       TGraph* GetResXVSFitXMean(int test_cid);
       TGraph* GetResXVSFitXPeak(int test_cid);
       TGraph* GetResXVSFitXFit(int test_cid);
+
+      void DrawHitdTVSFitXMean(int test_cid);
+      void DrawHitdTVSFitXPeak(int test_cid);
+      void DrawHitdTVSFitXFit(int test_cid);
+
+      void DrawHitXVSFitXMean(int test_cid);
+      void DrawHitXVSFitXPeak(int test_cid);
+      void DrawHitXVSFitXFit(int test_cid);
+
       void DrawResXVSFitXMean(int test_cid);
       void DrawResXVSFitXPeak(int test_cid);
       void DrawResXVSFitXFit(int test_cid);
-      void DrawHitXVSFitX(int test_cid);
-      void DrawHitdTVSFitX(int test_cid);
 
    private:
-      TH2F* h2_hitdT_VS_fitX_[MAX_LAYER]; // [test_cid]
-      TH2F* h2_hitX_VS_fitX_[MAX_LAYER]; // [test_cid]
-      TH2F* h2_resX_VS_fitX_[MAX_LAYER]; // [test_cid]
-      TH1F* h1_resX_[MAX_LAYER][100]; // [test_cid]
+      TH2F* h2_hitdT_VS_fitX_[MAX_LAYER];
+      TH1F* h1_hitdT_[MAX_LAYER][100];
+
+      TH2F* h2_hitX_VS_fitX_[MAX_LAYER];
+      TH1F* h1_hitX_[MAX_LAYER][100];
+
+      TH2F* h2_resX_VS_fitX_[MAX_LAYER];
+      TH1F* h1_resX_[MAX_LAYER][100];
+
+      TGraph* gr_hitdT_VS_fitX_mean_[MAX_LAYER];
+      TGraph* gr_hitdT_VS_fitX_peak_[MAX_LAYER];
+      TGraph* gr_hitdT_VS_fitX_fit_[MAX_LAYER];
+
+      TGraph* gr_hitX_VS_fitX_mean_[MAX_LAYER];
+      TGraph* gr_hitX_VS_fitX_peak_[MAX_LAYER];
+      TGraph* gr_hitX_VS_fitX_fit_[MAX_LAYER];
+
       TGraph* gr_resX_VS_fitX_mean_[MAX_LAYER];
       TGraph* gr_resX_VS_fitX_peak_[MAX_LAYER];
       TGraph* gr_resX_VS_fitX_fit_[MAX_LAYER];
+
 };
 
 #endif
