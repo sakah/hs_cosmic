@@ -82,3 +82,32 @@ struct Test2
       ana27.Loop(); printf("run27 done\n");
    };
 };
+
+//___________________
+struct Test3
+{
+   // config1: cid1=1, cid2=7
+   // config2: cid1=2, cid2=7
+   AnaResXVSFitX ana16_1;
+   AnaResXVSFitX ana24_1;
+   AnaResXVSFitX ana27_1;
+   AnaResXVSFitX ana16_2;
+   AnaResXVSFitX ana24_2;
+   AnaResXVSFitX ana27_2;
+   Test3()
+   {
+      ana16_1.OpenRootFile("../cosmic_root_out/run16_config_1.root");
+      ana24_1.OpenRootFile("../cosmic_root_out/run24_config_1.root");
+      ana27_1.OpenRootFile("../cosmic_root_out/run27_config_1.root");
+      ana16_2.OpenRootFile("../cosmic_root_out/run16_config_2.root");
+      ana24_2.OpenRootFile("../cosmic_root_out/run24_config_2.root");
+      ana27_2.OpenRootFile("../cosmic_root_out/run27_config_2.root");
+
+      ana16_1.Loop(); printf("run16 config1 done\n");
+      ana24_1.Loop(); printf("run24 config1 done\n");
+      ana27_1.Loop(); printf("run27 config1 done\n");
+      ana16_2.Loop(); printf("run16 config2 done\n");
+      ana24_2.Loop(); printf("run24 config2 done\n");
+      ana27_2.Loop(); printf("run27 config2 done\n");
+   };
+};

@@ -146,7 +146,10 @@ void AnaResXVSFitX::EndOfEvent()
          int imax = h1->GetMaximumBin();
          y2[ihitX] = h1->GetXaxis()->GetBinCenter(imax);
          h1->Fit("gaus", "0", "", y2[ihitX]-0.5, y2[ihitX]+0.5);
-         y3[ihitX] = h1->GetFunction("gaus")->GetParameter(1);
+         TF1* f1 = h1->GetFunction("gaus");
+         if (f1) {
+            y3[ihitX] = f1->GetParameter(1);
+         }
       }
       gr_resX_VS_fitX_mean_[test_cid] = MakeGraph(100, x, y1, 20, kBlack);
       gr_resX_VS_fitX_peak_[test_cid] = MakeGraph(100, x, y2, 20, kRed);
