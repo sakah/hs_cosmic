@@ -15,13 +15,13 @@ void Analysis::OpenRootFile(const char* path)
    // get basename of root file
    // ../../root_path/run16.root
    // -> name_ = run16
-   char* p1 = strrchr(path, '/');
-   char* p2 = strrchr(path, '.');
+   const char* p1 = strrchr(path, '/');
+   const char* p2 = strrchr(path, '.');
    if (p1==NULL) { p1 = (char*)path; }
    else { p1++; }
    p2--;
    int i=0;
-   for (char* p = p1; p<=p2; p++) {
+   for (const char* p = p1; p<=p2; p++) {
       name_[i++] = *p;
    }
    name_[i] = '\0';
@@ -146,7 +146,10 @@ void AnaResXVSFitX::EndOfEvent()
          int imax = h1->GetMaximumBin();
          y2[ihitX] = h1->GetXaxis()->GetBinCenter(imax);
          h1->Fit("gaus", "0", "", y2[ihitX]-0.5, y2[ihitX]+0.5);
-         y3[ihitX] = h1->GetFunction("gaus")->GetParameter(1);
+         TF1* f1 = h1->GetFunction("gaus");
+         if (f1) {
+            y3[ihitX] = f1->GetParameter(1);
+         }
       }
       gr_resX_VS_fitX_mean_[test_cid] = MakeGraph(100, x, y1, 20, kBlack);
       gr_resX_VS_fitX_peak_[test_cid] = MakeGraph(100, x, y2, 20, kRed);
