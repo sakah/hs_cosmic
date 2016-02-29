@@ -77,8 +77,8 @@ struct Test2
       ana16.OpenRootFile("cosmic_root_out/freet0/run16.root");
       ana24.OpenRootFile("cosmic_root_out/freet0/run24.root");
       ana27.OpenRootFile("cosmic_root_out/freet0/run27.root");
-      ana16.Loop(); printf("run16 done\n");
-      ana24.Loop(); printf("run24 done\n");
+      //ana16.Loop(); printf("run16 done\n");
+      //ana24.Loop(); printf("run24 done\n");
       ana27.Loop(); printf("run27 done\n");
    };
 };

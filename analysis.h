@@ -71,8 +71,6 @@ class AnaResXVSFitX : public Analysis
       void DrawResXVSFitXPeak(int test_cid);
       void DrawResXVSFitXFit(int test_cid);
 
-      void Save(const char* output_root_path);
-
    private:
       TH2F* h2_hitdT_VS_fitX_[MAX_LAYER];
       TH1F* h1_hitdT_[MAX_LAYER][100];
