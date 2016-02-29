@@ -3,11 +3,54 @@
 
 OutputROOT::OutputROOT()
 {
+   strcpy(fit_func_name_, "FIT_FUNC_TYPE_FREE_T0");
+   fit_func_type_ = Track::FIT_FUNC_TYPE_FREE_T0;
+   t0_bd0_ = -850;
+   t0_bd0_ = -850;
+   cid1_ = 1;
+   cid2_ = 7;
+   z_step_ = 10.0; // 10.0 mm
+   drift_velocity_ = 0.04;
 }
 
-OutputROOT::OutputROOT(const char* path)
+void OutputROOT::SetRootFile(const char* path)
 {
-   SetRootFile(path);
+   strcpy(out_root_path_, path);
+
+   f_ = new TFile(path, "recreate");
+   t_ = new TTree("t", "t");
+
+   t_->Branch("etime",             &etime_,            "etime/I");
+
+   t_->Branch("iev",               &iev_,              "iev/I");
+   t_->Branch("hit_num_hitcells",   hit_num_hitcells_, "hit_num_hitcells[9]/I");
+   t_->Branch("hit_icell",          hit_icell_,        "hit_icell[9][15]/I");
+   t_->Branch("hit_q",              hit_q_,            "hit_q[9][15]/D");
+   t_->Branch("hit_num_hittdcs",    hit_num_hittdcs_,  "hit_num_hittdcs[9][15]/I");
+   t_->Branch("hit_drift_time",     hit_drift_time_,   "hit_drit_time[9][15][10]/D");
+
+   t_->Branch("trackfinder_num_tracks", &trackfinder_num_tracks_, "trackfinder_num_tracks/I");
+
+   t_->Branch("track_chi2",         track_chi2_,         "track_chi2[9]/D");
+   t_->Branch("track_ndf",          track_ndf_,          "track_ndf[9]/D");
+   t_->Branch("track_icell",        track_icell_,        "track_icell[9]/D");
+   t_->Branch("track_q",            track_q_,            "track_q[9][9]/D");
+   t_->Branch("track_num_hittdcs",  track_num_hittdcs_,  "track_num_hittdcs[9][9]/I");
+   t_->Branch("track_hitT",         track_hitT_,         "track_hitT[9][9]/D");
+   t_->Branch("track_fitT0",        track_fitT0_,        "track_fitT0[9][9]/D");
+   t_->Branch("track_hitR",         track_hitR_,         "track_hitR[9][9]/D");
+   t_->Branch("track_fitX",         track_fitX_,         "track_fitX[9][9]/D");
+   t_->Branch("track_fitZ",         track_fitZ_,         "track_fitZ[9][9]/D");
+
+   // run parameters
+   t2_ = new TTree("t2", "Run parameters");
+   t2_->Branch("fit_func_type", &fit_func_type_, "fit_func_type/I");
+   t2_->Branch("t0_bd0", &t0_bd0_, "t0_bd0/D");
+   t2_->Branch("t0_bd1", &t0_bd1_, "t0_bd1/D");
+   t2_->Branch("cid1", &cid1_, "cid1/I");
+   t2_->Branch("cid2", &cid2_, "cid2/I");
+   t2_->Branch("z_step_", &z_step_, "z_step/D");
+   t2_->Branch("drift_velocity", &drift_velocity_, "drift_velocity/D");
 }
 
 void OutputROOT::Clear()
@@ -41,34 +84,6 @@ void OutputROOT::Clear()
    }
 }
 
-void OutputROOT::SetRootFile(const char* path)
-{
-   f_ = new TFile(path, "recreate");
-   t_ = new TTree("t", "t");
-
-   t_->Branch("etime",             &etime_,            "etime/I");
-
-   t_->Branch("iev",               &iev_,              "iev/I");
-   t_->Branch("hit_num_hitcells",   hit_num_hitcells_, "hit_num_hitcells[9]/I");
-   t_->Branch("hit_icell",          hit_icell_,        "hit_icell[9][15]/I");
-   t_->Branch("hit_q",              hit_q_,            "hit_q[9][15]/D");
-   t_->Branch("hit_num_hittdcs",    hit_num_hittdcs_,  "hit_num_hittdcs[9][15]/I");
-   t_->Branch("hit_drift_time",     hit_drift_time_,   "hit_drit_time[9][15][10]/D");
-
-   t_->Branch("trackfinder_num_tracks", &trackfinder_num_tracks_, "trackfinder_num_tracks/I");
-
-   t_->Branch("track_chi2",         track_chi2_,         "track_chi2[9]/D");
-   t_->Branch("track_ndf",          track_ndf_,          "track_ndf[9]/D");
-   t_->Branch("track_icell",        track_icell_,        "track_icell[9]/D");
-   t_->Branch("track_q",            track_q_,            "track_q[9][9]/D");
-   t_->Branch("track_num_hittdcs",  track_num_hittdcs_,  "track_num_hittdcs[9][9]/I");
-   t_->Branch("track_hitT",         track_hitT_,         "track_hitT[9][9]/D");
-   t_->Branch("track_fitT0",        track_fitT0_,        "track_fitT0[9][9]/D");
-   t_->Branch("track_hitR",         track_hitR_,         "track_hitR[9][9]/D");
-   t_->Branch("track_fitX",         track_fitX_,         "track_fitX[9][9]/D");
-   t_->Branch("track_fitZ",         track_fitZ_,         "track_fitZ[9][9]/D");
-
-}
 
 void OutputROOT::SetHitData(Event& event, Chamber& chamber)
 {
@@ -140,9 +155,9 @@ void OutputROOT::SetElapstedTime(int etime)
    etime_ = etime;
 }
 
-void OutputROOT::OpenRootFile(const char* path)
+void OutputROOT::OpenRootFile(const char* root_path)
 {
-   f_ = new TFile(path);
+   f_ = new TFile(root_path);
    t_ = (TTree*)f_->Get("t");
    if (t_==NULL) {
       fprintf(stderr, "ERROR: tree is not foudn...\n");
@@ -169,6 +184,23 @@ void OutputROOT::OpenRootFile(const char* path)
    t_->SetBranchAddress("track_hitR",         track_hitR_);
    t_->SetBranchAddress("track_fitX",         track_fitX_);
    t_->SetBranchAddress("track_fitZ",         track_fitZ_);
+
+   // run parameters
+   t2_ = (TTree*)f_->Get("t2");
+   if (t2_==NULL) {
+      printf("Warning: run parameters are not set. Defalut values are used!\n");
+      PrintRunParameters();
+      return;
+   }
+   t2_->SetBranchAddress("fit_func_type", &fit_func_type_);
+   t2_->SetBranchAddress("t0_bd0", &t0_bd0_);
+   t2_->SetBranchAddress("t0_bd1", &t0_bd1_);
+   t2_->SetBranchAddress("cid1", &cid1_);
+   t2_->SetBranchAddress("cid2", &cid2_);
+   t2_->SetBranchAddress("z_step", &z_step_);
+   t2_->SetBranchAddress("drift_velocity", &drift_velocity_);
+   t2_->GetEntry(0);
+   PrintRunParameters();
 }
 
 int OutputROOT::GetEntries()
@@ -332,5 +364,89 @@ double OutputROOT::GetTrackResX(int test_cid, int cid)
 double OutputROOT::GetTrackResR(int test_cid, int cid)
 {
    return GetTrackFitR(test_cid, cid) - GetTrackHitR(test_cid, cid);
+}
+
+void OutputROOT::ReadRunParameters(const char* path)
+{
+   strcpy(run_params_path_, path);
+
+   FILE* fp = fopen(path, "r");
+   if (fp==NULL) {
+      fprintf(stderr, "ERROR: cannot open %s\n", path);
+      exit(1);
+   }
+   char line[128];
+   while(fgets(line, sizeof(line), fp)) {
+      if (strstr(line, "fit_func_name")) sscanf(line, "fit_func_name %s", fit_func_name_);
+      if (strstr(line, "t0_bd0"))        sscanf(line, "t0_bd0 %lf", &t0_bd0_);
+      if (strstr(line, "t0_bd1"))        sscanf(line, "t0_bd1 %lf", &t0_bd1_);
+      if (strstr(line, "cid1"))          sscanf(line, "cid1 %d", &cid1_);
+      if (strstr(line, "cid2"))          sscanf(line, "cid2 %d", &cid2_);
+      if (strstr(line, "z_step"))        sscanf(line, "z_step %lf", &z_step_);
+      if (strstr(line, "drift_velocity"))sscanf(line, "drift_velocity %lf", &drift_velocity_);
+   }
+   fclose(fp);
+
+   if      (strcmp(fit_func_name_, "FIT_FUNC_TYPE_FIX_T0")==0)  { fit_func_type_ = Track::FIT_FUNC_TYPE_FIX_T0; } 
+   else if (strcmp(fit_func_name_, "FIT_FUNC_TYPE_FREE_T0")==0) { fit_func_type_ = Track::FIT_FUNC_TYPE_FREE_T0; } 
+
+
+   PrintRunParameters();
+}
+
+void OutputROOT::PrintRunParameters()
+{
+   printf("fit_func_name   %s\n", fit_func_name_);
+   printf("t0_bd0          %5.2f [ns]\n", t0_bd0_);
+   printf("t0_bd1          %5.2f [ns]\n", t0_bd0_);
+   printf("cid1            %d\n", cid1_);
+   printf("cid2            %d\n", cid2_);
+   printf("z_step          %6.2f [mm]\n", z_step_);
+   printf("drift_velocity  %6.2f [mm/ns]\n", drift_velocity_);
+}
+
+const char* OutputROOT::GetRootPath()
+{
+   return out_root_path_;
+}
+
+const char* OutputROOT::GetRunParamsPath()
+{
+   return run_params_path_;
+}
+
+int OutputROOT::GetFitFuncType()
+{
+   return fit_func_type_;
+}
+
+double OutputROOT::GetT0_Bd0()
+{
+   return t0_bd0_;
+}
+
+double OutputROOT::GetT0_Bd1()
+{
+   return t0_bd1_;
+}
+
+int OutputROOT::GetLayerNumber1()
+{
+   return cid1_;
+}
+
+int OutputROOT::GetLayerNumber2()
+{
+   return cid2_;
+}
+
+double OutputROOT::GetZstep()
+{
+   return z_step_;
+}
+
+double OutputROOT::GetDriftVelocity()
+{
+   return drift_velocity_;
 }
 
