@@ -2,13 +2,14 @@
 
 require "fileutils"
 
+$prog_path="/home/had/hideyuki/private/genfit2/KEKCC/hs_cosmic/"
 $inroot_dir="/home/had/hideyuki/private/genfit2/KEKCC/root/cosmic_root/"
 $outroot_dir="/home/had/hideyuki/private/genfit2/KEKCC/root/cosmic_root_out/sub/"
 $prog_dir="/home/had/hideyuki/private/genfit2/KEKCC/hs_cosmic/"
 $config_dir="/home/had/hideyuki/private/genfit2/KEKCC/hs_cosmic/config/"
 
 def command(total, run_num, config_num)
-   #Usage ./main <input.root> <output.root> <start_event> <last_event> <fit_func_name>
+   #Usage ./main <prog_path> <config.txt> <input.root> <output.root> <start_event> <last_event>
    num_each=10000
    input_root="run#{run_num}.root"
    config_path="#{$config_dir}/config#{config_num}.txt"
@@ -22,7 +23,7 @@ def command(total, run_num, config_num)
       output_root="run_#{run_num}_config_#{config_num}_#{iev_str}.root"
       #puts "iev #{start_iev} #{last_iev}"
       cmd="#!/bin/bash\n"
-      cmd+="#{$prog_dir}/main #{config_path} #{$inroot_dir}/#{input_root} #{$outroot_dir}/#{output_root} #{start_iev} #{last_iev}\n"
+      cmd+="#{$prog_dir}/main #{$prog_path} #{config_path} #{$inroot_dir}/#{input_root} #{$outroot_dir}/#{output_root} #{start_iev} #{last_iev}\n"
       File.open("batch/run_#{run_num}_config_#{config_num}_#{iev_str}.sh", "w") do |file|
          file.write cmd
       end

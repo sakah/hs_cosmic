@@ -131,8 +131,8 @@ struct FitXT_2016_03_02
 struct Test4
 {
    Run run;
-   Test4(const char* config_path, const char* input_root_path, const char* output_root_path)
-      :run(config_path, input_root_path, output_root_path)
+   Test4(const char* prog_path, const char* config_path, const char* input_root_path, const char* output_root_path)
+      :run(prog_path, config_path, input_root_path, output_root_path)
    {
       
    };

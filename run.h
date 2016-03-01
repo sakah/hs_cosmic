@@ -17,7 +17,7 @@ class Run
 {
    public:
       Run();
-      Run(const char* config_path, const char* input_root_path, const char* ouput_root_path);
+      Run(const char* prog_path, const char* config_path, const char* input_root_path, const char* ouput_root_path);
       void GetNext();
       void GetEntry(Long64_t event_number);
       void SetT0(double t0_0, double t0_1);

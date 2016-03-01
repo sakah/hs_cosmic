@@ -4,8 +4,9 @@ Run::Run()
 {
 }
 
-Run::Run(const char* config_path, const char* input_root_path, const char* output_root_path)
+Run::Run(const char* prog_path, const char* config_path, const char* input_root_path, const char* output_root_path)
 {
+   config_.SetProgPath(prog_path);
    config_.ReadParameters(config_path);
    output_.ReadConfig(config_);
    output_.SetOutputRootFile(output_root_path);
