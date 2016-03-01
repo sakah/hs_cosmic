@@ -1,2 +1,3 @@
 == done == Modify xtcurve.h/cc and run.cc for both cases; constant drift velocity and xt_param_path
 Check root with modified code
+Find the reason why xt_curve_pol4 is very slow
