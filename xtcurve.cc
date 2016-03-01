@@ -6,6 +6,8 @@
 #include "TLine.h"
 #include "TH2F.h"
 #include "TGraph.h"
+
+#include "config.h"
 #include "xtcurve.h"
 
 //__________________________________________________
@@ -13,7 +15,7 @@ XTcurve::XTcurve()
 {
 }
 
-void XTcurve::ReadParametersTextFile(const char* path)
+void XTcurve::Setup(Config& config)
 {
 }
 
@@ -32,8 +34,9 @@ ConstXTcurve::ConstXTcurve()
 {
 }
 
-void ConstXTcurve::ReadParametersTextFile(const char* path)
+void ConstXTcurve::Setup(Config& config)
 {
+   drift_velocity_ = config.GetDriftVelocity();
 }
 
 double ConstXTcurve::GetR(int cid, double T, int left_or_right)
@@ -78,11 +81,16 @@ XTcurvePol4::XTcurvePol4()
    }
 }
 
-void XTcurvePol4::ReadParametersTextFile(const char* path)
+void XTcurvePol4::Setup(Config& config)
 {
-   FILE* fp = fopen(path, "r");
+   char* xt_param_path = config.GetXTParamPath();
+   if (strcmp(xt_param_path, "NOT_USED")!=0) {
+      return;
+   }
+
+   FILE* fp = fopen(xt_param_path, "r");
    if (fp==NULL) {
-      fprintf(stderr, "ERROR: cannot open file %s\n", path);
+      fprintf(stderr, "ERROR: cannot open file %s\n", xt_param_path);
       exit(1);
    }
    char line[128];

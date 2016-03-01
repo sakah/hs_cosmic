@@ -3,22 +3,13 @@
 
 OutputROOT::OutputROOT()
 {
-   strcpy(fit_func_name_, "FIT_FUNC_TYPE_FREE_T0");
-   fit_func_type_ = Track::FIT_FUNC_TYPE_FREE_T0;
-   t0_bd0_ = -850;
-   t0_bd1_ = -850;
-   cid1_ = 1;
-   cid2_ = 7;
-   z_step_ = 10.0; // 10.0 mm
-   strcpy(xt_param_path_, "USE_CONST_DRIFT_VELOCITY");
-   drift_velocity_ = 0.04;
 }
 
-void OutputROOT::SetRootFile(const char* path)
+void OutputROOT::SetOutputRootFile(const char* output_root_path)
 {
-   strcpy(out_root_path_, path);
+   strcpy(output_root_path_, output_root_path);
 
-   f_ = new TFile(path, "recreate");
+   f_ = new TFile(output_root_path, "recreate");
    t_ = new TTree("t", "t");
 
    t_->Branch("etime",             &etime_,            "etime/I");
@@ -45,18 +36,33 @@ void OutputROOT::SetRootFile(const char* path)
 
    // run parameters
    t2_ = new TTree("t2", "Run parameters");
-   t2_->Branch("fit_func_type", &fit_func_type_, "fit_func_type/I");
-   t2_->Branch("t0_bd0", &t0_bd0_, "t0_bd0/D");
-   t2_->Branch("t0_bd1", &t0_bd1_, "t0_bd1/D");
-   t2_->Branch("cid1", &cid1_, "cid1/I");
-   t2_->Branch("cid2", &cid2_, "cid2/I");
-   t2_->Branch("z_step_", &z_step_, "z_step/D");
-   t2_->Branch("drift_velocity", &drift_velocity_, "drift_velocity/D");
-   //
-   // fill run parameters once
-   // ReadRunParameters should be called in advance
-   f_->cd();
-   t2_->Fill();
+   t2_->Branch("config_xt_curve_name", &config_xt_curve_name_, "xt_curve_name/C");
+   t2_->Branch("config_xt_param_path", &config_xt_param_path_, "xt_param_path/C");
+   t2_->Branch("config_fit_func_name", &config_fit_func_name_, "fit_func_name/C");
+   t2_->Branch("config_t0_bd0", &config_t0_bd0_, "t0_bd0/D");
+   t2_->Branch("config_t0_bd1", &config_t0_bd1_, "t0_bd1/D");
+   t2_->Branch("config_cid1", &config_cid1_, "cid1/I");
+   t2_->Branch("config_cid2", &config_cid2_, "cid2/I");
+   t2_->Branch("config_z_step", &config_z_step_, "z_step/D");
+   t2_->Branch("config_drift_velocity", &config_drift_velocity_, "drift_velocity/D");
+}
+
+const char* OutputROOT::GetOutputRootPath()
+{
+   return output_root_path_;
+}
+
+void OutputROOT::ReadConfig(Config& config)
+{
+   strcpy(config_xt_curve_name_, config.GetXTcurveName());
+   strcpy(config_xt_param_path_, config.GetXTParamPath());
+   strcpy(config_fit_func_name_, config.GetFitFuncName());
+   config_t0_bd0_         = config.GetT0_Bd1();
+   config_t0_bd1_         = config.GetT0_Bd1();
+   config_cid1_           = config.GetLayerNumber1();
+   config_cid2_           = config.GetLayerNumber2();
+   config_z_step_         = config.GetZstep();
+   config_drift_velocity_ = config.GetDriftVelocity();
 }
 
 void OutputROOT::Clear()
@@ -196,18 +202,19 @@ void OutputROOT::OpenRootFile(const char* root_path)
    t2_ = (TTree*)f_->Get("t2");
    if (t2_==NULL) {
       printf("Warning: run parameters are not set. Defalut values are used!\n");
-      PrintRunParameters();
       return;
    }
-   t2_->SetBranchAddress("fit_func_type", &fit_func_type_);
-   t2_->SetBranchAddress("t0_bd0", &t0_bd0_);
-   t2_->SetBranchAddress("t0_bd1", &t0_bd1_);
-   t2_->SetBranchAddress("cid1", &cid1_);
-   t2_->SetBranchAddress("cid2", &cid2_);
-   t2_->SetBranchAddress("z_step_", &z_step_);
-   t2_->SetBranchAddress("drift_velocity", &drift_velocity_);
+   t2_->SetBranchAddress("config_xt_curve_name",  config_xt_curve_name_);
+   t2_->SetBranchAddress("config_xt_param_path",  config_xt_param_path_);
+   t2_->SetBranchAddress("config_fit_func_name",  config_fit_func_name_);
+   t2_->SetBranchAddress("config_t0_bd0", &config_t0_bd0_);
+   t2_->SetBranchAddress("config_t0_bd1", &config_t0_bd1_);
+   t2_->SetBranchAddress("config_cid1", &config_cid1_);
+   t2_->SetBranchAddress("config_cid2", &config_cid2_);
+   t2_->SetBranchAddress("config_z_step", &config_z_step_);
+   t2_->SetBranchAddress("config_drift_velocity",&config_drift_velocity_);
    t2_->GetEntry(0);
-   PrintRunParameters();
+
 }
 
 int OutputROOT::GetEntries()
@@ -373,96 +380,54 @@ double OutputROOT::GetTrackResR(int test_cid, int cid)
    return GetTrackFitR(test_cid, cid) - GetTrackHitR(test_cid, cid);
 }
 
-void OutputROOT::ReadRunParameters(const char* path)
+char*  OutputROOT::GetConfigXTcurveName()
 {
-   strcpy(run_params_path_, path);
-
-   FILE* fp = fopen(path, "r");
-   if (fp==NULL) {
-      fprintf(stderr, "ERROR: cannot open %s\n", path);
-      exit(1);
-   }
-   char line[128];
-   while(fgets(line, sizeof(line), fp)) {
-      if (strstr(line, "fit_func_name")) sscanf(line, "fit_func_name %s", fit_func_name_);
-      if (strstr(line, "t0_bd0"))        sscanf(line, "t0_bd0 %lf", &t0_bd0_);
-      if (strstr(line, "t0_bd1"))        sscanf(line, "t0_bd1 %lf", &t0_bd1_);
-      if (strstr(line, "cid1"))          sscanf(line, "cid1 %d", &cid1_);
-      if (strstr(line, "cid2"))          sscanf(line, "cid2 %d", &cid2_);
-      if (strstr(line, "z_step"))        sscanf(line, "z_step %lf", &z_step_);
-      if (strstr(line, "drift_velocity"))sscanf(line, "drift_velocity %lf", &drift_velocity_);
-      if (strstr(line, "xt_param_path")) sscanf(line, "xt_param_path %s", xt_param_path_); // relative path
-   }
-   fclose(fp);
-
-   if (strcmp(xt_param_path_, "USE_CONST_DRIFT_VELOCITY")!=0) {
-      sprintf(xt_param_path_, "%s/%s", __FILE__, xt_param_path_);
-   }
-
-   if      (strcmp(fit_func_name_, "FIT_FUNC_TYPE_FIX_T0")==0)  { fit_func_type_ = Track::FIT_FUNC_TYPE_FIX_T0; } 
-   else if (strcmp(fit_func_name_, "FIT_FUNC_TYPE_FREE_T0")==0) { fit_func_type_ = Track::FIT_FUNC_TYPE_FREE_T0; } 
-
-   PrintRunParameters();
+   return config_xt_curve_name_;
 }
 
-void OutputROOT::PrintRunParameters()
+char*  OutputROOT::GetConfigXTParamPath()
 {
-   printf("fit_func_name   %s\n", fit_func_name_);
-   printf("t0_bd0          %5.2f [ns]\n", t0_bd0_);
-   printf("t0_bd1          %5.2f [ns]\n", t0_bd1_);
-   printf("cid1            %d\n", cid1_);
-   printf("cid2            %d\n", cid2_);
-   printf("z_step          %6.2f [mm]\n", z_step_);
-   printf("drift_velocity  %6.2f [mm/ns]\n", drift_velocity_);
-   printf("xt_param_path   %s\n", xt_param_path_);
+   return config_xt_param_path_;
 }
 
-const char* OutputROOT::GetRootPath()
+char*  OutputROOT::GetConfigFitFuncName()
 {
-   return out_root_path_;
+   return config_fit_func_name_;
 }
 
-const char* OutputROOT::GetRunParamsPath()
+double OutputROOT::GetConfigT0_Bd0()
 {
-   return run_params_path_;
+   return config_t0_bd0_;
 }
 
-int OutputROOT::GetFitFuncType()
+double OutputROOT::GetConfigT0_Bd1()
 {
-   return fit_func_type_;
+   return config_t0_bd1_;
 }
 
-double OutputROOT::GetT0_Bd0()
+int    OutputROOT::GetConfigLayerNumber1()
 {
-   return t0_bd0_;
+   return config_cid1_;
 }
 
-double OutputROOT::GetT0_Bd1()
+int    OutputROOT::GetConfigLayerNumber2()
 {
-   return t0_bd1_;
+   return config_cid2_;
 }
 
-int OutputROOT::GetLayerNumber1()
+double OutputROOT::GetConfigZstep()
 {
-   return cid1_;
+   return config_z_step_;
 }
 
-int OutputROOT::GetLayerNumber2()
+double OutputROOT::GetConfigDriftVelocity()
 {
-   return cid2_;
+   return config_drift_velocity_;
 }
 
-double OutputROOT::GetZstep()
+
+void OutputROOT::FillConfig()
 {
-   return z_step_;
+   t2_->Fill();
 }
 
-double OutputROOT::GetDriftVelocity()
-{
-   return drift_velocity_;
-}
-
-char* OutputROOT::GetXTParamPath()
-{
-   return xt_param_path_;
-}
