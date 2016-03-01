@@ -84,8 +84,10 @@ XTcurvePol4::XTcurvePol4()
 void XTcurvePol4::Setup(Config& config)
 {
    char* xt_param_path = config.GetXTParamPath();
-   if (strcmp(xt_param_path, "NOT_USED")!=0) {
-      return;
+   printf("XTcurvePol4::Setup is called. xt_param_path %s\n", xt_param_path);
+   if (strcmp(xt_param_path, "NOT_USED")==0) {
+      fprintf(stderr, "xt_param_path is not set. exit.\n");
+      exit(1);
    }
 
    FILE* fp = fopen(xt_param_path, "r");
@@ -93,6 +95,7 @@ void XTcurvePol4::Setup(Config& config)
       fprintf(stderr, "ERROR: cannot open file %s\n", xt_param_path);
       exit(1);
    }
+
    char line[128];
    int cid;
    int left_or_right;

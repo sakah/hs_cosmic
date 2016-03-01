@@ -32,6 +32,7 @@ void Config::ReadParameters(const char* path)
    }
    char line[128];
    while(fgets(line, sizeof(line), fp)) {
+      //printf("line -> '%s'", line);
       if (strstr(line, "xt_curve_name")) sscanf(line, "xt_curve_name %s", xt_curve_name_);
       if (strstr(line, "xt_param_path")) sscanf(line, "xt_param_path %s", xt_param_path_); // relative path
       if (strstr(line, "drift_velocity"))sscanf(line, "drift_velocity %lf", &drift_velocity_);
@@ -45,7 +46,16 @@ void Config::ReadParameters(const char* path)
    fclose(fp);
 
    if (strcmp(xt_param_path_, "NOT_USED")!=0) {
-      sprintf(xt_param_path_, "%s/%s", __FILE__, xt_param_path_);
+      char buf[1024]={};
+      readlink("/proc/self/exe", buf, sizeof(buf)-1);
+      //printf("path_to_program %s\n", buf);
+      char* p = strrchr(buf, '/');
+      *p = '\0';
+      char absolute_path[1024];
+      sprintf(absolute_path, "%s/%s", buf, xt_param_path_);
+      //printf("absolute_path %s\n", absolute_path);
+      // overwrite
+      strcpy(xt_param_path_, absolute_path);
    }
 
    if      (strcmp(fit_func_name_, "FIT_FUNC_TYPE_FIX_T0")==0)  { fit_func_type_ = Track::FIT_FUNC_TYPE_FIX_T0; } 
