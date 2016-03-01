@@ -80,6 +80,11 @@ void Config::PrintParameters()
    printf("z_step          %6.2f [mm]\n", z_step_);
 }
 
+const char* Config::GetProgPath()
+{
+   return prog_path_;
+}
+
 const char* Config::GetConfigPath()
 {
    return config_path_;
