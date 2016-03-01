@@ -7,6 +7,14 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TGraph.h"
+#include "TMath.h"
+
+
+double abs_gaus(double* x, double* par)
+{
+   double dx = (TMath::Abs(x[0]) - par[1])/par[2];
+   return par[0]*TMath::Exp(-0.5*dx*dx)/par[2]/TMath::Sqrt(2.0*TMath::Pi());
+}
 
 class Analysis
 {
@@ -18,6 +26,7 @@ class Analysis
       virtual void BeginOfEvent();
       virtual void LoopEvent(int iev);
       virtual void EndOfEvent();
+      TF1* f1_abs_gaus_;
 
    protected:
       OutputROOT outroot_;
@@ -59,6 +68,12 @@ class AnaResXVSFitX : public Analysis
       TGraph* GetResXVSFitXPeak(int test_cid);
       TGraph* GetResXVSFitXFit(int test_cid);
 
+      TH2F* GetFitXVSHitdTLeft(int test_cid);
+      TH2F* GetFitXVSHitdTRight(int test_cid);
+
+      TGraph* GetFitXVSHitdTFitLeft(int test_cid);
+      TGraph* GetFitXVSHitdTFitRight(int test_cid);
+
       void DrawHitdTVSFitXMean(int test_cid);
       void DrawHitdTVSFitXPeak(int test_cid);
       void DrawHitdTVSFitXFit(int test_cid);
@@ -71,10 +86,30 @@ class AnaResXVSFitX : public Analysis
       void DrawResXVSFitXPeak(int test_cid);
       void DrawResXVSFitXFit(int test_cid);
 
+      void DrawFitXVSHitdTFitLeft(int test_cid);
+      void DrawFitXVSHitdTFitRight(int test_cid);
+
       TF1* FitHitdTVSFitXFitWithPol4(int test_cid, int left_or_right, double xmin, double xmax);
       void FitHitdTVSFitXFitWithPol4(char* output_txt);
 
+      TF1* FitFitXVSHitdTFitWithPol4(int test_cid, int left_or_right, double xmin, double xmax);
+      void FitFitXVSHitdTFitWithPol4(char* output_txt);
+
+
+      int GetFitXNumBins();
+      double GetFitXXmin();
+      double GetFitXXmax();
+      double GetFitXdX();
+
+      void SetFitXNumBins(int numBins);
+      void SetFitXXmin(double xmin);
+      void SetFitXXmax(double xmax);
+
    private:
+      int fitX_num_bins_;
+      double fitX_xmin_;
+      double fitX_xmax_;
+
       TH2F* h2_hitdT_VS_fitX_[MAX_LAYER];
       TH1F* h1_hitdT_[MAX_LAYER][100];
 
@@ -95,6 +130,11 @@ class AnaResXVSFitX : public Analysis
       TGraph* gr_resX_VS_fitX_mean_[MAX_LAYER];
       TGraph* gr_resX_VS_fitX_peak_[MAX_LAYER];
       TGraph* gr_resX_VS_fitX_fit_[MAX_LAYER];
+
+      TH2F* h2_fitX_left_VS_hitdT_[MAX_LAYER];
+      TH2F* h2_fitX_right_VS_hitdT_[MAX_LAYER];
+      TGraph* gr_fitX_left_VS_hitdT_fit_[MAX_LAYER];
+      TGraph* gr_fitX_right_VS_hitdT_fit_[MAX_LAYER];
 
       int GetIdxFitX(double fitX);
       double GetFitXAt(int ifitX);

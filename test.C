@@ -115,9 +115,15 @@ struct Test3
 //___________________
 struct FitXT_2016_03_02
 {
-   FitXT_2016_03_02 ana27_1;
-   ana27_1.OpenRootFile("../cosmic_root_out/run27_config_1.root");
-   ana27_1.Loop(); printf("run27 config1 done\n");
+   AnaResXVSFitX ana27_1;
+   AnaResXVSFitX ana27_2;
+   FitXT_2016_03_02()
+   {
+      ana27_1.OpenRootFile("../cosmic_root_out/run27_config_1.root");
+      ana27_2.OpenRootFile("../cosmic_root_out/run27_config_2.root");
+      ana27_1.Loop(); printf("run27 config1 done\n");
+      //ana27_2.Loop(); printf("run27 config2 done\n");
+   };
 };
 
 
