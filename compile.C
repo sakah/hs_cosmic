@@ -1,4 +1,5 @@
 {
+   gROOT->ProcessLine(".L config.cc+O");
    gROOT->ProcessLine(".L line.cc+O");
    gROOT->ProcessLine(".L wiremap.cc+O");
    gROOT->ProcessLine(".L event.cc+O");
