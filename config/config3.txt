@@ -1,4 +1,4 @@
-xt_curve_type USE_PARAM_POL4
+xt_curve_name USE_PARAM_POL4
 xt_param_file xt_param/fitpar_run27.txt
 fit_func_name FIT_FUNC_TYPE_FREE_T0
 t0_bd0 -850
