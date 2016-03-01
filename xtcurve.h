@@ -2,14 +2,16 @@
 #define _XTCURVE_H
 
 #include "param.h"
+#include "config.h"
 #include "TF1.h"
 
 class XTcurve
 {
    public:
-      enum { LEFT, RIGHT};
+      enum { USE_CONST_XT, USE_PARAM_POL4 };
+      enum { LEFT, RIGHT };
       XTcurve();
-      virtual void ReadParametersTextFile(const char* path);
+      virtual void Setup(Config& config);
       virtual double GetR(int cid, double T, int left_or_right);
       virtual double GetT(int cid, double X);
 };
@@ -18,7 +20,7 @@ class ConstXTcurve : public XTcurve
 {
    public:
       ConstXTcurve();
-      virtual void ReadParametersTextFile(const char* path);
+      virtual void Setup(Config& config);
       virtual double GetR(int cid, double T, int left_or_right);
       virtual double GetT(int cid, double X);
       void SetDriftVelocity(double drift_velocity);
@@ -33,7 +35,7 @@ class XTcurvePol4 : public XTcurve
 {
    public:
       XTcurvePol4();
-      virtual void ReadParametersTextFile(const char* path);
+      virtual void Setup(Config& config);
       virtual double GetR(int cid, double T, int left_or_right);
       virtual double GetT(int cid, double X);
       virtual void DrawXTcurve(int cid);

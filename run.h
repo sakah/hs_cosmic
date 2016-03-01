@@ -17,14 +17,13 @@ class Run
 {
    public:
       Run();
-      Run(const char* input_root_path, const char* ouput_root_path, const char* run_params_path);
+      Run(const char* config_path, const char* input_root_path, const char* ouput_root_path);
       void GetNext();
       void GetEntry(Long64_t event_number);
       void SetT0(double t0_0, double t0_1);
       void PrintHits();
       void DrawHits();
       void MakeTangents(int cid1, int cid2, double z1, double z2);
-      void PrintTangents();
       void DrawTangents();
       bool FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_step);
       void DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_step);
@@ -33,12 +32,12 @@ class Run
       void Loop(Long64_t start_iev, Long64_t last_iev);
 
    private:
-      ConstXTcurve xt_;
+      Config config_;
+      XTcurve* xt_ptr_;
       Chamber chamber_;
       Event event_;
       Track track_;
       TrackFinder finder_;
-      bool save_output_;
       OutputROOT output_;
 };
 

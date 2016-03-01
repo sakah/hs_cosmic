@@ -4,18 +4,21 @@ Run::Run()
 {
 }
 
-Run::Run(const char* input_root_path, const char* output_root_path, const char* run_params_path)
+Run::Run(const char* config_path, const char* input_root_path, const char* output_root_path)
 {
-   output_.ReadRunParameters(run_params_path);
-   output_.SetRootFile(output_root_path);
+   config_.ReadParameters(config_path);
+   output_.ReadConfig(config_);
+   output_.SetOutputRootFile(output_root_path);
+   output_.FillConfig();
 
-   if (strcmp(output_.GetXTParamPath(), "USE_CONST_DRIFT_VELOCITY")!=0) {
-      xt_.ReadParametersTextFile(output_.GetXTParamPath());
+   if (config_.GetXTcurveType() == XTcurve::USE_CONST_XT) {
+      xt_ptr_ = new ConstXTcurve;
+   } else if (config_.GetXTcurveType() == XTcurve::USE_PARAM_POL4) {
+      xt_ptr_ = new XTcurvePol4;
    }
-   xt_.SetDriftVelocity(output_.GetDriftVelocity());
+   xt_ptr_->Setup(config_);
 
    chamber_.ReadWireMap("wirepos.proto4.sw.ver7.txt");
-
    event_.OpenRootFile(input_root_path);
 }
 
@@ -40,12 +43,12 @@ void Run::SetT0(double t0_0, double t0_1)
 
 void Run::PrintHits()
 {
-   chamber_.PrintHits(xt_);
+   chamber_.PrintHits(*xt_ptr_);
 }
 
 void Run::DrawHits()
 {
-   chamber_.DrawHits(event_, xt_);
+   chamber_.DrawHits(event_, *xt_ptr_);
 }
 
 void Run::MakeTangents(int cid1, int cid2, double z1, double z2)
@@ -73,13 +76,8 @@ void Run::MakeTangents(int cid1, int cid2, double z1, double z2)
    }
 
    WireMap& wiremap = chamber_.GetWireMap();
-   track_.MakeTangents(wiremap, xt_, cid1, cid2, z1, z2);
-}
-
-void Run::PrintTangents()
-{
-   WireMap& wiremap = chamber_.GetWireMap();
-   track_.PrintTangents(wiremap, xt_);
+   track_.MakeTangents(wiremap, *xt_ptr_, cid1, cid2, z1, z2);
+   track_.PrintTangents(wiremap, *xt_ptr_);
 }
 
 void Run::DrawTangents()
@@ -97,12 +95,12 @@ bool Run::FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_st
    }
 
    WireMap& wiremap = chamber_.GetWireMap();
-   int num_tracks = finder_.SetTracks(chamber_, xt_);
+   int num_tracks = finder_.SetTracks(chamber_, *xt_ptr_);
    if (num_tracks==0) {
       return false;
    }
-   finder_.FindBestTrack(chamber_, xt_, cid1, cid2, z_step);
-   finder_.PrintTracks(wiremap, xt_);
+   finder_.FindBestTrack(chamber_, *xt_ptr_, cid1, cid2, z_step);
+   finder_.PrintTracks(wiremap, *xt_ptr_);
    return true;
 }
 
@@ -115,9 +113,9 @@ void Run::DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_st
    }
    WireMap& wiremap = chamber_.GetWireMap();
    Track& min_track = finder_.GetBestTrack();
-   min_track.PrintTrackWithLine(wiremap, xt_, min_track.GetMinTangent(wiremap, xt_));
-   Line& min_tangent = min_track.GetMinTangent(wiremap, xt_);
-   chamber_.DrawTrack(event_, xt_, min_track, min_tangent);
+   min_track.PrintTrackWithLine(wiremap, *xt_ptr_, min_track.GetMinTangent(wiremap, *xt_ptr_));
+   Line& min_tangent = min_track.GetMinTangent(wiremap, *xt_ptr_);
+   chamber_.DrawTrack(event_, *xt_ptr_, min_track, min_tangent);
 }
 
 bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid)
@@ -136,12 +134,12 @@ bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int te
       return false;
    }
    Track& min_track = finder_.GetBestTrack();
-   min_track.PrintTrackWithLine(wiremap, xt_, min_track.GetMinTangent(wiremap, xt_));
+   min_track.PrintTrackWithLine(wiremap, *xt_ptr_, min_track.GetMinTangent(wiremap, *xt_ptr_));
 
-   min_track.InitFit(wiremap, xt_, test_cid, output_.GetFitFuncType());
-   min_track.DoFit(wiremap, xt_);
+   min_track.InitFit(wiremap, *xt_ptr_, test_cid, config_.GetFitFuncType());
+   min_track.DoFit(wiremap, *xt_ptr_);
    min_track.PrintFitResults();
-   min_track.PrintTrackWithLine(wiremap, xt_, min_track.GetFitLine());
+   min_track.PrintTrackWithLine(wiremap, *xt_ptr_, min_track.GetFitLine());
    return true;
 }
 
@@ -156,7 +154,7 @@ void Run::DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int 
    WireMap& wiremap = chamber_.GetWireMap();
    Track& min_track = finder_.GetBestTrack();
    Line& fit_line = min_track.GetFitLine();
-   chamber_.DrawTrack(event_, xt_, min_track, fit_line);
+   chamber_.DrawTrack(event_, *xt_ptr_, min_track, fit_line);
 }
 
 void Run::Loop(Long64_t start_iev, Long64_t last_iev)
@@ -167,19 +165,19 @@ void Run::Loop(Long64_t start_iev, Long64_t last_iev)
    if (last_iev >= total) {
       last_iev = total -1;
    }
+   printf("config_path %s\n", config_.GetConfigPath());
    printf("input_root_path %s\n", event_.GetRootPath());
-   printf("output_root_path %s\n", output_.GetRootPath());
-   printf("run_params_path %s\n", output_.GetRunParamsPath());
+   printf("output_root_path %s\n", output_.GetOutputRootPath());
    printf("total %lld\n", total);
    printf("start_iev %lld\n", start_iev);
    printf("last_iev %lld\n", last_iev);
 
 
-   double t0_0  = output_.GetT0_Bd0();
-   double t0_1  = output_.GetT0_Bd1();
-   int cid1 = output_.GetLayerNumber1();
-   int cid2 = output_.GetLayerNumber2();
-   double z_step = output_.GetZstep();
+   double t0_0  = config_.GetT0_Bd0();
+   double t0_1  = config_.GetT0_Bd1();
+   int cid1 = config_.GetLayerNumber1();
+   int cid2 = config_.GetLayerNumber2();
+   double z_step = config_.GetZstep();
 
    SetT0(t0_0, t0_1);
 
@@ -194,20 +192,20 @@ void Run::Loop(Long64_t start_iev, Long64_t last_iev)
 
       output_.SetHitData(event_, chamber_);
 
-      int num_tracks = finder_.SetTracks(chamber_, xt_);
-      //finder_.PrintTracks(wiremap, xt_);
+      int num_tracks = finder_.SetTracks(chamber_, *xt_ptr_);
+      //finder_.PrintTracks(wiremap, *xt_ptr_);
 
       output_.SetTrackFinderData(finder_);
 
       if (num_tracks>0) {
-         finder_.FindBestTrack(chamber_, xt_, cid1, cid2, z_step);
+         finder_.FindBestTrack(chamber_, *xt_ptr_, cid1, cid2, z_step);
          Track& track = finder_.GetBestTrack();
          for (int test_cid=1; test_cid<=7; test_cid++) {
             //printf("test_cid %d\n", test_cid);
-            track.InitFit(wiremap, xt_, test_cid, output_.GetFitFuncType(), false);
-            track.DoFit(wiremap, xt_);
+            track.InitFit(wiremap, *xt_ptr_, test_cid, config_.GetFitFuncType(), false);
+            track.DoFit(wiremap, *xt_ptr_);
             //track.PrintFitResults();
-            output_.SetTrackData(chamber_, xt_, track);
+            output_.SetTrackData(chamber_, *xt_ptr_, track);
          }
       }
 
