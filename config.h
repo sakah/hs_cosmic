@@ -9,6 +9,8 @@ class Config
       Config();
       void ReadParameters(const char* path);
       void PrintParameters();
+
+      const char* GetProgPath();
       const char* GetConfigPath();
 
       char*  GetXTcurveName();
@@ -23,7 +25,10 @@ class Config
       double GetDriftVelocity();
       char*  GetXTParamPath();
 
+      void SetProgPath(const char* prog_path);
+
    private:
+      char prog_path_[512];
       char config_path_[512];
       char xt_curve_name_[32];
       int xt_curve_type_;

@@ -7,6 +7,7 @@
 
 Config::Config()
 {
+   strcpy(prog_path_, "./");
    strcpy(xt_curve_name_, "USE_CONST_XT");
    strcpy(xt_param_path_, "NOT_USED");
    drift_velocity_ = 0.04;
@@ -46,19 +47,7 @@ void Config::ReadParameters(const char* path)
    fclose(fp);
 
    if (strcmp(xt_param_path_, "NOT_USED")!=0) {
-      // try to set absolute path for running at KEKCC
-      char buf[1024]={};
-      int ret = readlink("/proc/self/exe", buf, sizeof(buf)-1);
-      if (ret!=-1) {
-         //printf("path_to_program %s\n", buf);
-         char* p = strrchr(buf, '/');
-         *p = '\0';
-         char absolute_path[1024];
-         sprintf(absolute_path, "%s/%s", buf, xt_param_path_);
-         //printf("absolute_path %s\n", absolute_path);
-         // overwrite
-         strcpy(xt_param_path_, absolute_path);
-      }
+      sprintf(xt_param_path_, "%s/%s", prog_path_, xt_param_path_);
    }
 
    if      (strcmp(fit_func_name_, "FIT_FUNC_TYPE_FIX_T0")==0)  { fit_func_type_ = Track::FIT_FUNC_TYPE_FIX_T0; } 
@@ -149,4 +138,9 @@ double Config::GetDriftVelocity()
 char* Config::GetXTParamPath()
 {
    return xt_param_path_;
+}
+
+void Config::SetProgPath(const char* prog_path)
+{
+   strcpy(prog_path_, prog_path);
 }
