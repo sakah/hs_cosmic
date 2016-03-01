@@ -111,3 +111,23 @@ struct Test3
       ana27_2.Loop(); printf("run27 config2 done\n");
    };
 };
+
+//___________________
+struct FitXT_2016_03_02
+{
+   FitXT_2016_03_02 ana27_1;
+   ana27_1.OpenRootFile("../cosmic_root_out/run27_config_1.root");
+   ana27_1.Loop(); printf("run27 config1 done\n");
+};
+
+
+//___________________
+struct Test4
+{
+   Run run;
+   Test4(const char* config_path, const char* input_root_path, const char* output_root_path)
+      :run(config_path, input_root_path, output_root_path)
+   {
+      
+   };
+};
