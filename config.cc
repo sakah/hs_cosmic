@@ -50,19 +50,27 @@ void Config::ReadParameters(const char* path)
 
    if      (strcmp(fit_func_name_, "FIT_FUNC_TYPE_FIX_T0")==0)  { fit_func_type_ = Track::FIT_FUNC_TYPE_FIX_T0; } 
    else if (strcmp(fit_func_name_, "FIT_FUNC_TYPE_FREE_T0")==0) { fit_func_type_ = Track::FIT_FUNC_TYPE_FREE_T0; } 
+   else {
+      fprintf(stderr, "ERROR: unknown name %s\n", fit_func_name_);
+      exit(1);
+   }
 
    if      (strcmp(xt_curve_name_, "USE_CONST_XT")==0)   { xt_curve_type_ = XTcurve::USE_CONST_XT; } 
    else if (strcmp(xt_curve_name_, "USE_PARAM_POL4")==0) { xt_curve_type_ = XTcurve::USE_PARAM_POL4; } 
+   else {
+      fprintf(stderr, "ERROR: unknown name %s\n", xt_curve_name_);
+      exit(1);
+   }
 
    PrintParameters();
 }
 
 void Config::PrintParameters()
 {
-   printf("xt_curve_name   %s\n", xt_curve_name_);
+   printf("xt_curve_name   %s (%d)\n", xt_curve_name_, xt_curve_type_);
    printf("xt_param_path   %s\n", xt_param_path_);
    printf("drift_velocity  %6.2f [mm/ns]\n", drift_velocity_);
-   printf("fit_func_name   %s\n", fit_func_name_);
+   printf("fit_func_name   %s (%d)\n", fit_func_name_, fit_func_type_);
    printf("t0_bd0          %5.2f [ns]\n", t0_bd0_);
    printf("t0_bd1          %5.2f [ns]\n", t0_bd1_);
    printf("cid1            %d\n", cid1_);
