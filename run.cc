@@ -20,6 +20,12 @@ Run::Run(const char* config_path, const char* input_root_path, const char* outpu
 
    chamber_.ReadWireMap("wirepos.proto4.sw.ver7.txt");
    event_.OpenRootFile(input_root_path);
+
+   double t0_0 = config_.GetT0_Bd0();
+   double t0_1 = config_.GetT0_Bd1();
+   chamber_.SetT0(0, t0_0);
+   chamber_.SetT0(1, t0_1);
+
 }
 
 void Run::GetNext()
