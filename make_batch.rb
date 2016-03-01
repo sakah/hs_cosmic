@@ -22,7 +22,7 @@ def command(total, run_num, config_num)
       output_root="run_#{run_num}_config_#{config_num}_#{iev_str}.root"
       #puts "iev #{start_iev} #{last_iev}"
       cmd="#!/bin/bash\n"
-      cmd+="#{$prog_dir}/main #{$inroot_dir}/#{input_root} #{$outroot_dir}/#{output_root} #{start_iev} #{last_iev} #{config_path}\n"
+      cmd+="#{$prog_dir}/main #{config_path} #{$inroot_dir}/#{input_root} #{$outroot_dir}/#{output_root} #{start_iev} #{last_iev}\n"
       File.open("batch/run_#{run_num}_config_#{config_num}_#{iev_str}.sh", "w") do |file|
          file.write cmd
       end
@@ -32,7 +32,7 @@ end
 
 #command(39322,   16, 1);
 #command(1730623, 24, 1);
-#command(2114226, 27, 1);
+command(2114226, 27, 1);
 
 #command(39322,   16, 2);
 #command(1730623, 24, 2);
