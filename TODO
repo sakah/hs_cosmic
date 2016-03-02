@@ -1,4 +1,4 @@
 == done == Modify xtcurve.h/cc and run.cc for both cases; constant drift velocity and xt_param_path
 == done == Check root with modified code
 == done == Find the reason why xt_curve_pol4 is very slow => Fill into tx_left/right_[cid][ns] and use it in XTcurve::GetR
-There is sharp peak at fitX=8mm
+There is sharp peak at hitR=8mm
