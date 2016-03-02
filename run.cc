@@ -206,8 +206,8 @@ void Run::Loop(Long64_t start_iev, Long64_t last_iev)
 
       if (num_tracks>0) {
          finder_.FindBestTrack(chamber_, *xt_ptr_, cid1, cid2, z_step);
-         Track& track = finder_.GetBestTrack();
          for (int test_cid=1; test_cid<=7; test_cid++) {
+            Track track = finder_.GetBestTrack();
             //printf("test_cid %d\n", test_cid);
             track.InitFit(wiremap, *xt_ptr_, test_cid, config_.GetFitFuncType(), false);
             track.DoFit(wiremap, *xt_ptr_);
