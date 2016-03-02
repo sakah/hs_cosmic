@@ -126,7 +126,6 @@ struct FitXT_2016_03_02
    };
 };
 
-
 //___________________
 struct Test4
 {
@@ -137,3 +136,18 @@ struct Test4
       
    };
 };
+
+//___________________
+struct Test5
+{
+   AnaResXVSFitX ana27_1;
+   AnaResXVSFitX ana27_3;
+   Test5()
+   {
+      ana27_1.OpenRootFile("../cosmic_root_out/run27_config_1.root");
+      ana27_3.OpenRootFile("../cosmic_root_out/run27_config_3.root");
+      ana27_1.Loop(); printf("run27 config1 done\n");
+      ana27_3.Loop(); printf("run27 config3 done\n");
+   };
+};
+

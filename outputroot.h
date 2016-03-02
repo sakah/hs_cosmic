@@ -74,6 +74,8 @@ class OutputROOT
       double GetConfigDriftVelocity();
 
       void FillConfig();
+      TTree* GetTree();
+      TTree* GetTreeConfig();
 
    private:
       char output_root_path_[1280];

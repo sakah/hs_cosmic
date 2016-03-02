@@ -89,6 +89,10 @@ void Analysis::RedrawStatBox(double x1, double y1, double x2, double y2)
       stats->Draw();
    }
 }
+TTree* Analysis::GetTree()
+{
+   return outroot_.GetTree();
+}
 
 //______________________________
 AnaResXVSFitX::AnaResXVSFitX()

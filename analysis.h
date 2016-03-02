@@ -27,6 +27,7 @@ class Analysis
       virtual void LoopEvent(int iev);
       virtual void EndOfEvent();
       TF1* f1_abs_gaus_;
+      TTree* GetTree();
 
    protected:
       OutputROOT outroot_;
