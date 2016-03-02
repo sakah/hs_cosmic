@@ -47,7 +47,9 @@ void Config::ReadParameters(const char* path)
    fclose(fp);
 
    if (strcmp(xt_param_path_, "NOT_USED")!=0) {
-      sprintf(xt_param_path_, "%s/%s", prog_path_, xt_param_path_);
+      char newpath[512];
+      sprintf(newpath, "%s/%s", prog_path_, xt_param_path_);
+      strcpy(xt_param_path_, newpath);
    }
 
    if      (strcmp(fit_func_name_, "FIT_FUNC_TYPE_FIX_T0")==0)  { fit_func_type_ = Track::FIT_FUNC_TYPE_FIX_T0; } 

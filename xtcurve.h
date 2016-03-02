@@ -47,6 +47,8 @@ class XTcurvePol4 : public XTcurve
       TF1* pol4_left_[MAX_LAYER];
       TF1* pol4_left_inverse_x_[MAX_LAYER];
       TF1* pol4_right_[MAX_LAYER];
+      double tx_left_[MAX_LAYER][300];  // Divide 0 - 300 ns in 1ns step
+      double tx_right_[MAX_LAYER][300]; // Divide 0 - 300 ns in 1ns step
 };
 
 #endif

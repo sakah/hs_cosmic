@@ -118,11 +118,19 @@ void XTcurvePol4::Setup(Config& config)
          pol4_left_inverse_x_[cid]->SetNpx(1000);
          pol4_left_inverse_x_[cid]->SetLineColor(kBlue);
 
+         for (int ns=0; ns<300; ns++) {
+            tx_left_[cid][ns] = pol4_left_[cid]->GetX(ns);
+         }
+
       } else {
          pol4_right_[cid] = new TF1(Form("pol4_right_%d", cid), "[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x", 0, 8);
          pol4_right_[cid]->SetParameters(pol0, pol1, pol2, pol3, pol4);
          pol4_right_[cid]->SetNpx(1000);
          pol4_right_[cid]->SetLineColor(kRed);
+
+         for (int ns=0; ns<300; ns++) {
+            tx_right_[cid][ns] = pol4_right_[cid]->GetX(ns);
+         }
       }
    }
    fclose(fp);
@@ -131,14 +139,15 @@ void XTcurvePol4::Setup(Config& config)
 double XTcurvePol4::GetR(int cid, double T, int left_or_right)
 {
    double r = -1e10;
+   int ns = T;
    if (left_or_right==XTcurve::LEFT) {
-      if (pol4_left_[cid]) {
-         r = pol4_left_[cid]->GetX(T);
-      }
+      if (T<0) r= 0;
+      else if (T>=0) r= tx_left_[cid][299];
+      else r = tx_left_[cid][ns];
    }
-   if (pol4_right_[cid]) {
-      r = pol4_right_[cid]->GetX(T);
-   }
+   if (T<0) r= 0;
+   else if (T>=0) r= tx_right_[cid][299];
+   else r = tx_right_[cid][ns];
    return r;
 }
 
