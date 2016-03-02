@@ -25,7 +25,7 @@ void OutputROOT::SetOutputRootFile(const char* output_root_path)
 
    t_->Branch("track_chi2",         track_chi2_,         "track_chi2[9]/D");
    t_->Branch("track_ndf",          track_ndf_,          "track_ndf[9]/D");
-   t_->Branch("track_icell",        track_icell_,        "track_icell[9]/I");
+   t_->Branch("track_icell",        track_icell_,        "track_icell[9][9]/I");
    t_->Branch("track_q",            track_q_,            "track_q[9][9]/D");
    t_->Branch("track_num_hittdcs",  track_num_hittdcs_,  "track_num_hittdcs[9][9]/I");
    t_->Branch("track_hitT",         track_hitT_,         "track_hitT[9][9]/D");
@@ -136,6 +136,7 @@ void OutputROOT::SetTrackData(Chamber& chamber, XTcurve& xt, Track& track)
       if (!hit.HasHit()) continue;
 
       int icell = hit.GetCellNumber();
+      //printf("OutputROOT::SEtTrackData cid %d icell %d\n", cid, icell);
       double hitR = hit.GetHitR(xt);
       double fitX = track.GetXFromLine(wiremap, cid, fit_line);
       track_icell_[test_cid][cid]        = icell;
