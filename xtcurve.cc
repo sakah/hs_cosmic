@@ -142,11 +142,11 @@ double XTcurvePol4::GetR(int cid, double T, int left_or_right)
    int ns = T;
    if (left_or_right==XTcurve::LEFT) {
       if (T<0) r= 0;
-      else if (T>=0) r= tx_left_[cid][299];
+      else if (T>=300) r= tx_left_[cid][299];
       else r = tx_left_[cid][ns];
    }
-   if (T<0) r= 0;
-   else if (T>=0) r= tx_right_[cid][299];
+   if (T<0) r = 0;
+   else if (T>=300) r= tx_right_[cid][299];
    else r = tx_right_[cid][ns];
    return r;
 }
