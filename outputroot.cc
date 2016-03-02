@@ -431,3 +431,13 @@ void OutputROOT::FillConfig()
    t2_->Fill();
 }
 
+TTree* OutputROOT::GetTree()
+{
+   return t_;
+}
+
+TTree* OutputROOT::GetTreeConfig()
+{
+   return t2_;
+}
+
