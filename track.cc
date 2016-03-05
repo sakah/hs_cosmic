@@ -276,7 +276,8 @@ void Track::DoFit(WireMap& wiremap, XTcurve& xt)
             break;
          }
       }
-      double T_step = 1.0;
+      ini_pars_[4] = T_ini;
+      double T_step = 0.5;
       minuit_->SetParameter(4,"T",T_ini,T_step,0,0);
    }
 
