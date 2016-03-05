@@ -2,3 +2,4 @@
 == done == Check root with modified code
 == done == Find the reason why xt_curve_pol4 is very slow => Fill into tx_left/right_[cid][ns] and use it in XTcurve::GetR
 There is sharp peak at hitR=8mm
+Found that different t0 makes another local minimum.. Broad residual at layer=2 is caused by this reason
