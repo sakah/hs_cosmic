@@ -22,6 +22,7 @@ void Track::ClearFitFlag()
 void Track::SetHit(int cid, Hit& hit)
 {
    hits_[cid] = hit;
+   hits_[cid].SetUseByFitFlag(true);
 }
 
 void Track::SetSigma(double sigma)
@@ -394,10 +395,12 @@ int Track::GetNumHitsUseByFit()
    for (int cid=0; cid<MAX_LAYER; cid++) {
       bool has_hit = hits_[cid].HasHit();
       bool use_by_fit = hits_[cid].UseByFit();
+      printf("Track::GetNumHitsUseByFit:: cid %d has_hit %d use_by_fit %d\n", cid, has_hit, use_by_fit);
       if (has_hit && use_by_fit) {
          num_hits++;
       }
    }
+   printf("Track::GetNumHitsUseByFit:: num_hits %d\n", num_hits);
    return num_hits;
 }
 
@@ -442,13 +445,7 @@ void Track::SetNumParameters(int num_params)
 void Track::SetTestLayerNumber(int test_cid)
 {
     test_cid_ = test_cid;
-    for (int cid=0; cid<MAX_LAYER; cid++) {
-       // clear 
-       hits_[cid].SetUseByFitFlag(true);
-       if (test_cid!=-1) {
-          hits_[test_cid_].SetUseByFitFlag(false);
-       }
-    }
+    hits_[test_cid_].SetUseByFitFlag(false);
 }
 
 void Track::SetFitFuncType(int fit_func_type)
