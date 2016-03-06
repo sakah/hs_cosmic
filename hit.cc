@@ -3,6 +3,11 @@
 
 Hit::Hit()
 {
+   ClearHit();
+}
+
+void Hit::ClearHit()
+{
    layer_number_ = -1;
    cell_number_ = -1;
    chan_number_ = -1;

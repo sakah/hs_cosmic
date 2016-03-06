@@ -13,6 +13,15 @@ TrackFinder::TrackFinder()
    max_tracks_ = 4;
 }
 
+void TrackFinder::ClearTracks()
+{
+   num_tracks_ = 0;
+
+   for (int itrack=0; itrack<MAX_TRACK; itrack++) {
+      tracks_[itrack].ClearFitFlag();
+   }
+}
+
 int TrackFinder::SetTracks(Chamber& chamber, XTcurve& xt, bool include_outer_guard_layer)
 {
    if (include_outer_guard_layer) {
@@ -22,10 +31,14 @@ int TrackFinder::SetTracks(Chamber& chamber, XTcurve& xt, bool include_outer_gua
 }
 
 
-void TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2)
+bool TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2)
 {
    WireMap& wiremap = chamber.GetWireMap();
-   MakeTangents(chamber, xt, cid1, cid2, z1, z2);
+   int ret = MakeTangents(chamber, xt, cid1, cid2, z1, z2);
+   if (ret==0) {
+      printf("could not make tangents\n");
+      return false;
+   }
 
    double min_chi2 = 1e10;
    for (int itrack=0; itrack<num_tracks_; itrack++) {
@@ -36,9 +49,10 @@ void TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid
          min_itrack_ = itrack;
       }
    }
+   return true;
 }
 
-void TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z_step)
+bool TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z_step)
 {
    WireMap& wiremap = chamber.GetWireMap();
 
@@ -49,7 +63,10 @@ void TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid
       for (int iz2=0; iz2<num_z; iz2++) {
          double z1 = min_z_ + iz1*z_step;
          double z2 = min_z_ + iz2*z_step;
-         FindBestTrack(chamber, xt, cid1, cid2, z1, z2);
+         bool found = FindBestTrack(chamber, xt, cid1, cid2, z1, z2);
+         if (!found) {
+            return false;
+         }
          if (g_debug_trackfinder) {
             printf("z1 %f z2 %f min_itrack_ %d\n", z1, z2, min_itrack_);
          }
@@ -71,15 +88,20 @@ void TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid
    Track& min_track = tracks_[min_itrack_];
    min_track.MakeTangents(wiremap, xt, cid1, cid2, min_z1_, min_z2_);
    min_track.SetHitZWithMinTangent(wiremap, xt);
+   return true;
 }
 
-void TrackFinder::MakeTangents(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2)
+int TrackFinder::MakeTangents(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2)
 {
    WireMap& wiremap = chamber.GetWireMap();
 
    for (int itrack=0; itrack<num_tracks_; itrack++) {
-      tracks_[itrack].MakeTangents(wiremap, xt, cid1, cid2, z1, z2);
+      int ret = tracks_[itrack].MakeTangents(wiremap, xt, cid1, cid2, z1, z2);
+      if (ret==0) {
+         return 0;
+      }
    }
+   return 1;
 }
 
 Track& TrackFinder::GetBestTrack()
@@ -98,6 +120,7 @@ void TrackFinder::PrintTracks(WireMap& wiremap, XTcurve& xt)
    for (int itrack=0; itrack<num_tracks_; itrack++) {
       printf("--- itrack %d ---\n", itrack);
       tracks_[itrack].PrintTangents(wiremap, xt);
+      tracks_[itrack].PrintHits(xt);
    }
 }
 
@@ -163,7 +186,7 @@ int TrackFinder::GetMaxTracks()
 
 int TrackFinder::SetTracks_with_outer_guard_layer(Chamber& chamber, XTcurve& xt)
 {
-   num_tracks_ = 0;
+   ClearTracks();
 
    int m1 = chamber.GetNumHitCells(1);
    int m2 = chamber.GetNumHitCells(2);
@@ -245,7 +268,7 @@ end:
 
 int TrackFinder::SetTracks_without_guard_layers(Chamber& chamber, XTcurve& xt)
 {
-   num_tracks_ = 0;
+   ClearTracks();
 
    int m1 = chamber.GetNumHitCells(1);
    int m2 = chamber.GetNumHitCells(2);

@@ -11,6 +11,13 @@ Track::Track()
    fit_num_params_ = 4;
 } 
 
+void Track::ClearFitFlag()
+{
+   for (int cid=0; cid<MAX_LAYER; cid++) {
+      hits_[cid].SetUseByFitFlag(false);
+   }
+}
+
 void Track::SetHit(int cid, Hit& hit)
 {
    hits_[cid] = hit;
@@ -38,11 +45,14 @@ void Track::SetHitZWithMinTangent(WireMap& wiremap, XTcurve& xt)
    SetHitZWithLine(wiremap, GetMinTangent(wiremap, xt));
 }
 
-void Track::MakeTangents(WireMap& wiremap, XTcurve& xt, int cid1, int cid2, double z1, double z2)
+int Track::MakeTangents(WireMap& wiremap, XTcurve& xt, int cid1, int cid2, double z1, double z2)
 {
    // Transform in new coordinate
    Hit& hit1 = hits_[cid1];
    Hit& hit2 = hits_[cid2];
+   if (!hit1.UseByFit() || !hit2.UseByFit()) {
+      return 0;
+   }
    //hit1.SetZ(z1);
    //hit2.SetZ(z2);
    Line& wire1 = wiremap.GetWire(hit1.GetLayerNumber(), hit1.GetCellNumber());
@@ -91,6 +101,7 @@ void Track::MakeTangents(WireMap& wiremap, XTcurve& xt, int cid1, int cid2, doub
       printf("--- relang ---\n");
       printf("%f (deg)\n", relang/TMath::Pi()*180);
    }
+   return 4;
 }
 
 Line& Track::GetTangent(int itan)
@@ -146,6 +157,14 @@ double Track::GetSigma()
 Hit& Track::GetHit(int cid)
 {
    return hits_[cid];
+}
+
+void Track::PrintHits(XTcurve& xt)
+{
+   printf("--- hits ---\n");
+   for (int cid=0; cid<MAX_LAYER; cid++) {
+      hits_[cid].PrintHit(xt);
+   }
 }
 
 void Track::PrintTangents(WireMap& wiremap, XTcurve& xt)

@@ -7,6 +7,8 @@ class Hit
 {
    public:
       Hit();
+      void ClearHit();
+
       int GetLayerNumber();
       int GetCellNumber();
       int GetChanNumber();

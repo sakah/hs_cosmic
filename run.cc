@@ -106,7 +106,8 @@ bool Run::FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_st
    if (num_tracks==0) {
       return false;
    }
-   finder_.FindBestTrack(chamber_, *xt_ptr_, cid1, cid2, z_step);
+   bool found = finder_.FindBestTrack(chamber_, *xt_ptr_, cid1, cid2, z_step);
+   if (!found) return false;
    finder_.PrintTracks(wiremap, *xt_ptr_);
    return true;
 }

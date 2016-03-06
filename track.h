@@ -17,16 +17,18 @@ class Track
          FIT_FUNC_TYPE_FREE_T0,
       };
       Track();
+      void ClearFitFlag();
       void SetHit(int cid, Hit& hit);
       void SetSigma(double sigma);
       void SetHitZWithLine(WireMap& wiremap, Line& line);
       void SetHitZWithMinTangent(WireMap& wiremap, XTcurve& xt);
-      void MakeTangents(WireMap& wiremap, XTcurve& xt, int cid1, int cid2, double z1, double z2);
+      int  MakeTangents(WireMap& wiremap, XTcurve& xt, int cid1, int cid2, double z1, double z2);
       Line& GetTangent(int itan);
       double GetChi2OfLine(WireMap& wiremap, XTcurve& xt, Line& line);
       Line& GetMinTangent(WireMap& wiremap, XTcurve& xt);
       double GetSigma();
       Hit& GetHit(int cid);
+      void PrintHits(XTcurve& xt);
       void PrintTangents(WireMap& wiremap, XTcurve& xt);
       void DrawTangents();
       double GetXFromLine(WireMap& wiremap, int cid, Line& line);

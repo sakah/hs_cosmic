@@ -11,10 +11,11 @@ class TrackFinder
 {
    public:
       TrackFinder();
+      void ClearTracks();
       int SetTracks(Chamber& chamber, XTcurve& xt, bool include_outer_guard_layer);
-      void FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2);
-      void FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z_step);
-      void MakeTangents(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2);
+      bool FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2);
+      bool FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z_step);
+      int  MakeTangents(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2);
       Track& GetBestTrack();
       int GetNumTracks();
       void PrintTracks(WireMap& wiremap, XTcurve& xt);
