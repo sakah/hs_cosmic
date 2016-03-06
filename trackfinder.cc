@@ -3,8 +3,8 @@
 
 TrackFinder::TrackFinder()
 {
-   num_tracks_ = 0;
-   min_itrack_ = -1;
+   ClearTracks();
+
    max_r_ = 10.0; // 10.0 mm
    min_z_ = -400;
    max_z_ = +400;
@@ -16,6 +16,7 @@ TrackFinder::TrackFinder()
 void TrackFinder::ClearTracks()
 {
    num_tracks_ = 0;
+   min_itrack_ = -1;
 
    for (int itrack=0; itrack<MAX_TRACK; itrack++) {
       tracks_[itrack].ClearFitFlag();

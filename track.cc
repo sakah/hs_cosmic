@@ -9,6 +9,7 @@ Track::Track()
    test_cid_ = -1;  // use all of hits in fitting
    fit_func_type_ = FIT_FUNC_TYPE_FIX_T0;
    fit_num_params_ = 4;
+   minuit_ = NULL;
 } 
 
 void Track::ClearFitFlag()
@@ -250,6 +251,7 @@ void Track::InitFit(WireMap& wiremap, XTcurve& xt, int test_cid, int fit_func_ty
    Track_obj = this;
    if (fit_func_type_==FIT_FUNC_TYPE_FIX_T0)  { fit_num_params_ = 4; }
    if (fit_func_type_==FIT_FUNC_TYPE_FREE_T0) { fit_num_params_ = 5; }
+   if (minuit_!=NULL) delete minuit_;
    minuit_ = new TFitter(fit_num_params_);
 
    if (!verbose) {

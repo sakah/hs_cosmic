@@ -143,6 +143,7 @@ bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int te
    }
    Track& min_track = finder_.GetBestTrack();
    min_track.PrintTrackWithLine(wiremap, *xt_ptr_, min_track.GetMinTangent(wiremap, *xt_ptr_));
+   printf("### min_track.GetNumHitsUseByFit %d\n", min_track.GetNumHitsUseByFit());
 
    min_track.InitFit(wiremap, *xt_ptr_, test_cid, config_.GetFitFuncType());
    min_track.DoFit(wiremap, *xt_ptr_);
