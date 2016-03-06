@@ -333,19 +333,23 @@ void Track::DoFit(WireMap& wiremap, XTcurve& xt)
    fit_line_.PrintLine();
 #endif
 
-   // update line (extend line) for drawing purpose
-   Hit& hit1 = hits_[1];
-   Hit& hit7 = hits_[7];
-   Line& wire1 = wiremap.GetWire(1, hit1.GetCellNumber());
-   Line& wire7 = wiremap.GetWire(7, hit7.GetCellNumber());
-   TVector3 pA1;
-   TVector3 pB1;
-   TVector3 pA7;
-   TVector3 pB7;
-   fit_line_.GetClosestPoints(wire1, pA1, pB1);
-   fit_line_.GetClosestPoints(wire7, pA7, pB7);
+   // extend line from cid=1 to cid=7 or 8 for drawing purpose
+   int cidA=1;
+   int cidB=7;
+   if (hits_[8].UseByFit()) cidB=8;
+
+   Hit& hitA = hits_[cidA];
+   Hit& hitB = hits_[cidB];
+   Line& wireA = wiremap.GetWire(cidA, hitA.GetCellNumber());
+   Line& wireB = wiremap.GetWire(cidB, hitB.GetCellNumber());
+   TVector3 pAA;
+   TVector3 pBA;
+   TVector3 pAB;
+   TVector3 pBB;
+   fit_line_.GetClosestPoints(wireA, pAA, pBA);
+   fit_line_.GetClosestPoints(wireB, pAB, pBB);
    Line newline;
-   newline.MakeLine(pA1, pA7);
+   newline.MakeLine(pAA, pAB);
    //printf("pA1 "); pA1.Print();
    //printf("pA7 "); pA7.Print();
    //double dx1 = ini_line_.GetP2().X()- ini_line_.GetP1().X();
@@ -395,12 +399,12 @@ int Track::GetNumHitsUseByFit()
    for (int cid=0; cid<MAX_LAYER; cid++) {
       bool has_hit = hits_[cid].HasHit();
       bool use_by_fit = hits_[cid].UseByFit();
-      printf("Track::GetNumHitsUseByFit:: cid %d has_hit %d use_by_fit %d\n", cid, has_hit, use_by_fit);
+      //printf("Track::GetNumHitsUseByFit:: cid %d has_hit %d use_by_fit %d\n", cid, has_hit, use_by_fit);
       if (has_hit && use_by_fit) {
          num_hits++;
       }
    }
-   printf("Track::GetNumHitsUseByFit:: num_hits %d\n", num_hits);
+   //printf("Track::GetNumHitsUseByFit:: num_hits %d\n", num_hits);
    return num_hits;
 }
 
