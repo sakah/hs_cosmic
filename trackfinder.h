@@ -11,7 +11,7 @@ class TrackFinder
 {
    public:
       TrackFinder();
-      int SetTracks(Chamber& chamber, XTcurve& xt);
+      int SetTracks(Chamber& chamber, XTcurve& xt, bool include_outer_guard_layer);
       void FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2);
       void FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z_step);
       void MakeTangents(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2);
@@ -41,6 +41,9 @@ class TrackFinder
       double min_z1_;
       double min_z2_;
       int max_tracks_;
+
+      int SetTracks_with_outer_guard_layer(Chamber& chamber, XTcurve& xt);
+      int SetTracks_without_guard_layers(Chamber& chamber, XTcurve& xt);
 };
 
 #endif

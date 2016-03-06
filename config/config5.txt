@@ -1,0 +1,9 @@
+xt_curve_name USE_CONST_XT
+drift_velocity 0.04
+fit_func_name FIT_FUNC_TYPE_FREE_T0
+t0_bd0 -830
+t0_bd1 -830
+cid1 1
+cid2 7
+z_step 10.0
+include_outer_guard_layer 1

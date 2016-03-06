@@ -25,10 +25,10 @@ class Run
       void DrawHits();
       void MakeTangents(int cid1, int cid2, double z1, double z2);
       void DrawTangents();
-      bool FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_step);
-      void DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_step);
-      bool DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid);
-      void DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid);
+      bool FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_step, bool include_outer_guard_layer);
+      void DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_step, bool include_outer_guard_layer);
+      bool DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid, bool include_outer_guard_layer);
+      void DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid, bool include_outer_guard_layer);
       void Loop(Long64_t start_iev, Long64_t last_iev);
 
    private:

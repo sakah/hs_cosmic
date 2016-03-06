@@ -24,8 +24,10 @@ class Config
       double GetZstep();
       double GetDriftVelocity();
       char*  GetXTParamPath();
+      bool   IncludeOuterGuardLayer();
 
       void SetProgPath(const char* prog_path);
+      
 
    private:
       char prog_path_[512];
@@ -41,6 +43,7 @@ class Config
       double z_step_; // [mm]
       double drift_velocity_; // [mm/ns]
       char xt_param_path_[512];
+      bool include_outer_guard_layer_;
 };
 
 #endif

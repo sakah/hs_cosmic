@@ -17,6 +17,7 @@ Config::Config()
    cid1_ = 1;
    cid2_ = 7;
    z_step_ = 10.0; // 10.0 mm
+   include_outer_guard_layer_ = true;
 
    xt_curve_type_ = XTcurve::USE_CONST_XT;
    fit_func_type_ = Track::FIT_FUNC_TYPE_FREE_T0;
@@ -43,6 +44,7 @@ void Config::ReadParameters(const char* path)
       if (strstr(line, "cid1"))          sscanf(line, "cid1 %d", &cid1_);
       if (strstr(line, "cid2"))          sscanf(line, "cid2 %d", &cid2_);
       if (strstr(line, "z_step"))        sscanf(line, "z_step %lf", &z_step_);
+      if (strstr(line, "include_outer_guard_layer")) sscanf(line, "include_outer_guard_layer %d", &include_outer_guard_layer_);
    }
    fclose(fp);
 
@@ -80,6 +82,7 @@ void Config::PrintParameters()
    printf("cid1            %d\n", cid1_);
    printf("cid2            %d\n", cid2_);
    printf("z_step          %6.2f [mm]\n", z_step_);
+   printf("include_outer_guard_layer %d\n", include_outer_guard_layer_);
 }
 
 const char* Config::GetProgPath()
@@ -145,6 +148,11 @@ double Config::GetDriftVelocity()
 char* Config::GetXTParamPath()
 {
    return xt_param_path_;
+}
+
+bool Config::IncludeOuterGuardLayer()
+{
+   return include_outer_guard_layer_;
 }
 
 void Config::SetProgPath(const char* prog_path)

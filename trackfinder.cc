@@ -13,81 +13,14 @@ TrackFinder::TrackFinder()
    max_tracks_ = 4;
 }
 
-int TrackFinder::SetTracks(Chamber& chamber, XTcurve& xt)
+int TrackFinder::SetTracks(Chamber& chamber, XTcurve& xt, bool include_outer_guard_layer)
 {
-   num_tracks_ = 0;
-
-   int m1 = chamber.GetNumHitCells(1);
-   int m2 = chamber.GetNumHitCells(2);
-   int m3 = chamber.GetNumHitCells(3);
-   int m4 = chamber.GetNumHitCells(4);
-   int m5 = chamber.GetNumHitCells(5);
-   int m6 = chamber.GetNumHitCells(6);
-   int m7 = chamber.GetNumHitCells(7);
-   if (g_debug_trackfinder) {
-      printf("#/hits@layer [1-7] => %d %d %d %d %d %d %d\n", m1, m2, m3, m4, m5, m6, m7);
-   }
-
-   for (int icellhit1=0; icellhit1<m1; icellhit1++) { int icell1 = chamber.GetHitCellNumber(1, icellhit1); Hit& hit1 = chamber.GetHit(1, icell1, 0);
-   for (int icellhit2=0; icellhit2<m2; icellhit2++) { int icell2 = chamber.GetHitCellNumber(2, icellhit2); Hit& hit2 = chamber.GetHit(2, icell2, 0);
-   for (int icellhit3=0; icellhit3<m3; icellhit3++) { int icell3 = chamber.GetHitCellNumber(3, icellhit3); Hit& hit3 = chamber.GetHit(3, icell3, 0);
-   for (int icellhit4=0; icellhit4<m4; icellhit4++) { int icell4 = chamber.GetHitCellNumber(4, icellhit4); Hit& hit4 = chamber.GetHit(4, icell4, 0);
-   for (int icellhit5=0; icellhit5<m5; icellhit5++) { int icell5 = chamber.GetHitCellNumber(5, icellhit5); Hit& hit5 = chamber.GetHit(5, icell5, 0);
-   for (int icellhit6=0; icellhit6<m6; icellhit6++) { int icell6 = chamber.GetHitCellNumber(6, icellhit6); Hit& hit6 = chamber.GetHit(6, icell6, 0);
-   for (int icellhit7=0; icellhit7<m7; icellhit7++) { int icell7 = chamber.GetHitCellNumber(7, icellhit7); Hit& hit7 = chamber.GetHit(7, icell7, 0);
-      hit1.SetT0(chamber.GetT0(1, icell1));
-      hit2.SetT0(chamber.GetT0(2, icell2));
-      hit3.SetT0(chamber.GetT0(3, icell3));
-      hit4.SetT0(chamber.GetT0(4, icell4));
-      hit5.SetT0(chamber.GetT0(5, icell5));
-      hit6.SetT0(chamber.GetT0(6, icell6));
-      hit7.SetT0(chamber.GetT0(7, icell7));
-      double hitR1 = hit1.GetHitR(xt);
-      double hitR2 = hit2.GetHitR(xt);
-      double hitR3 = hit3.GetHitR(xt);
-      double hitR4 = hit4.GetHitR(xt);
-      double hitR5 = hit5.GetHitR(xt);
-      double hitR6 = hit6.GetHitR(xt);
-      double hitR7 = hit7.GetHitR(xt);
-      if (g_debug_trackfinder) {
-         printf("hitR1 %f hitR2 %f hitR3 %f hitR4 %f hitR5 %f hitR6 %f hitR7 %f\n", hitR1, hitR2, hitR3, hitR4, hitR5, hitR6, hitR7);
-      }
-      if (hitR1<0 || hitR2<0 || hitR3<0 ||hitR4<0 || hitR5<0 || hitR6<0 || hitR7<0) {
-         continue;
-      }
-      if (hitR1>max_r_ || hitR2>max_r_ || hitR3>max_r_ ||hitR4>max_r_ || hitR5>max_r_ || hitR6>max_r_ || hitR7>max_r_) {
-         continue;
-      }
-
-      if (num_tracks_>= max_tracks_) {
-         goto end;
-      }
-
-      Track& track = tracks_[num_tracks_];
-      track.SetHit(1, hit1);
-      track.SetHit(2, hit2);
-      track.SetHit(3, hit3);
-      track.SetHit(4, hit4);
-      track.SetHit(5, hit5);
-      track.SetHit(6, hit6);
-      track.SetHit(7, hit7);
-      //printf("num_tracks %d time %d max_tracks %d\n", num_tracks_, time(NULL), max_tracks_);
-      num_tracks_++;
+   if (include_outer_guard_layer) {
+      return SetTracks_with_outer_guard_layer(chamber, xt);
    } 
-   } 
-   } 
-   } 
-   } 
-   } 
-   } 
-end:
-
-   if (g_debug_trackfinder) {
-      printf("num_tracks_ %d\n", num_tracks_);
-   }
-
-   return num_tracks_;
+   return SetTracks_without_guard_layers(chamber, xt);
 }
+
 
 void TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2)
 {
@@ -228,3 +161,160 @@ int TrackFinder::GetMaxTracks()
    return max_tracks_;
 }
 
+int TrackFinder::SetTracks_with_outer_guard_layer(Chamber& chamber, XTcurve& xt)
+{
+   num_tracks_ = 0;
+
+   int m1 = chamber.GetNumHitCells(1);
+   int m2 = chamber.GetNumHitCells(2);
+   int m3 = chamber.GetNumHitCells(3);
+   int m4 = chamber.GetNumHitCells(4);
+   int m5 = chamber.GetNumHitCells(5);
+   int m6 = chamber.GetNumHitCells(6);
+   int m7 = chamber.GetNumHitCells(7);
+   int m8 = chamber.GetNumHitCells(8);
+   if (g_debug_trackfinder) {
+      printf("#/hits@layer [1-8] => %d %d %d %d %d %d %d %d\n", m1, m2, m3, m4, m5, m6, m7, m8);
+   }
+
+   for (int icellhit1=0; icellhit1<m1; icellhit1++) { int icell1 = chamber.GetHitCellNumber(1, icellhit1); Hit& hit1 = chamber.GetHit(1, icell1, 0);
+   for (int icellhit2=0; icellhit2<m2; icellhit2++) { int icell2 = chamber.GetHitCellNumber(2, icellhit2); Hit& hit2 = chamber.GetHit(2, icell2, 0);
+   for (int icellhit3=0; icellhit3<m3; icellhit3++) { int icell3 = chamber.GetHitCellNumber(3, icellhit3); Hit& hit3 = chamber.GetHit(3, icell3, 0);
+   for (int icellhit4=0; icellhit4<m4; icellhit4++) { int icell4 = chamber.GetHitCellNumber(4, icellhit4); Hit& hit4 = chamber.GetHit(4, icell4, 0);
+   for (int icellhit5=0; icellhit5<m5; icellhit5++) { int icell5 = chamber.GetHitCellNumber(5, icellhit5); Hit& hit5 = chamber.GetHit(5, icell5, 0);
+   for (int icellhit6=0; icellhit6<m6; icellhit6++) { int icell6 = chamber.GetHitCellNumber(6, icellhit6); Hit& hit6 = chamber.GetHit(6, icell6, 0);
+   for (int icellhit7=0; icellhit7<m7; icellhit7++) { int icell7 = chamber.GetHitCellNumber(7, icellhit7); Hit& hit7 = chamber.GetHit(7, icell7, 0);
+   for (int icellhit8=0; icellhit8<m8; icellhit8++) { int icell8 = chamber.GetHitCellNumber(8, icellhit7); Hit& hit8 = chamber.GetHit(8, icell8, 0);
+      hit1.SetT0(chamber.GetT0(1, icell1));
+      hit2.SetT0(chamber.GetT0(2, icell2));
+      hit3.SetT0(chamber.GetT0(3, icell3));
+      hit4.SetT0(chamber.GetT0(4, icell4));
+      hit5.SetT0(chamber.GetT0(5, icell5));
+      hit6.SetT0(chamber.GetT0(6, icell6));
+      hit7.SetT0(chamber.GetT0(7, icell7));
+      hit8.SetT0(chamber.GetT0(8, icell8));
+      double hitR1 = hit1.GetHitR(xt);
+      double hitR2 = hit2.GetHitR(xt);
+      double hitR3 = hit3.GetHitR(xt);
+      double hitR4 = hit4.GetHitR(xt);
+      double hitR5 = hit5.GetHitR(xt);
+      double hitR6 = hit6.GetHitR(xt);
+      double hitR7 = hit7.GetHitR(xt);
+      double hitR8 = hit8.GetHitR(xt);
+      if (g_debug_trackfinder) {
+         printf("hitR1 %f hitR2 %f hitR3 %f hitR4 %f hitR5 %f hitR6 %f hitR7 %f hitR8 %f\n", hitR1, hitR2, hitR3, hitR4, hitR5, hitR6, hitR7, hitR8);
+      }
+      if (hitR1<0 || hitR2<0 || hitR3<0 ||hitR4<0 || hitR5<0 || hitR6<0 || hitR7<0 || hitR8<0) {
+         continue;
+      }
+      if (hitR1>max_r_ || hitR2>max_r_ || hitR3>max_r_ ||hitR4>max_r_ || hitR5>max_r_ || hitR6>max_r_ || hitR7>max_r_ || hitR8>max_r_) {
+         continue;
+      }
+
+      if (num_tracks_>= max_tracks_) {
+         goto end;
+      }
+
+      Track& track = tracks_[num_tracks_];
+      track.SetHit(1, hit1);
+      track.SetHit(2, hit2);
+      track.SetHit(3, hit3);
+      track.SetHit(4, hit4);
+      track.SetHit(5, hit5);
+      track.SetHit(6, hit6);
+      track.SetHit(7, hit7);
+      track.SetHit(8, hit8);
+      //printf("num_tracks %d time %d max_tracks %d\n", num_tracks_, time(NULL), max_tracks_);
+      num_tracks_++;
+   } 
+   } 
+   } 
+   } 
+   } 
+   } 
+   } 
+   } 
+end:
+
+   if (g_debug_trackfinder) {
+      printf("num_tracks_ %d\n", num_tracks_);
+   }
+
+   return num_tracks_;
+}
+
+int TrackFinder::SetTracks_without_guard_layers(Chamber& chamber, XTcurve& xt)
+{
+   num_tracks_ = 0;
+
+   int m1 = chamber.GetNumHitCells(1);
+   int m2 = chamber.GetNumHitCells(2);
+   int m3 = chamber.GetNumHitCells(3);
+   int m4 = chamber.GetNumHitCells(4);
+   int m5 = chamber.GetNumHitCells(5);
+   int m6 = chamber.GetNumHitCells(6);
+   int m7 = chamber.GetNumHitCells(7);
+   if (g_debug_trackfinder) {
+      printf("#/hits@layer [1-7] => %d %d %d %d %d %d %d\n", m1, m2, m3, m4, m5, m6, m7);
+   }
+
+   for (int icellhit1=0; icellhit1<m1; icellhit1++) { int icell1 = chamber.GetHitCellNumber(1, icellhit1); Hit& hit1 = chamber.GetHit(1, icell1, 0);
+   for (int icellhit2=0; icellhit2<m2; icellhit2++) { int icell2 = chamber.GetHitCellNumber(2, icellhit2); Hit& hit2 = chamber.GetHit(2, icell2, 0);
+   for (int icellhit3=0; icellhit3<m3; icellhit3++) { int icell3 = chamber.GetHitCellNumber(3, icellhit3); Hit& hit3 = chamber.GetHit(3, icell3, 0);
+   for (int icellhit4=0; icellhit4<m4; icellhit4++) { int icell4 = chamber.GetHitCellNumber(4, icellhit4); Hit& hit4 = chamber.GetHit(4, icell4, 0);
+   for (int icellhit5=0; icellhit5<m5; icellhit5++) { int icell5 = chamber.GetHitCellNumber(5, icellhit5); Hit& hit5 = chamber.GetHit(5, icell5, 0);
+   for (int icellhit6=0; icellhit6<m6; icellhit6++) { int icell6 = chamber.GetHitCellNumber(6, icellhit6); Hit& hit6 = chamber.GetHit(6, icell6, 0);
+   for (int icellhit7=0; icellhit7<m7; icellhit7++) { int icell7 = chamber.GetHitCellNumber(7, icellhit7); Hit& hit7 = chamber.GetHit(7, icell7, 0);
+      hit1.SetT0(chamber.GetT0(1, icell1));
+      hit2.SetT0(chamber.GetT0(2, icell2));
+      hit3.SetT0(chamber.GetT0(3, icell3));
+      hit4.SetT0(chamber.GetT0(4, icell4));
+      hit5.SetT0(chamber.GetT0(5, icell5));
+      hit6.SetT0(chamber.GetT0(6, icell6));
+      hit7.SetT0(chamber.GetT0(7, icell7));
+      double hitR1 = hit1.GetHitR(xt);
+      double hitR2 = hit2.GetHitR(xt);
+      double hitR3 = hit3.GetHitR(xt);
+      double hitR4 = hit4.GetHitR(xt);
+      double hitR5 = hit5.GetHitR(xt);
+      double hitR6 = hit6.GetHitR(xt);
+      double hitR7 = hit7.GetHitR(xt);
+      if (g_debug_trackfinder) {
+         printf("hitR1 %f hitR2 %f hitR3 %f hitR4 %f hitR5 %f hitR6 %f hitR7 %f\n", hitR1, hitR2, hitR3, hitR4, hitR5, hitR6, hitR7);
+      }
+      if (hitR1<0 || hitR2<0 || hitR3<0 ||hitR4<0 || hitR5<0 || hitR6<0 || hitR7<0) {
+         continue;
+      }
+      if (hitR1>max_r_ || hitR2>max_r_ || hitR3>max_r_ ||hitR4>max_r_ || hitR5>max_r_ || hitR6>max_r_ || hitR7>max_r_) {
+         continue;
+      }
+
+      if (num_tracks_>= max_tracks_) {
+         goto end;
+      }
+
+      Track& track = tracks_[num_tracks_];
+      track.SetHit(1, hit1);
+      track.SetHit(2, hit2);
+      track.SetHit(3, hit3);
+      track.SetHit(4, hit4);
+      track.SetHit(5, hit5);
+      track.SetHit(6, hit6);
+      track.SetHit(7, hit7);
+      //printf("num_tracks %d time %d max_tracks %d\n", num_tracks_, time(NULL), max_tracks_);
+      num_tracks_++;
+   } 
+   } 
+   } 
+   } 
+   } 
+   } 
+   } 
+end:
+
+   if (g_debug_trackfinder) {
+      printf("num_tracks_ %d\n", num_tracks_);
+   }
+
+   return num_tracks_;
+}
