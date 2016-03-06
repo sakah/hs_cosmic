@@ -134,6 +134,7 @@ void Hit::PrintHit(XTcurve& xt)
 {
    double dT = drift_time_- t0_;
    double hitR = GetHitR(xt);
-   printf("cid %2d icell %2d t0 %3.2f drift_time %6.2f dT %6.2f --> hitR %6.2f hitZ %6.2f\n", layer_number_, cell_number_, t0_, drift_time_, dT, hitR, z_);
+   printf("cid %2d icell %2d has_hit %d use_by_fit %d t0 %3.2f drift_time %6.2f dT %6.2f --> hitR %6.2f hitZ %6.2f\n", 
+         layer_number_, cell_number_, has_hit_, use_by_fit_, t0_, drift_time_, dT, hitR, z_);
 }
 
