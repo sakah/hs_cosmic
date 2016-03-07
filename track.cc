@@ -380,7 +380,7 @@ void Track::PrintFitResults()
       if (i==4) ch = 'T';
       printf("[%c] ini_par %8.2f => fit_par %8.2f +/- %8.2f\n", ch, ini_pars_[i], fit_min_pars_[i], fit_err_pars_[i]);
    }
-   printf("fit_chi2_ / ndf  = %f (%f / %d)\n", fit_chi2_/GetNDF(), fit_chi2_, GetNDF());
+   printf("fit_chi2_ / ndf  = %f (%f / %d) nfits %d npar %d\n", fit_chi2_/GetNDF(), fit_chi2_, GetNDF(), GetNumHitsUseByFit(), GetNumParameters());
 }
 
 int Track::GetNumHits()
