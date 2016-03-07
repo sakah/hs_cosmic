@@ -231,7 +231,6 @@ void Track::PrintTrackWithLine(WireMap& wiremap, XTcurve& xt, Line& line)
    for (int cid=0; cid<MAX_LAYER; cid++) {
       Hit& hit = hits_[cid];
       if (!hit.HasHit()) continue;
-      if (!hit.UseByFit()) continue;
       int icell = hit.GetCellNumber();
       Line& wire = wiremap.GetWire(cid, icell);
       double fitX = GetXFromLine(wiremap, cid, line);
