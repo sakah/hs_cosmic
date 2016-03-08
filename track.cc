@@ -461,6 +461,9 @@ void Track::SetNumParameters(int num_params)
 void Track::SetTestLayerNumber(int test_cid)
 {
     test_cid_ = test_cid;
+    for (int cid=0; cid<MAX_LAYER; cid++) {
+       hits_[cid].SetUseByFitFlag(true);
+    }
     hits_[test_cid_].SetUseByFitFlag(false);
 }
 

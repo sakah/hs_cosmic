@@ -13,8 +13,8 @@ class TrackFinder
       TrackFinder();
       void ClearTracks();
       int SetTracks(Chamber& chamber, XTcurve& xt, bool include_outer_guard_layer);
-      double FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2);
-      double FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z_step);
+      double FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, int test_cid, double z1, double z2);
+      double FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, int test_cid, double z_step);
       int  MakeTangents(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2);
       Track& GetBestTrack();
       int GetNumTracks();

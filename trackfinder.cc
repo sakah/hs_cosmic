@@ -34,7 +34,7 @@ int TrackFinder::SetTracks(Chamber& chamber, XTcurve& xt, bool include_outer_gua
 }
 
 
-double TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z1, double z2)
+double TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, int test_cid, double z1, double z2)
 {
    double min_chi2 = 1e10;
    WireMap& wiremap = chamber.GetWireMap();
@@ -46,6 +46,7 @@ double TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int c
 
    for (int itrack=0; itrack<num_tracks_; itrack++) {
       Line& min_tangent = tracks_[itrack].GetMinTangent(wiremap, xt);
+      tracks_[itrack].SetTestLayerNumber(test_cid);
       double chi2 = tracks_[itrack].GetChi2OfLine(wiremap, xt, min_tangent);
       if (chi2 < min_chi2) {
          min_chi2 = chi2;
@@ -55,7 +56,7 @@ double TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int c
    return min_chi2;
 }
 
-double TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z_step)
+double TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, int test_cid, double z_step)
 {
    WireMap& wiremap = chamber.GetWireMap();
 
@@ -66,15 +67,13 @@ double TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int c
       for (int iz2=0; iz2<num_z; iz2++) {
          double z1 = min_z_ + iz1*z_step;
          double z2 = min_z_ + iz2*z_step;
-         bool found = FindBestTrack(chamber, xt, cid1, cid2, z1, z2);
-         if (!found) {
-            return false;
+         double chi2 = FindBestTrack(chamber, xt, cid1, cid2, test_cid, z1, z2);
+         if (chi2>1e9) {
+            return min_chi2;
          }
          if (g_debug_trackfinder) {
             printf("z1 %f z2 %f min_itrack_ %d\n", z1, z2, min_itrack_);
          }
-         Line& min_tangent = GetBestTrack().GetMinTangent(wiremap, xt);
-         double chi2 = GetBestTrack().GetChi2OfLine(wiremap, xt, min_tangent);
          if (chi2 < min_chi2) {
             min_chi2 = chi2;
             min_itrack = min_itrack_;

@@ -93,8 +93,16 @@ void Run::DrawTangents()
    track_.DrawTangents();
 }
 
-bool Run::FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_step, double t0_min, double t0_max, double t0_step, bool include_outer_guard_layer)
+bool Run::FindBestTangent(Long64_t event_number, int cid1, int cid2, int test_cid, double z_step, double t0_min, double t0_max, double t0_step, bool include_outer_guard_layer)
 {
+   printf("cid1 %d\n", cid1);
+   printf("cid2 %d\n", cid2);
+   printf("test_cid %d\n", test_cid);
+   printf("z_step %f\n", z_step);
+   printf("t0_min %f\n", t0_min);
+   printf("t0_max %f\n", t0_max);
+   printf("t0_step %f\n", t0_step);
+   printf("include_outer_guard_layer %d\n", include_outer_guard_layer);
    if (event_number>=0) {
       GetEntry(event_number);
    } else {
@@ -108,12 +116,15 @@ bool Run::FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_st
    double chi2_of_small_track = 100;
    for (int it0=0; it0<t0_num; it0++) {
       double t0 = t0_min + it0*t0_step;
-      chamber_.SetT0(t0, t0);
+      printf("t0 %f\n", t0);
+      chamber_.SetT0(0, t0);
+      chamber_.SetT0(1, t0);
       int num_tracks = finder_.SetTracks(chamber_, *xt_ptr_, include_outer_guard_layer);
       if (num_tracks==0) {
          continue;
       }
-      double chi2 = finder_.FindBestTrack(chamber_, *xt_ptr_, cid1, cid2, z_step);
+      double chi2 = finder_.FindBestTrack(chamber_, *xt_ptr_, cid1, cid2, test_cid, z_step);
+      printf("==> t0 %f -> chi2 %f\n", t0, chi2);
       if (chi2>1e9) {
          continue;
       }
@@ -132,9 +143,9 @@ bool Run::FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_st
    return true;
 }
 
-void Run::DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_step, double t0_min, double t0_max, double t0_step, bool include_outer_guard_layer)
+void Run::DrawBestTangent(Long64_t event_number, int cid1, int cid2, int test_cid, double z_step, double t0_min, double t0_max, double t0_step, bool include_outer_guard_layer)
 {
-   bool found = FindBestTangent(event_number, cid1, cid2, z_step, include_outer_guard_layer, t0_min, t0_max, t0_step);
+   bool found = FindBestTangent(event_number, cid1, cid2, test_cid, z_step, t0_min, t0_max, t0_step, include_outer_guard_layer);
    if (!found) {
       printf("tangent cannot be found...\n");
       return;
@@ -146,7 +157,7 @@ void Run::DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_st
    chamber_.DrawTrack(event_, *xt_ptr_, min_track, min_tangent);
 }
 
-bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, double t0_min, double t0_max, double t0_step, int test_cid, bool include_outer_guard_layer)
+bool Run::DoFit(Long64_t event_number, int cid1, int cid2, int test_cid, double z_step, double t0_min, double t0_max, double t0_step, bool include_outer_guard_layer)
 {
    WireMap& wiremap = chamber_.GetWireMap();
 
@@ -156,7 +167,7 @@ bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, double
       GetNext();
    }
 
-   bool found = FindBestTangent(event_number, cid1, cid2, z_step, t0_min, t0_max, t0_step, include_outer_guard_layer);
+   bool found = FindBestTangent(event_number, cid1, cid2, test_cid, z_step, t0_min, t0_max, t0_step, include_outer_guard_layer);
    if (!found) {
       printf("tangent cannot be found...\n");
       return false;
@@ -172,9 +183,9 @@ bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, double
    return true;
 }
 
-void Run::DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, double t0_min, double t0_max, double t0_step, int test_cid, bool include_outer_guard_layer)
+void Run::DrawFit(Long64_t event_number, int cid1, int cid2, int test_cid, double z_step, double t0_min, double t0_max, double t0_step, bool include_outer_guard_layer)
 {
-   bool done = DoFit(event_number, cid1, cid2, z_step, t0_min, t0_max, t0_step, test_cid, include_outer_guard_layer);
+   bool done = DoFit(event_number, cid1, cid2, test_cid, z_step, t0_min, t0_max, t0_step, include_outer_guard_layer);
    if (!done) {
       printf("fit cannot be done\n");
       return;
@@ -228,8 +239,8 @@ void Run::Loop(Long64_t start_iev, Long64_t last_iev)
       output_.SetTrackFinderData(finder_);
 
       if (num_tracks>0) {
-         finder_.FindBestTrack(chamber_, *xt_ptr_, cid1, cid2, z_step);
          for (int test_cid=1; test_cid<=8; test_cid++) {
+            finder_.FindBestTrack(chamber_, *xt_ptr_, cid1, cid2, test_cid, z_step);
             Track track = finder_.GetBestTrack();
             //printf("test_cid %d\n", test_cid);
             track.InitFit(wiremap, *xt_ptr_, test_cid, config_.GetFitFuncType(), false);
