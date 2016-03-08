@@ -93,7 +93,7 @@ void Run::DrawTangents()
    track_.DrawTangents();
 }
 
-bool Run::FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_step, bool include_outer_guard_layer)
+bool Run::FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_step, double t0_min, double t0_max, double t0_step, bool include_outer_guard_layer)
 {
    if (event_number>=0) {
       GetEntry(event_number);
@@ -106,15 +106,15 @@ bool Run::FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_st
    if (num_tracks==0) {
       return false;
    }
-   bool found = finder_.FindBestTrack(chamber_, *xt_ptr_, cid1, cid2, z_step);
-   if (!found) return false;
+   double chi2 = finder_.FindBestTrack(chamber_, *xt_ptr_, cid1, cid2, z_step, t0_min, t0_max, t0_step);
+   if (chi2>1e9) return false;
    finder_.PrintTracks(wiremap, *xt_ptr_);
    return true;
 }
 
-void Run::DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_step, bool include_outer_guard_layer)
+void Run::DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_step, double t0_min, double t0_max, double t0_step, bool include_outer_guard_layer)
 {
-   bool found = FindBestTangent(event_number, cid1, cid2, z_step, include_outer_guard_layer);
+   bool found = FindBestTangent(event_number, cid1, cid2, z_step, include_outer_guard_layer, t0_min, t0_max, t0_step);
    if (!found) {
       printf("tangent cannot be found...\n");
       return;
@@ -126,7 +126,7 @@ void Run::DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_st
    chamber_.DrawTrack(event_, *xt_ptr_, min_track, min_tangent);
 }
 
-bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid, bool include_outer_guard_layer)
+bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, double t0_min, double t0_max, double t0_step, int test_cid, bool include_outer_guard_layer)
 {
    WireMap& wiremap = chamber_.GetWireMap();
 
@@ -136,7 +136,7 @@ bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int te
       GetNext();
    }
 
-   bool found = FindBestTangent(event_number, cid1, cid2, z_step, include_outer_guard_layer);
+   bool found = FindBestTangent(event_number, cid1, cid2, z_step, t0_min, t0_max, t0_step, include_outer_guard_layer);
    if (!found) {
       printf("tangent cannot be found...\n");
       return false;
@@ -152,9 +152,9 @@ bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int te
    return true;
 }
 
-void Run::DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid, bool include_outer_guard_layer)
+void Run::DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, double t0_min, double t0_max, double t0_step, int test_cid, bool include_outer_guard_layer)
 {
-   bool done = DoFit(event_number, cid1, cid2, z_step, test_cid, include_outer_guard_layer);
+   bool done = DoFit(event_number, cid1, cid2, z_step, t0_min, t0_max, t0_step, test_cid, include_outer_guard_layer);
    if (!done) {
       printf("fit cannot be done\n");
       return;
