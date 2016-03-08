@@ -227,8 +227,10 @@ double Track::GetResidualOfMinTangent(WireMap& wiremap, XTcurve& xt, int cid)
 void Track::PrintTrackWithLine(WireMap& wiremap, XTcurve& xt, Line& line)
 {
    printf("line's chi2  %lf\n", GetChi2OfLine(wiremap, xt, line));
+   double chi2_layers[9];
    Line& min_tangent = GetMinTangent(wiremap, xt);
    for (int cid=0; cid<MAX_LAYER; cid++) {
+      chi2_layers[cid] = 0;
       Hit& hit = hits_[cid];
       if (!hit.HasHit()) continue;
       int icell = hit.GetCellNumber();
@@ -237,8 +239,19 @@ void Track::PrintTrackWithLine(WireMap& wiremap, XTcurve& xt, Line& line)
       double fitR = line.GetDistance(wire);
       double dT = hit.GetDriftTime() - hit.GetT0();
       double hitR = hit.GetHitR(xt);
-      printf("cid %2d icell %2d t0 %3.2f drift_time %6.2f dT %6.2f --> hitR %6.2f fitR %6.2f fitX %6.2f hitZ %6.2f fitR-hitR %6.2f\n",
-            cid, icell, hit.GetT0(), hit.GetDriftTime(), dT, hitR, fitR, fitX, hit.GetZ(), fitR-hitR);
+      double sigma = 0.2; //200um
+      double chi2 = (fitR-hitR)/sigma*(fitR-hitR)/sigma;
+      printf("cid %2d icell %2d t0 %3.2f drift_time %6.2f dT %6.2f --> hitR %6.2f fitR %6.2f fitX %6.2f hitZ %6.2f fitR-hitR %6.2f chi2 %6.2f\n",
+            cid, icell, hit.GetT0(), hit.GetDriftTime(), dT, hitR, fitR, fitX, hit.GetZ(), fitR-hitR, chi2);
+      chi2_layers[cid] = chi2;
+   }
+   for (int cid=0; cid<MAX_LAYER; cid++) {
+      double sum_chi2 = 0;
+      for (int cid2=0; cid2<MAX_LAYER; cid2++) {
+         if (cid==cid2) continue;
+         sum_chi2 += chi2_layers[cid2];
+      }
+      printf("chi2 without cid %d => %f\n", cid, sum_chi2);
    }
 }
 
