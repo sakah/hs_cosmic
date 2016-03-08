@@ -102,13 +102,33 @@ bool Run::FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_st
    }
 
    WireMap& wiremap = chamber_.GetWireMap();
-   int num_tracks = finder_.SetTracks(chamber_, *xt_ptr_, include_outer_guard_layer);
-   if (num_tracks==0) {
+   int t0_num = (t0_max - t0_min)/t0_step;
+   double min_chi2 = 1e10;
+   double min_t0 = 1e10;
+   double chi2_of_small_track = 100;
+   for (int it0=0; it0<t0_num; it0++) {
+      double t0 = t0_min + it0*t0_step;
+      chamber_.SetT0(t0, t0);
+      int num_tracks = finder_.SetTracks(chamber_, *xt_ptr_, include_outer_guard_layer);
+      if (num_tracks==0) {
+         continue;
+      }
+      double chi2 = finder_.FindBestTrack(chamber_, *xt_ptr_, cid1, cid2, z_step);
+      if (chi2>1e9) {
+         continue;
+      }
+      if (chi2<min_chi2) {
+         min_chi2 = chi2;
+         min_t0 = t0;
+      }
+      if (chi2<chi2_of_small_track) {
+         printf("min_t0 %f\n", min_t0);
+      }
+      finder_.PrintTracks(wiremap, *xt_ptr_);
+   }
+   if (min_chi2>1e9) {
       return false;
    }
-   double chi2 = finder_.FindBestTrack(chamber_, *xt_ptr_, cid1, cid2, z_step, t0_min, t0_max, t0_step);
-   if (chi2>1e9) return false;
-   finder_.PrintTracks(wiremap, *xt_ptr_);
    return true;
 }
 

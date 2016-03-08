@@ -12,9 +12,7 @@ TrackFinder::TrackFinder()
 
    min_z1_ = 0;
    min_z2_ = 0;
-   min_t0_ = 0;
 
-   chi2_of_small_track_ = 100;
 }
 
 void TrackFinder::ClearTracks()
@@ -25,12 +23,6 @@ void TrackFinder::ClearTracks()
    for (int itrack=0; itrack<MAX_TRACK; itrack++) {
       tracks_[itrack].ClearFitFlag();
    }
-
-   num_small_tracks_ = 0;
-   for (int itrack=0; itrack<MAX_TRACK; itrack++) {
-      small_tracks_[itrack].ClearFitFlag();
-   }
-
 }
 
 int TrackFinder::SetTracks(Chamber& chamber, XTcurve& xt, bool include_outer_guard_layer)
@@ -99,24 +91,6 @@ double TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int c
    Track& min_track = tracks_[min_itrack_];
    min_track.MakeTangents(wiremap, xt, cid1, cid2, min_z1_, min_z2_);
    min_track.SetHitZWithMinTangent(wiremap, xt);
-   return min_chi2;
-}
-double TrackFinder::FindBestTrack(Chamber& chamber, XTcurve& xt, int cid1, int cid2, double z_step, double t0_min, double t0_max, double t0_step)
-{
-   double min_chi2 = 1e10;
-   int num_t0 = (t0_max - t0_min)/t0_step;
-   for (int it0=0; it0<num_t0; it0++) {
-      double t0 = t0_min + it0*t0_step;
-      chamber.SetT0(t0, t0);
-      double chi2 = FindBestTrack(chamber, xt, cid1, cid2, z_step);
-      if (chi2<min_chi2) {
-         min_t0_ = t0;
-         min_chi2 = chi2;
-      }
-      if (chi2<chi2_of_small_track_) {
-         printf("t0 %f min_z1 %f min_z2 %f\n", t0, min_z1_, min_z2_ );
-      }
-   }
    return min_chi2;
 }
 
