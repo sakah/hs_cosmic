@@ -15,11 +15,17 @@ XTcurve::XTcurve()
 {
 }
 
-void XTcurve::Setup(Config& config)
+int XTcurve::GetXTcurveType(const char* xt_curve_name)
 {
+   int xt_curve_type=-1;
+   if (strcmp(xt_curve_name, "USE_CONST_XT")==0) xt_curve_type = USE_CONST_XT;
+   else if (strcmp(xt_curve_name, "USE_PARAM_POL4")==0) xt_curve_type = USE_PARAM_POL4;
+   else {
+      fprintf(stderr, "ERROR: XTcurve unkonwn xt_curve_name '%s'\n", xt_curve_name);
+   }
+   return xt_curve_type;
 }
-
-double XTcurve::GetR(int cid, double T, int left_or_right)
+double XTcurve::GetX(int cid, double T, int left_or_right)
 {
    return 0;
 }
@@ -29,37 +35,43 @@ double XTcurve::GetT(int cid, double X)
    return 0;
 }
 
+double XTcurve::GetSigmaR(int cid, double X)
+{
+   return 0;
+}
+
 //__________________________________________________
-ConstXTcurve::ConstXTcurve()
+XTcurveConst::XTcurveConst(double drift_velocity, double sigma_r)
 {
+   drift_velocity_ = drift_velocity;
+   sigma_r_ = sigma_r;
 }
 
-void ConstXTcurve::Setup(Config& config)
+double XTcurveConst::GetX(int cid, double T, int left_or_right)
 {
-   drift_velocity_ = config.GetDriftVelocity();
+   int sign=1;
+   if (left_or_right==XTcurve::LEFT) {
+      sign = -1;
+   }
+   return sign * T * drift_velocity_;
 }
 
-double ConstXTcurve::GetR(int cid, double T, int left_or_right)
-{
-   return T * drift_velocity_;
-}
-
-double ConstXTcurve::GetT(int cid, double X)
+double XTcurveConst::GetT(int cid, double X)
 {
    return X/drift_velocity_;
 }
 
-void ConstXTcurve::SetDriftVelocity(double drift_velocity)
+double XTcurveConst::GetSigmaR(int cid, double X)
 {
-   drift_velocity_ = drift_velocity;
+   return sigma_r_;
 }
 
-double ConstXTcurve::GetDriftVelocity()
+double XTcurveConst::GetDriftVelocity(int cid)
 {
    return drift_velocity_;
 }
 
-void ConstXTcurve::DrawXTcurve(int cid)
+void XTcurveConst::DrawXTcurve(int cid)
 {
    double x1 = -8.0;
    double x2 =  8.0;
@@ -72,23 +84,20 @@ void ConstXTcurve::DrawXTcurve(int cid)
 }
 
 //__________________________________________________
-XTcurvePol4::XTcurvePol4()
+XTcurvePol4::XTcurvePol4(const char* xt_param_path, double sigma_r)
 {
    for (int cid=0; cid<MAX_LAYER; cid++) {
       pol4_left_[cid] = NULL;
       pol4_left_inverse_x_[cid] = NULL;
       pol4_right_[cid] = NULL;
    }
-}
 
-void XTcurvePol4::Setup(Config& config)
-{
-   char* xt_param_path = config.GetXTParamPath();
-   printf("XTcurvePol4::Setup is called. xt_param_path %s\n", xt_param_path);
+   printf("XTcurvePol4::XTcurvePol4. xt_param_path %s\n", xt_param_path);
    if (strcmp(xt_param_path, "NOT_USED")==0) {
       fprintf(stderr, "xt_param_path is not set. exit.\n");
       exit(1);
    }
+   sigma_r_ = sigma_r;
 
    FILE* fp = fopen(xt_param_path, "r");
    if (fp==NULL) {
@@ -136,19 +145,20 @@ void XTcurvePol4::Setup(Config& config)
    fclose(fp);
 }
 
-double XTcurvePol4::GetR(int cid, double T, int left_or_right)
+double XTcurvePol4::GetX(int cid, double T, int left_or_right)
 {
-   double r = -1e10;
+   double x = -1e10;
    int ns = T;
    if (left_or_right==XTcurve::LEFT) {
-      if (T<0) r= 0;
-      else if (T>=300) r= tx_left_[cid][299];
-      else r = tx_left_[cid][ns];
+      if (T<0) x = 0;
+      else if (T>=300) x = -tx_left_[cid][299];
+      else x = -tx_left_[cid][ns];
+   } else {
+      if (T<0) x = 0;
+      else if (T>=300) x = tx_right_[cid][299];
+      else x = tx_right_[cid][ns];
    }
-   if (T<0) r = 0;
-   else if (T>=300) r= tx_right_[cid][299];
-   else r = tx_right_[cid][ns];
-   return r;
+   return x;
 }
 
 double XTcurvePol4::GetT(int cid, double X)
@@ -163,6 +173,11 @@ double XTcurvePol4::GetT(int cid, double X)
       t = pol4_right_[cid]->Eval(X);
    }
    return t;
+}
+
+double XTcurvePol4::GetSigmaR(int cid, double X)
+{
+   return sigma_r_;
 }
 
 void XTcurvePol4::DrawXTcurve(int cid)

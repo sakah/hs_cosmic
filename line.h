@@ -1,5 +1,5 @@
-#ifndef _LINE_H
-#define _LINE_H
+#ifndef LINE_H
+#define LINE_H
 
 #include "param.h"
 #include "TVector3.h"
@@ -9,7 +9,7 @@ class Line
    public:
       Line();
       void MakeLine(TVector3 p1, TVector3 p2);
-      void MakeLine(double A, double B, double C, double D, double E, double F1);
+      void MakeLine(double A, double B, double C, double D, double E, double F);
       void Trans2D(TVector3& pos, double ang);
       void DrawPoints(int marker_style, int marker_col, int marker_size);
       void DrawLine(int line_col);

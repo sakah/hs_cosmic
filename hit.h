@@ -1,53 +1,47 @@
-#ifndef _HIT_H
-#define _HIT_H
+#ifndef HIT_H
+#define HIT_H
 
+#include "wiremap.h"
 #include "xtcurve.h"
 
 class Hit
 {
    public:
       Hit();
-      void ClearHit();
+      Hit(WireMap* wiremap_ptr, XTcurve* xtcurve_ptr, int layer_number, int cell_number, int hit_number, int left_or_right, double drift_time, double t0, double q, double z, double fitX);
 
+      void ClearHit();
       int GetLayerNumber();
       int GetCellNumber();
-      int GetChanNumber();
-      int GetLeftRight();
+      int GetHitNumber();
+      int GetLeftOrRight();
       double GetDriftTime();
       double GetDriftTimeFromT0();
-      double GetQ();
       double GetT0();
+      double GetQ();
       double GetZ();
-      double GetHitR(XTcurve& xt);
-      bool HasHit();
-      bool UseByFit();
+      double GetHitX();
+      double GetFitX();
+      double GetResX();
+      double GetChi2();
+      TVector3 GetHitPosInChamber();
+      TVector3 GetHitPosInCell();
 
-      void SetLayerNumber(int layer_number);
-      void SetCellNumber(int cell_number);
-      void SetChanNumber(int chan_number);
-      void SetLeftRight(int left_or_right);
-      void SetDriftTime(double drift_time);
-      void SetQ(double q);
-      void SetT0(double t0);
-      void SetZ(double z);
-      void SetHitFlag(bool has_hit);
-      void SetUseByFitFlag(bool use_by_fit);
-
-      void PrintHit(XTcurve& xt);
+      void PrintHit();
+      void DrawHit();
 
    private:
-      bool has_hit_;
-      bool use_by_fit_;
+      WireMap* wiremap_ptr_;
+      XTcurve* xtcurve_ptr_;
       int layer_number_;
       int cell_number_;
-      int chan_number_;
+      int hit_number_;
       int left_or_right_;
       double drift_time_;
-      double q_;
       double t0_;
+      double q_;
       double z_;
+      double fitX_;
 };
 
 #endif
-
-

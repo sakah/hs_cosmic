@@ -1,5 +1,5 @@
-#ifndef _WIREMAP_H
-#define _WIREMAP_H
+#ifndef WIREMAP_H
+#define WIREMAP_H
 
 #include "param.h"
 #include "line.h"
@@ -7,8 +7,7 @@
 class WireMap
 {
    public:
-      WireMap();
-      void Read(const char* path);
+      WireMap(const char* wiremap_path);
       double GetZRO();
       double GetZHV();
       int GetNumLayers();
@@ -29,6 +28,7 @@ class WireMap
       int chan_numbers_[MAX_LAYER][MAX_CELL];
       int board_numbers_[MAX_LAYER][MAX_CELL];
       Line wires_[MAX_LAYER][MAX_CELL];
+
 };
 
 #endif

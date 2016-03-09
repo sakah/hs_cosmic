@@ -472,33 +472,6 @@ void Track::SetFitFuncType(int fit_func_type)
    fit_func_type_ = fit_func_type;
 }
 
-void Track::CalcPointsOnTangentials(
-      double x2, double r1, double r2,
-      double& xR1,
-      double& yR1,
-      double& xL1,
-      double& yL1,
-      double& xR2,
-      double& yR2,
-      double& xL2,
-      double& yL2)
-{
-   xL1 = (r1*r1 + r1*r2)/x2;
-   yL1 = TMath::Sqrt(r1*r1 - (r1*r1+r1*r2)/x2*(r1*r1+r1*r2)/x2);
-   xR1 = ((x2*x2-r2*r2-r1*r2)/x2);
-   yR1 = -TMath::Sqrt(r2*r2 - (-r2*r2-r1*r2)/x2*(-r2*r2-r1*r2)/x2);
-   xL2 = (r1*r1 - r1*r2)/x2;
-   yL2 = TMath::Sqrt(r1*r1 - (r1*r1-r1*r2)/x2*(r1*r1-r1*r2)/x2);
-   xR2 = ((x2*x2-r2*r2+r1*r2)/x2);
-   yR2 = TMath::Sqrt(r2*r2 - (-r2*r2+r1*r2)/x2*(-r2*r2+r1*r2)/x2);
-   if (g_debug_track>0) {
-      printf("xR1 %lf yR1 %lf\n", xR1, yR1);
-      printf("xL1 %lf yL1 %lf\n", xL1, yL1);
-      printf("xR2 %lf yR2 %lf\n", xR2, yR2);
-      printf("xL2 %lf yL2 %lf\n", xL2, yL2);
-   }
-}
-
 void Track::MinuitFunction_with_fix_t0(int& nDim, double* gout, double& result, double par[], int flg)
 {
    // Line in 3D space is described in the following
@@ -538,5 +511,44 @@ void Track::MinuitFunction_with_free_t0(int& nDim, double* gout, double& result,
    }
    Track_obj->fit_line_.MakeLine(A,B,C,D,E,F);
    result = Track_obj->GetChi2OfLine(*g_wiremap_ptr, *g_xt_ptr, *g_fit_line);
+}
+
+void Track::DrawTrack()
+{
+   TCanvas*c1 = new TCanvas("c1-track", "", 700, 700);
+   TH2F* h2 = new TH2F("h2", Form("%s Event# %lld", event.GetRootPath(), event.GetEventNumber()), 
+         100, -100, 100, 100, 480, 680);
+   h2->SetStats(0);
+   h2->Draw();
+
+   for (int cid=0; cid<MAX_LAYER; cid++) {
+      Hit& hit = track.GetHit(cid);
+      if (!hit.HasHit()) continue;
+      //hit.PrintHit(xt);
+      int icell = hit.GetCellNumber();
+      Line& wire = wiremap_.GetWire(cid, icell);
+      line.DrawLine(kRed);
+      TVector3 pA;
+      TVector3 pB;
+      wire.GetClosestPoints(line, pA, pB);
+      double zA = pA.Z();
+      //if (cid==1) zA=100;
+      //if (cid==7) zA=200;
+      //printf("--pA--\n");
+      //pA.Print();
+      //printf("--pB--\n");
+      //pB.Print();
+      TVector3 pos = wire.GetPosAtZ(zA);
+
+      double hitR = hit.GetHitR(xt);
+      if (hitR<0) {
+         printf("skip this hit due to negative hitR %f @cid %d icell %d\n", hitR, cid, icell);
+         continue;
+      }
+      TEllipse* e = new TEllipse(pos.X(), pos.Y(), hitR);
+      e->SetLineColor(kBlue);
+      e->SetFillStyle(4000);
+      e->Draw();
+   }
 }
 

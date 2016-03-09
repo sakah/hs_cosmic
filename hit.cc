@@ -1,23 +1,40 @@
-#include "hit.h"
 #include <stdio.h>
+#include "hit.h"
+#include "TVector3.h"
+#include "TMarker.h"
+#include "TEllipse.h"
 
 Hit::Hit()
 {
    ClearHit();
 }
 
+Hit::Hit(WireMap* wiremap_ptr, XTcurve* xtcurve_ptr, int layer_number, int cell_number, int hit_number, int left_or_right, double drift_time, double t0, double q, double z, double fitX)
+{
+   wiremap_ptr_ = wiremap_ptr;
+   xtcurve_ptr_ = xtcurve_ptr;
+   layer_number_ = layer_number;
+   cell_number_ = cell_number;
+   hit_number_ = hit_number;
+   left_or_right_ = left_or_right;
+   drift_time_ = drift_time;
+   t0_ = t0;
+   q_ = q;
+   z_ = z;
+   fitX_ = fitX;
+}
+
 void Hit::ClearHit()
 {
    layer_number_ = -1;
    cell_number_ = -1;
-   chan_number_ = -1;
-   left_or_right_ = XTcurve::LEFT;
-   drift_time_ = 0;
-   q_ = 0;
-   t0_ = -840;
-   z_ = 0;
-   has_hit_ = false;
-   use_by_fit_ = true;
+   hit_number_ = -1;
+   left_or_right_ = XTcurve::RIGHT;
+   drift_time_ = -1e10;
+   t0_ = -1e10;
+   q_ = -1e10;
+   z_ = -1e10;
+   fitX_ = -1e10;
 }
 
 int Hit::GetLayerNumber()
@@ -30,12 +47,12 @@ int Hit::GetCellNumber()
    return cell_number_;
 }
 
-int Hit::GetChanNumber()
+int Hit::GetHitNumber()
 {
-   return chan_number_;
+   return hit_number_;
 }
 
-int Hit::GetLeftRight()
+int Hit::GetLeftOrRight()
 {
    return left_or_right_;
 }
@@ -50,14 +67,14 @@ double Hit::GetDriftTimeFromT0()
    return drift_time_ - t0_;
 }
 
-double Hit::GetQ()
-{
-   return q_;
-}
-
 double Hit::GetT0()
 {
    return t0_;
+}
+
+double Hit::GetQ()
+{
+   return q_;
 }
 
 double Hit::GetZ()
@@ -65,76 +82,54 @@ double Hit::GetZ()
    return z_;
 }
 
-bool Hit::HasHit()
+double Hit::GetHitX()
 {
-   return has_hit_;
+   return xtcurve_ptr_->GetX(layer_number_, drift_time_ - t0_, left_or_right_);
 }
 
-bool Hit::UseByFit()
+double Hit::GetFitX()
 {
-   return use_by_fit_;
+   return fitX_;
 }
 
-double Hit::GetHitR(XTcurve& xt)
+double Hit::GetResX()
 {
-   return xt.GetR(layer_number_, drift_time_ - t0_, left_or_right_);
+   return fitX_ - GetHitX();
 }
 
-void Hit::SetLayerNumber(int layer_number)
+double Hit::GetChi2()
 {
-   layer_number_ = layer_number;
+   double sigma_r = xtcurve_ptr_->GetSigmaR(layer_number_, GetHitX());
+   double dx = GetResX()/sigma_r;
+   return dx*dx;
 }
 
-void Hit::SetCellNumber(int cell_number)
+void Hit::PrintHit()
 {
-   cell_number_ = cell_number;
+   printf("cid %2d icell %2d left_or_right %d t0 %3.2f drift_time %6.2f dT %6.2f --> hitX %6.2f fitX %6.2f resX %6.2f chi2 %6.2f hitZ %6.2f\n", 
+         layer_number_, cell_number_, left_or_right_, t0_, drift_time_, GetDriftTimeFromT0(), GetHitX(), GetFitX(), GetResX(), GetChi2(), z_);
 }
 
-void Hit::SetChanNumber(int chan_number)
+void Hit::DrawHit()
 {
-   chan_number_ = chan_number;
-}
+   TVector3 pos = wiremap_ptr_->GetWire(layer_number_, cell_number_).GetPosAtZ(z_);
+   // draw wire center
+   TMarker* m = new TMarker(pos.X(), pos.Y(), 20);
+   m->SetMarkerSize(0.3);
+   m->Draw();
 
-void Hit::SetLeftRight(int left_or_right)
-{
-   left_or_right_ = left_or_right;
-}
+   if (layer_number_==-1) {
+      return;
+   }
 
-void Hit::SetDriftTime(double drift_time)
-{
-   drift_time_ = drift_time;
-}
-
-void Hit::SetQ(double q)
-{
-   q_ = q;
-}
-
-void Hit::SetT0(double t0)
-{
-   t0_ = t0;
-}
-
-void Hit::SetZ(double z)
-{
-   z_ = z;
-}
-
-void Hit::SetHitFlag(bool has_hit)
-{
-   has_hit_ = has_hit;
-}
-
-void Hit::SetUseByFitFlag(bool use_by_fit)
-{
-   use_by_fit_ = use_by_fit;
-}
-
-void Hit::PrintHit(XTcurve& xt)
-{
-   double dT = drift_time_- t0_;
-   double hitR = GetHitR(xt);
-   printf("cid %2d icell %2d has_hit %d use_by_fit %d t0 %3.2f drift_time %6.2f dT %6.2f --> hitR %6.2f hitZ %6.2f\n", 
-         layer_number_, cell_number_, has_hit_, use_by_fit_, t0_, drift_time_, dT, hitR, z_);
+   // draw drift circle
+   TEllipse* e = new TEllipse(pos.X(), pos.Y(), TMath::Abs(GetHitX()));
+   if (hit_number_==0) {
+      e->SetLineColor(kBlue);
+   } else {
+      e->SetLineColor(kRed);
+   }
+   e->SetFillStyle(4000);
+   e->Draw();
 }
 

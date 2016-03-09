@@ -1,41 +1,33 @@
-#ifndef _CHAMBER_H
-#define _CHAMBER_H
+#ifndef CHAMBER_H
+#define CHAMBER_H
 
 #include "param.h"
-#include "event.h"
-#include "wiremap.h"
-#include "xtcurve.h"
-#include "hit.h"
-#include "track.h"
+#include "layer.h"
 
-#include "TCanvas.h"
-#include "TH2F.h"
-#include "TMarker.h"
-#include "TEllipse.h"
+class Config;
+class WireMap;
+class XTcurve;
+class InputROOT;
 
 class Chamber
 {
    public:
-      Chamber();
-      void GetEvent(Event& event);
-      void ClearEvent();
-      void ReadWireMap(const char* path);
-      WireMap& GetWireMap();
-      int GetNumHitCells(int cid);
-      int GetNumHitsInCell(int cid, int icell);
-      int GetHitCellNumber(int cid, int icellhit);
-      Hit& GetHit(int cid, int icell, int ihit);
-      void PrintHits(XTcurve& xt);
-      void DrawHits(Event& event, XTcurve& xt);
-      void DrawTrack(Event& event, XTcurve& xt, Track& track, Line& line);
-      void SetT0(int bd, double t0);
-      double GetT0(int bd);
-      double GetT0(int cid, int icell);
+      Chamber(Config* config_ptr);
+      void ClearHits();
+      void GetEvent();
+      Layer& GetLayer(int cid);
+      int GetHitLayers(Layer** hit_layers);
+      void PrintHits();
+      void DrawHits();
       
    private:
-      WireMap wiremap_;
-      Hit hits_[MAX_LAYER][MAX_CELL][MAX_CELL_HIT];
-      double t0_[MAX_BOARD];
+      WireMap* wiremap_ptr_;
+      XTcurve* xtcurve_ptr_;
+      InputROOT* input_root_ptr_;
+      int num_boards_;
+      double t0_boards_[MAX_BOARD];
+
+      Layer layers_[MAX_LAYER];
 };
 
 #endif

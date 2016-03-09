@@ -1,15 +1,12 @@
 #include "wiremap.h"
 
-WireMap::WireMap()
+WireMap::WireMap(const char* path)
 {
    for (int ch=0; ch<MAX_CH; ch++) {
       layer_numbers_[ch] = -1;
       cell_numbers_[ch] = -1;
    }
-}
 
-void WireMap::Read(const char* path)
-{
    zro_ = -299.585;
    zhv_ = +299.585;
 

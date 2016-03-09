@@ -1,5 +1,5 @@
-#ifndef _PARAM_H
-#define _PARAM_H
+#ifndef PARAM_H
+#define PARAM_H
 
 #define g_debug_line 0
 #define g_debug_track 0
@@ -7,6 +7,7 @@
 
 enum
 {
+   MAX_CONFIG=100,
    MAX_BOARD=2,
    MAX_CH=96,
    MAX_SAMPLE=32,
