@@ -11,8 +11,8 @@ Range::Range(const char* name, double min, double max, double step)
 }
 
 Range::Range(const char* name, double min, double max)
+   :Range(name, min, max, -1)
 {
-   Range(name, min, max, -1);
 }
 
 Range::Range()
@@ -42,5 +42,5 @@ double Range::GetStep()
 
 void Range::PrintRange()
 {
-   printf("Range %s min %f max %f step %f\n", name_, min_, max_, step_);
+   printf("Range %s min %8.2f max %8.2f step %8.2f\n", name_, min_, max_, step_);
 }
