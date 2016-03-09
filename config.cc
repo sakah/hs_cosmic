@@ -49,20 +49,24 @@ void Config::PrintConfig()
    printf("input_root_name_templ  %s\n", input_root_name_templ_);
    printf("xt_curve_name          %s\n", xt_curve_name_);
    printf("xt_param_path          %s\n", xt_param_path_);
-   printf("xt_drift_velocity      %6.2f [mm/ns]\n", xt_drift_velocity_);
-   printf("xt_sigma_r             %6.2f [mm]\n", xt_sigma_r_);
+   printf("xt_drift_velocity    %6.2f [mm/ns]\n", xt_drift_velocity_);
+   printf("xt_sigma_r           %6.2f [mm]\n", xt_sigma_r_);
    printf("fit_func_name          %s\n", fit_func_name_);
    for (int bd=0; bd<num_boards_; bd++) {
       printf("bd %d t0               %5.2f [ns]\n", bd, t0_boards_[bd]);
    }
-   printf("track_find_cid1       %d\n", track_find_cid1_);
-   printf("track_find_cid2       %d\n", track_find_cid2_);
-   printf("use_inner_guard_layer %d\n", use_inner_guard_layer_);
-   printf("use_outer_guard_layer %d\n", use_outer_guard_layer_);
+   printf("track_find_cid1        %d\n", track_find_cid1_);
+   printf("track_find_cid2        %d\n", track_find_cid2_);
+   printf("use_inner_guard_layer  %d\n", use_inner_guard_layer_);
+   printf("use_outer_guard_layer  %d\n", use_outer_guard_layer_);
    printf("... track_find_range ...\n");
    track_find_range_.PrintTrackFindRange();
    printf("........................\n");
    printf("--------------------------------------------------\n");
+}
+void Config::ls()
+{
+   PrintConfig();
 }
 
 void Config::SetDefaults()
@@ -113,7 +117,7 @@ void Config::ReadConfig(const char* config_path)
       if (strstr(line, "t0"))                  { sscanf(line, "board %d t0 %lf", &board, &t0); t0_boards_[board] = t0;}
       if (strstr(line, "xt_curve_name"))         sscanf(line, "xt_curve_name %s", xt_curve_name_);
       if (strstr(line, "xt_param_path"))         sscanf(line, "xt_param_path %s", xt_param_path_); // relative path
-      if (strstr(line, "xt_drift_velocity"))     sscanf(line, "drift_velocity %lf", &xt_drift_velocity_);
+      if (strstr(line, "xt_drift_velocity"))     sscanf(line, "xt_drift_velocity %lf", &xt_drift_velocity_);
       if (strstr(line, "xt_sigma_r"))            sscanf(line, "xt_sigma_r %lf",     &xt_sigma_r_);
       if (strstr(line, "fit_func_name"))         sscanf(line, "fit_func_name %s", fit_func_name_);
       if (strstr(line, "track_find_cid1"))       sscanf(line, "track_find_cid1 %d", &track_find_cid1_);
@@ -131,7 +135,7 @@ void Config::ReadConfig(const char* config_path)
    PrintConfig();
 }
 
-Config Config::ChangeConfig(const char* name, char* value)
+Config Config::ChangeConfig(const char* name, const char* value)
 {
    if (strstr(name, "wiremap_path"))          strcpy(wiremap_path_, value);
    if (strstr(name, "input_root_dir"))        strcpy(input_root_dir_, value);

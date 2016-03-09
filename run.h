@@ -9,8 +9,8 @@ class Run
 {
    public:
       Run(Config* config_ptr, int run_number);
-      Event& GetNextEvent(bool skip_empty_event);
-      Event& GetEvent(Long64_t event_number);
+      Event GetNextEvent(bool skip_empty_event);
+      Event GetEvent(Long64_t event_number);
 
    private:
       Config* config_ptr_;
