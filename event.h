@@ -4,6 +4,7 @@
 #include "wiremap.h"
 #include "xtcurve.h"
 #include "chamber.h"
+#include "inputroot.h"
 //#include "line.h"
 //#include "track.h"
 //#include "xtcurve.h"
@@ -30,6 +31,11 @@ class Event
 
    private:
       Config* config_ptr_;
+      WireMap* wiremap_ptr_;
+      XTcurve* xtcurve_ptr_;
+      Chamber* chamber_ptr_;
+      InputROOT* input_root_ptr_;
+
       //TrackFinder track_finder_;
       //TrackFitter* track_fitter_ptr_;
       //OutputROOT output_root_;

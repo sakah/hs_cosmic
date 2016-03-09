@@ -1,3 +1,7 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "configlist.h"
 
 ConfigList::ConfigList(const char* top_dir, const char* config_list_path)

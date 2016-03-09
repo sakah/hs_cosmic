@@ -1,5 +1,9 @@
 #include "event.h"
 #include "config.h"
+#include "wiremap.h"
+#include "xtcurve.h"
+#include "chamber.h"
+#include "inputroot.h"
 
 Event::Event()
 {
