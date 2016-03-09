@@ -7,5 +7,6 @@ output
 *.pcm
 *.d
 *.root
+*.o
 main
 cosmic_root_out
