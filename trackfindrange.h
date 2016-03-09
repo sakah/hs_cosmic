@@ -23,8 +23,8 @@ class TrackFindRange
       Range z1_;
       Range z2_;
       Range t0_;
-      Range drift_radius_;
-      Range num_tracks_;
+      Range dr_;
+      Range nt_;
 };
 
 #endif
