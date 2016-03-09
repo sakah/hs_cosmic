@@ -18,7 +18,9 @@ class Config
       ~Config();
       Config();
       Config(const char* top_dir);
+      Config(const char* top_dir, const char* config_path);
       void PrintConfig();
+      void SetDefaults();
       void ReadConfig(const char* config_path);
       Config ChangeConfig(const char* name, char* value);
       Config ChangeConfig(const char* name, int value);

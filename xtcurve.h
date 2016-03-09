@@ -7,7 +7,7 @@
 class XTcurve
 {
    public:
-      enum { USE_CONST_XT=0, USE_PARAM_POL4 };
+      enum { XT_CONST=0, XT_PARAM_POL4 };
       enum { LEFT=0, RIGHT };
       XTcurve();
       virtual double GetX(int cid, double T, int left_or_right);

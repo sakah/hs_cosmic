@@ -20,6 +20,8 @@ Config::~Config()
    if (event_ptr_) delete event_ptr_;
 
 }
+
+
 Config::Config()
 {
    Config("./");
@@ -28,7 +30,43 @@ Config::Config()
 Config::Config(const char* top_dir)
 {
    strcpy(top_dir_, top_dir);
+   SetDefaults();
+}
 
+Config::Config(const char* top_dir, const char* config_path)
+{
+   strcpy(top_dir_, top_dir);
+   ReadConfig(config_path);
+}
+
+void Config::PrintConfig()
+{
+   printf("--------------------------------------------------\n");
+   printf("top_dir                %s\n", top_dir_);
+   printf("config_path            %s\n", config_path_);
+   printf("wiremap_path           %s\n", wiremap_path_);
+   printf("input_root_dir         %s\n", input_root_dir_);
+   printf("input_root_name_templ  %s\n", input_root_name_templ_);
+   printf("xt_curve_name          %s\n", xt_curve_name_);
+   printf("xt_param_path          %s\n", xt_param_path_);
+   printf("xt_drift_velocity      %6.2f [mm/ns]\n", xt_drift_velocity_);
+   printf("xt_sigma_r             %6.2f [mm]\n", xt_sigma_r_);
+   printf("fit_func_name          %s\n", fit_func_name_);
+   for (int bd=0; bd<num_boards_; bd++) {
+      printf("bd %d t0               %5.2f [ns]\n", bd, t0_boards_[bd]);
+   }
+   printf("track_find_cid1       %d\n", track_find_cid1_);
+   printf("track_find_cid2       %d\n", track_find_cid2_);
+   printf("use_inner_guard_layer %d\n", use_inner_guard_layer_);
+   printf("use_outer_guard_layer %d\n", use_outer_guard_layer_);
+   printf("... track_find_range ...\n");
+   track_find_range_.PrintTrackFindRange();
+   printf("........................\n");
+   printf("--------------------------------------------------\n");
+}
+
+void Config::SetDefaults()
+{
    strcpy(config_path_, "NOT_SET");
    strcpy(wiremap_path_, "NOT_SET");
    strcpy(input_root_dir_, "NOT_SET");
@@ -49,28 +87,6 @@ Config::Config(const char* top_dir)
    //track_find_range_; // defalut
 }
 
-void Config::PrintConfig()
-{
-   printf("-------------------------\n");
-   printf("top_dir                %s\n", top_dir_);
-   printf("config_path            %s\n", config_path_);
-   printf("xt_curve_name          %s\n", xt_curve_name_);
-   printf("xt_param_path          %s\n", xt_param_path_);
-   printf("xt_drift_velocity      %6.2f [mm/ns]\n", xt_drift_velocity_);
-   printf("xt_sigma_r             %6.2f [mm]\n", xt_sigma_r_);
-   printf("fit_func_name          %s\n", fit_func_name_);
-   for (int bd=0; bd<num_boards_; bd++) {
-      printf("bd %d t0               %5.2f [ns]\n", bd, t0_boards_[bd]);
-   }
-   printf("track_find_cid1       %d\n", track_find_cid1_);
-   printf("track_find_cid2       %d\n", track_find_cid2_);
-   printf("use_inner_guard_layer %d\n", use_inner_guard_layer_);
-   printf("use_outer_guard_layer %d\n", use_outer_guard_layer_);
-   printf("... track_find_range ...\n");
-   track_find_range_.PrintTrackFindRange();
-   printf("-------------------------\n");
-}
-
 void Config::ReadConfig(const char* config_path)
 {
    strcpy(config_path_, config_path);
@@ -78,7 +94,7 @@ void Config::ReadConfig(const char* config_path)
    FILE* fp = fopen(config_path, "r");
    if (fp==NULL) {
       fprintf(stderr, "ERROR: cannot open %s\n", config_path);
-      exit(1);
+      return;
    }
    char line[128];
    int board;
@@ -286,9 +302,9 @@ void Config::MakeXTcurve()
    if (xtcurve_ptr_) {
       delete xtcurve_ptr_;
    }
-   if (strcmp(GetXTcurveName(), "USE_CONST_XT")==0) {
+   if (strcmp(GetXTcurveName(), "XT_CONST")==0) {
       xtcurve_ptr_ = new XTcurveConst(xt_drift_velocity_, xt_sigma_r_);
-   } else if (strcmp(GetXTcurveName(), "USE_PARAM_POL4")==0) {
+   } else if (strcmp(GetXTcurveName(), "XT_PARAM_POL4")==0) {
       xtcurve_ptr_ = new XTcurvePol4(GetXTParamPathAbs(), xt_sigma_r_);
    } else {
       fprintf(stderr, "ERROR: unknown xt_curve_name %s\n", GetXTcurveName());

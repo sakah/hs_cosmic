@@ -18,8 +18,8 @@ XTcurve::XTcurve()
 int XTcurve::GetXTcurveType(const char* xt_curve_name)
 {
    int xt_curve_type=-1;
-   if (strcmp(xt_curve_name, "USE_CONST_XT")==0) xt_curve_type = USE_CONST_XT;
-   else if (strcmp(xt_curve_name, "USE_PARAM_POL4")==0) xt_curve_type = USE_PARAM_POL4;
+   if (strcmp(xt_curve_name, "XT_CONST")==0) xt_curve_type = XT_CONST;
+   else if (strcmp(xt_curve_name, "XT_PARAM_POL4")==0) xt_curve_type = XT_PARAM_POL4;
    else {
       fprintf(stderr, "ERROR: XTcurve unkonwn xt_curve_name '%s'\n", xt_curve_name);
    }
