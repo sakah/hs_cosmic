@@ -8,5 +8,6 @@ output
 *.d
 *.root
 *.o
+mydict.cc
 main
 cosmic_root_out
