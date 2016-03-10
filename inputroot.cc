@@ -23,6 +23,7 @@ void InputROOT::OpenRootFile(const char* root_path)
    t_->SetBranchAddress("tdcNhit", tdcNhit_);
    t_->SetBranchAddress("driftTime", driftTime_);
    t_->SetBranchAddress("clockNumberDriftTime", clockNumberDriftTime_);
+   printf("InputROOT %s is opend\n", root_path);
 }
 
 void InputROOT::GetNextEntry(bool skip_empty_event)

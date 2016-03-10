@@ -6,8 +6,11 @@
 class ConfigList
 {
    public:
+      ConfigList();
       ConfigList(const char* top_dir, const char* config_list_path);
+      void ReadConfigList(const char* config_list_path);
       void PrintConfigList();
+      Config* GetConfig(int icon);
 
    private:
       char top_dir_[128]; // depends on working directory

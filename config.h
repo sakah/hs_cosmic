@@ -2,6 +2,9 @@
 #define CONFIG_H
 
 #include "param.h"
+#include "TString.h"
+//#include <string>
+#include "range.h"
 
 class Run;
 //class TrackFindRange;
@@ -19,43 +22,53 @@ class Config
       Config();
       Config(const char* top_dir);
       Config(const char* top_dir, const char* config_path);
+      Config(const Config& obj);
+      void CopyConfig(const Config& other);
       void PrintConfig();
       void ls();
       void SetDefaults();
       void ReadConfig(const char* config_path);
-      Config ChangeConfig(const char* name, const char* value);
-      Config ChangeConfig(const char* name, int value);
-      Config ChangeConfig(const char* name, double value);
-      Config ChangeConfig(const char* name, int idx, double value);
-      Config ChangeConfig(const char* name, double min, double max, double step);
-      Config ChangeConfig(const char* name, int min, int max, int step);
+      //Config NewConfig(int par);
+      //Config NewConfig(int par, int par2);
+      Config track_find_cid1(int new_value);
+      Config track_find_cid2(int new_value, int a);
+      //Config track_find_cid3(Hoge a);
+      Config track_find_cid4(char str);
+      //Range<double>& track_find_cid3();
+      //Config NewConfig(TString par);
+      //Config* ChangeConfig(const char* name, const char* value);
+      //Config ChangeConfig(const char* name, int value);
+      //Config ChangeConfig(const char* name, double value);
+      //Config ChangeConfig(const char* name, int idx, double value);
+      //Config ChangeConfig(const char* name, double min, double max, double step);
+      //Config ChangeConfig(const char* name, int min, int max, int step);
 
-      int    GetNumBoards();
-      double GetT0Board(int bd);
-      int    GetT0Boards(double* t0list);
-      char*  GetXTcurveName();
-      char*  GetXTParamPath();
-      double GetXTDriftVelocity();
-      double GetXTSigmaR();
-      char*  GetFitFuncName();
-      int    UseInnerGuardLayer();
-      int    UseOuterGuardLayer();
-      int    GetTrackFindLayerNumber1();
-      int    GetTrackFindLayerNumber2();
-      double GetTrackFindZstep();
-      TrackFindRange& GetTrackFindRange();
+      int    GetNumBoards() const;
+      double GetT0Board(int bd) const;
+      int    GetT0Boards(double* t0_boards) const;
+      const char*  GetXTcurveName() const;
+      const char*  GetXTParamPath() const;
+      double GetXTDriftVelocity() const;
+      double GetXTSigmaR() const;
+      const char*  GetFitFuncName() const;
+      int    GetTrackFindLayerNumber1() const;
+      int    GetTrackFindLayerNumber2() const;
+      const TrackFindRange& GetTrackFindRange() const;
+      int    UseInnerGuardLayer() const;
+      int    UseOuterGuardLayer() const;
 
-      const char* GetTopDir();
-      const char* GetConfigPath();
-      const char* GetWireMapPath();
-      const char* GetInputROOTNameTempl();
+      const char* GetTopDir() const;
+      const char* GetConfigPath() const;
+      const char* GetWireMapPath() const;
+      const char* GetInputROOTDir() const;
+      const char* GetInputROOTNameTempl() const;
 
-      const char* GetConfigPathAbs();
-      const char* GetWireMapPathAbs();
-      const char* GetXTParamPathAbs();
-      const char* GetInputROOTPathAbs(int run_number);
+      const char* GetConfigPathAbs() const;
+      const char* GetWireMapPathAbs() const;
+      const char* GetXTParamPathAbs() const;
+      const char* GetInputROOTPathAbs(int run_number) const;
 
-      Run GetRun(int run_number);
+      Run* GetRun(int run_number);
 
       void MakeAll(int run_number);
       void MakeWireMap();
@@ -94,6 +107,9 @@ class Config
       Chamber* chamber_ptr_;
       InputROOT* input_root_ptr_;
       Event* event_ptr_;
+
+      int num_runs_;
+      Run* runs_[MAX_RUN];
 };
 
 #endif

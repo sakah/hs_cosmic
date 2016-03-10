@@ -16,6 +16,7 @@ Chamber::Chamber(Config* config_ptr)
    xtcurve_ptr_ = config_ptr->GetXTcurve_Ptr();
    input_root_ptr_ = config_ptr->GetInputROOT_Ptr();
    num_boards_ = config_ptr->GetT0Boards(t0_boards_);
+   //printf("chamber::chamber is called. input_root_ptr %p\n", input_root_ptr_);
    ClearHits();
 }
 
@@ -85,3 +86,7 @@ void Chamber::DrawHits()
    }
 }
 
+int Chamber::GetNumBoards()
+{
+   return num_boards_;
+}

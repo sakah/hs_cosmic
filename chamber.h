@@ -19,6 +19,7 @@ class Chamber
       int GetHitLayers(Layer** hit_layers);
       void PrintHits();
       void DrawHits();
+      int GetNumBoards();
       
    private:
       WireMap* wiremap_ptr_;

@@ -7,6 +7,7 @@
 
 enum
 {
+   MAX_RUN=10,
    MAX_CONFIG=100,
    MAX_BOARD=2,
    MAX_CH=96,

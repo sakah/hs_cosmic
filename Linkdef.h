@@ -13,7 +13,8 @@
 #pragma link C++ class IputROOT+;
 #pragma link C++ class Layer+;
 #pragma link C++ class Line+;
-#pragma link C++ class Range+;
+#pragma link C++ class Range<double>+;
+#pragma link C++ class Range<int>+;
 #pragma link C++ class Run+;
 #pragma link C++ class TrackFindRange+;
 #pragma link C++ class XTcurve+;

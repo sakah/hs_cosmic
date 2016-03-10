@@ -2,7 +2,7 @@ wiremap_path           wirepos.proto4.sw.ver7.txt
 input_root_dir         test/
 input_root_name_templ  run%d.root
 num_boards             2
-t0                     -850
+t0_all                 -850
 xt_curve_name          XT_CONST
 xt_param_path          NOT_SET
 xt_drift_velocity      0.04
@@ -13,7 +13,7 @@ track_find_cid2        7
 track_find_range_z1    -200 +200 10
 track_find_range_z2    -200 +200 10
 track_find_range_t0    -900 -800 1
-track_find_range_drift_radius  0.0 8.0
-track_find_num_tracks  1 4
+track_find_range_dr    0.0   8.0
+track_find_range_nt    1     4
 use_inner_guard_layer  1
 use_outer_guard_layer  1

@@ -7,24 +7,21 @@ class TrackFindRange
 {
    public:
       TrackFindRange();
-      TrackFindRange(Range z1, Range z2, Range t0, Range drift_radius, Range num_tracks);
-      Range& GetRangeZ1();
-      Range& GetRangeZ2();
-      Range& GetRangeT0();
-      Range& GetRangeDriftRadius();
-      Range& GetRangeNumTracks();
+      TrackFindRange(Range<double> z1, Range<double> z2, Range<double> t0, Range<double> drift_radius, Range<int> num_tracks);
+      Range<double>& z1();
+      Range<double>& z2();
+      Range<double>& t0();
+      Range<double>& dr();
+      Range<int>& nt();
 
       void PrintTrackFindRange();
 
-      void UpdateRange(const char* name, double min, double max, double step=-1.0);
-      void UpdateRange(const char* name, int min, int max, int step=-1);
-
    private:
-      Range z1_;
-      Range z2_;
-      Range t0_;
-      Range dr_;
-      Range nt_;
+      Range<double> z1_;
+      Range<double> z2_;
+      Range<double> t0_;
+      Range<double> dr_;
+      Range<int> nt_;
 };
 
 #endif

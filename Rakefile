@@ -1,6 +1,7 @@
 require 'rake/clean'
 
-SRCS =%w(cell.cc chamber.cc config.cc configlist.cc event.cc hit.cc inputroot.cc main.cc layer.cc line.cc range.cc run.cc trackfindrange.cc xtcurve.cc wiremap.cc)
+#SRCS =%w(cell.cc chamber.cc config.cc configlist.cc event.cc hit.cc inputroot.cc main.cc layer.cc line.cc range.cc run.cc trackfindrange.cc xtcurve.cc wiremap.cc)
+SRCS =%w(cell.cc chamber.cc config.cc configlist.cc event.cc hit.cc inputroot.cc main.cc layer.cc line.cc run.cc trackfindrange.cc xtcurve.cc wiremap.cc)
 OBJS = SRCS.map do |src|
    src.gsub('.cc', '.o')
 end
@@ -8,6 +9,7 @@ headers=SRCS.map do |src|
    src.gsub('.cc', '.h')
 end
 headers.delete('main.h')
+headers.push("range.h")
 HEADERS=headers
 
 obj=OBJS.dup
@@ -24,7 +26,7 @@ rule '.o' => '.cc' do |t|
    sh "g++ -O2 `root-config --cflags` -c #{t.source} -o #{t.name}"
 end
 
-file "mydict.cc" do |t|
+file "mydict.cc" => OBJS do |t|
    #puts "--- #{HEADERS} ----"
    sh "rootcint -f mydict.cc -c -p #{HEADERS.join(' ')} Linkdef.h"
 end

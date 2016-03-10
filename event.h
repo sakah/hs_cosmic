@@ -18,6 +18,7 @@ class Event
    public:
       Event();
       Event(Config* config_ptr);
+      Event(const Event& other);
 
       void PrintHits();
       void DrawHits();

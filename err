@@ -1,0 +1,19 @@
+g++ -O2 `root-config --cflags` -c config.cc -o config.o
+config.cc:280:11: error: cannot initialize return object of type 'char *' with an lvalue of type 'char const[32]'
+   return xt_curve_name_;
+          ^~~~~~~~~~~~~~
+config.cc:285:11: error: cannot initialize return object of type 'char *' with an lvalue of type 'char const[512]'
+   return xt_param_path_;
+          ^~~~~~~~~~~~~~
+config.cc:300:11: error: cannot initialize return object of type 'char *' with an lvalue of type 'char const[64]'
+   return fit_func_name_;
+          ^~~~~~~~~~~~~~
+config.cc:325:11: error: binding of reference to type 'TrackFindRange' to a value of type 'const TrackFindRange' drops qualifiers
+   return track_find_range_;
+          ^~~~~~~~~~~~~~~~~
+4 errors generated.
+rake aborted!
+Command failed with status (1): [g++ -O2 `root-config --cflags` -c config.c...]
+/Users/sakamoto/hs_cosmic/Rakefile:26:in `block in <top (required)>'
+Tasks: TOP => lib => config.o
+(See full trace by running task with --trace)

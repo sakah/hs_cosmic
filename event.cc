@@ -20,11 +20,28 @@ Event::Event(Config* config_ptr)
    wiremap_ptr_ = config_ptr_->GetWireMap_Ptr();
    xtcurve_ptr_ = config_ptr_->GetXTcurve_Ptr();
    chamber_ptr_ = config_ptr_->GetChamber_Ptr();
-   input_root_ptr_ = config_ptr->GetInputROOT_Ptr();
+   input_root_ptr_ = config_ptr_->GetInputROOT_Ptr();
+}
+
+Event::Event(const Event& other)
+{
+   printf("Event copy construcotr is called\n");
+   config_ptr_ = other.config_ptr_;
+   wiremap_ptr_ = other.config_ptr_->GetWireMap_Ptr();
+   xtcurve_ptr_ = other.config_ptr_->GetXTcurve_Ptr();
+   chamber_ptr_ = other.config_ptr_->GetChamber_Ptr();
+   input_root_ptr_ = other.config_ptr_->GetInputROOT_Ptr();
+   printf("config_ptr %p\n", config_ptr_);
+   printf("wirempa_ptr %p\n", wiremap_ptr_);
+   printf("xtcurve_ptr %p\n", xtcurve_ptr_);
+   printf("chamber_ptr %p\n", chamber_ptr_);
+   printf("input_root_ptr %p\n", input_root_ptr_);
 }
 
 void Event::PrintHits()
 {
+   printf("chamber_ptr %p\n", chamber_ptr_);
+   printf("chamber_ptr->num_boards %d\n", chamber_ptr_->GetNumBoards());
    chamber_ptr_->PrintHits();
 }
 
