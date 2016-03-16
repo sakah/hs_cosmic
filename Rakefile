@@ -13,7 +13,7 @@ headers.push("range.h")
 HEADERS=headers
 
 obj=OBJS.dup
-CLEAN.include(obj.push("mydict.cc", "mydict.o", "mydict_rdict.pcm", "libmylib.so", "main"))
+CLEAN.include(obj.push("mydict.cc", "mydict.o", "mydict_rdict.pcm", "libmylib.so", "main", "*.so", "*.pcm", "*.d"))
 
 task :default => :main
 
