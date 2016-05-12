@@ -155,8 +155,10 @@ void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_i
 {
    output_.SetRootFile(output_root_path);
 
-   double t0_0 = -835;
-   double t0_1 = -835;
+   //double t0_0 = -835;
+   //double t0_1 = -835;
+   double t0_0 = -900;
+   double t0_1 = -900;
 
    int cid1 = 1;
    int cid2 = 7;
