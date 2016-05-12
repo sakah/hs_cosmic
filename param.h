@@ -8,7 +8,8 @@
 enum
 {
    MAX_BOARD=2,
-   MAX_CH=96,
+   MAX_CH=144,
+   MAX_DATA_CH=96,
    MAX_SAMPLE=32,
    MAX_LAYER=9,
    MAX_CELL=11,

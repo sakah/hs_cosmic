@@ -11,6 +11,7 @@ int main(int argc, char** argv)
    Long64_t start_iev = atoi(argv[3]);
    Long64_t last_iev = atoi(argv[4]);
    Run run(input_root_path);
+run.SetT0(-900, -900);
    run.Loop(output_root_path, start_iev, last_iev);
 
    return 0;

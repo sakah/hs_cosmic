@@ -37,7 +37,7 @@ void Event::GetNext(bool skip_empty_event)
       if (!skip_empty_event) break;
 
       bool empty_event=true;
-      for (int ch=0; ch<MAX_CH; ch++) {
+      for (int ch=0; ch<MAX_DATA_CH; ch++) {
          if (tdcNhit_[ch]!=0) {
             empty_event=false;
             break;
@@ -64,7 +64,7 @@ void Event::PrintEvent()
 {
    printf("iev %lld\n", event_number_);
    printf("triggerNumber %d\n", triggerNumber_);
-   for (int ch=0; ch<96; ch++) {
+   for (int ch=0; ch<MAX_CH; ch++) {
       printf("ch %d TdcNhit %d q %d\n", ch, tdcNhit_[ch], q_[ch]);
       //for (int sample=0; sample<32; sample++) {
       //   printf("ch %d sample %d adc %d\n", ch, sample, adc_[ch][sample]);
