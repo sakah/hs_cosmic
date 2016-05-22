@@ -7,7 +7,7 @@ Run::Run()
 Run::Run(const char* root_file_path)
 {
    xt_.SetDriftVelocity(0.040);
-   chamber_.ReadWireMap("wirepos.proto4.sw.ver7.txt");
+   chamber_.ReadWireMap("/gpfs/home/had/hideyuki/private/genfit2/KEKCC/hs_cosmic/wirepos.proto4.sw.ver7.txt");
    event_.OpenRootFile(root_file_path);
 }
 
