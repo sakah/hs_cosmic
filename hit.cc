@@ -50,6 +50,11 @@ double Hit::GetQ()
    return q_;
 }
 
+int Hit::GetAdc()
+{
+   return adc_;
+}
+
 double Hit::GetT0()
 {
    return t0_;

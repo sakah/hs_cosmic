@@ -33,7 +33,9 @@ void Chamber::GetEvent(Event& event)
 
          // apply adc peak cut
          int sample = event.GetClockNumberDriftTime(ch, ihit);
-         if (event.GetAdc(ch, sample)<adc_thre_) {
+         int adc = event.GetAdc(ch, sample);
+         //printf("sample %d adc %d\n", sample, adc);
+         if (adc<adc_thre_) {
             continue;
          }
          jhit++;

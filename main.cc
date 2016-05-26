@@ -16,7 +16,7 @@ int main(int argc, char** argv)
    //run.SetT0(-890, -890);
    //run.SetT0(-895, -895);
    run.SetT0(t0, t0);
-   run.SetAdcPeakThreshold(300);
+   run.SetAdcPeakThreshold(250);
    run.Loop(output_root_path, start_iev, last_iev);
 
    return 0;
