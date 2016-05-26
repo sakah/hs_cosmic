@@ -6,7 +6,8 @@ Run::Run()
 
 Run::Run(const char* root_file_path)
 {
-   xt_.SetDriftVelocity(0.040);
+   //xt_.SetDriftVelocity(0.040); // He:C2H6(50:50)
+   xt_.SetDriftVelocity(0.025); // He:iC4H10(90:10)
    chamber_.ReadWireMap("/gpfs/home/had/hideyuki/private/genfit2/KEKCC/hs_cosmic/wirepos.proto4.sw.ver7.txt");
    event_.OpenRootFile(root_file_path);
 }
@@ -157,8 +158,8 @@ void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_i
 
    //double t0_0 = -835;
    //double t0_1 = -835;
-   double t0_0 = -900;
-   double t0_1 = -900;
+   //double t0_0 = -900;
+   //double t0_1 = -900;
 
    int cid1 = 1;
    int cid2 = 7;
@@ -175,7 +176,7 @@ void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_i
    printf("start_iev %lld\n", start_iev);
    printf("last_iev %lld\n", last_iev);
 
-   SetT0(t0_0, t0_1);
+   //SetT0(t0_0, t0_1);
 
    int start_time = time(NULL);
    int prev_time = start_time;
