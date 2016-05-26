@@ -10,6 +10,11 @@ Chamber::Chamber()
 {
 }
 
+void Chamber::SetAdcPeakThreshold(int adc_thre)
+{
+   adc_thre_ = adc_thre;
+}
+
 void Chamber::GetEvent(Event& event)
 {
    ClearEvent();
@@ -20,14 +25,26 @@ void Chamber::GetEvent(Event& event)
       if (cid==-1) continue; // not connected to wire
       int nhits = event.GetTdcNhit(ch);
       //printf("ch %d cid %d icell %d nhits %d\n", ch, cid, icell, nhits);
+
+      int jhit=0;
       for (int ihit=0; ihit<nhits; ihit++) {
-         Hit& hit = hits_[cid][icell][ihit];
+
+         Hit& hit = hits_[cid][icell][jhit];
+
+         // apply adc peak cut
+         int sample = event.GetClockNumberDriftTime(ch, ihit);
+         if (event.GetAdc(ch, sample)<adc_thre_) {
+            continue;
+         }
+         jhit++;
+
          hit.SetHitFlag(true);
          hit.SetLayerNumber(cid);
          hit.SetCellNumber(icell);
          hit.SetChanNumber(ch);
          hit.SetDriftTime(event.GetDriftTime(ch, ihit));
          hit.SetQ(event.GetQ(ch));
+         hit.SetAdc(event.GetAdc(ch, sample));
          hit.SetT0(GetT0(cid, icell));
          hit.SetZ(wiremap_.GetZRO());
       }
@@ -115,13 +132,13 @@ Hit& Chamber::GetHit(int cid, int icell, int ihit)
 void Chamber::PrintHits(XTcurve& xt)
 {
    for (int cid=0; cid<MAX_LAYER; cid++) {
-      printf("cid %d num_hit_cells %d\n", cid, GetNumHitCells(cid));
+      printf("cid %2d num_hit_cells %d\n", cid, GetNumHitCells(cid));
    }
    for (int cid=0; cid<MAX_LAYER; cid++) {
       for (int icell=0; icell<MAX_CELL; icell++) {
          int nhits =  GetNumHitsInCell(cid, icell);
          if (nhits==0) continue;
-         printf("cid %d icell %d num_hits_in_cell %d\n", cid, icell, nhits);
+         printf("cid %2d icell %2d num_hits_in_cell %d\n", cid, icell, nhits);
          for (int ihit=0; ihit<nhits; ihit++) {
             hits_[cid][icell][ihit].PrintHit(xt);
          }

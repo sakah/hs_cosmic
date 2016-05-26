@@ -17,6 +17,7 @@ class Chamber
 {
    public:
       Chamber();
+      void SetAdcPeakThreshold(int adc_thre);
       void GetEvent(Event& event);
       void ClearEvent();
       void ReadWireMap(const char* path);
@@ -36,6 +37,7 @@ class Chamber
       WireMap wiremap_;
       Hit hits_[MAX_LAYER][MAX_CELL][MAX_CELL_HIT];
       double t0_[MAX_BOARD];
+      int adc_thre_; // rough cut on raw adc count. If adc<adc_thre, then corresponding tdc is not considerded as hit
 };
 
 #endif

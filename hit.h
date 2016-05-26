@@ -14,6 +14,7 @@ class Hit
       double GetDriftTime();
       double GetDriftTimeFromT0();
       double GetQ();
+      int GetAdc();
       double GetT0();
       double GetZ();
       double GetHitR(XTcurve& xt);
@@ -26,6 +27,7 @@ class Hit
       void SetLeftRight(int left_or_right);
       void SetDriftTime(double drift_time);
       void SetQ(double q);
+      void SetAdc(int adc);
       void SetT0(double t0);
       void SetZ(double z);
       void SetHitFlag(bool has_hit);
@@ -42,6 +44,7 @@ class Hit
       int left_or_right_;
       double drift_time_;
       double q_;
+      int adc_;
       double t0_;
       double z_;
 };

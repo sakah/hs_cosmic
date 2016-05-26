@@ -31,6 +31,11 @@ void Run::SetT0(double t0_0, double t0_1)
    chamber_.SetT0(1, t0_1);
 }
 
+void Run::SetAdcPeakThreshold(int adc_thre)
+{
+   chamber_.SetAdcPeakThreshold(adc_thre);
+}
+
 void Run::PrintHits()
 {
    chamber_.PrintHits(xt_);
