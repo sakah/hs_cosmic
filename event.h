@@ -24,6 +24,7 @@ class Event
       int GetDriftTime(int ch, int ihit);
       int GetClockNumberDriftTime(int ch, int ihit);
       char* GetRootPath();
+      double GetPedestal(int ch);
 
    private:
       TFile* f_;

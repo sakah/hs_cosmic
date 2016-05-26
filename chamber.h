@@ -40,6 +40,7 @@ class Chamber
       double t0_[MAX_BOARD];
       double vel_;
       int adc_thre_; // rough cut on raw adc count. If adc<adc_thre, then corresponding tdc is not considerded as hit
+                     // this cut is for adc-ped, not raw adc count. (update 2016/5/27 5:14)
 };
 
 #endif

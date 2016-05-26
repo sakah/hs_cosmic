@@ -107,3 +107,15 @@ char* Event::GetRootPath()
 {
    return root_path_;
 }
+double Event::GetPedestal(int ch)
+{
+   // use first four points
+   // start of signal depdends on the delay of TRIG-IN
+   int num=4;
+   double ped = 0;
+   for (int sample=0; sample<num; sample++) {
+      ped += GetAdc(ch, sample);
+   }
+   ped /= num;
+   return ped;
+}

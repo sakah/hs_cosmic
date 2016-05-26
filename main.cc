@@ -19,7 +19,7 @@ int main(int argc, char** argv)
    run.SetT0(t0, t0);
    //run.SetVelocity(0.04);
    run.SetVelocity(velocity);
-   run.SetAdcPeakThreshold(250);
+   run.SetAdcPeakThreshold(100);
    run.Loop(output_root_path, start_iev, last_iev);
 
    return 0;
