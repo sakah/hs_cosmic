@@ -21,6 +21,7 @@ class Run
       void GetNext();
       void GetEntry(Long64_t event_number);
       void SetT0(double t0_0, double t0_1);
+      void SetVelocity(double vel);
       void SetAdcPeakThreshold(int adc_thre);
       void PrintHits();
       void DrawHits();

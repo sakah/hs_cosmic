@@ -30,6 +30,7 @@ class Chamber
       void DrawHits(Event& event, XTcurve& xt);
       void DrawTrack(Event& event, XTcurve& xt, Track& track, Line& line);
       void SetT0(int bd, double t0);
+      void SetVelocity(double vel);
       double GetT0(int bd);
       double GetT0(int cid, int icell);
       
@@ -37,6 +38,7 @@ class Chamber
       WireMap wiremap_;
       Hit hits_[MAX_LAYER][MAX_CELL][MAX_CELL_HIT];
       double t0_[MAX_BOARD];
+      double vel_;
       int adc_thre_; // rough cut on raw adc count. If adc<adc_thre, then corresponding tdc is not considerded as hit
 };
 

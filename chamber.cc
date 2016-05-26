@@ -241,6 +241,11 @@ void Chamber::SetT0(int bd, double t0)
    t0_[bd] = t0;
 }
 
+void Chamber::SetVelocity(double vel)
+{
+   vel_ = vel;
+}
+
 double Chamber::GetT0(int bd)
 {
    return t0_[bd];
