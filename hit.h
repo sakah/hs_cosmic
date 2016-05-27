@@ -7,6 +7,7 @@ class Hit
 {
    public:
       Hit();
+      int GetHitNumber();
       int GetLayerNumber();
       int GetCellNumber();
       int GetChanNumber();
@@ -15,12 +16,14 @@ class Hit
       double GetDriftTimeFromT0();
       double GetQ();
       int GetAdc();
+      double GetPedestal();
       double GetT0();
       double GetZ();
       double GetHitR(XTcurve& xt);
       bool HasHit();
       bool UseByFit();
 
+      void SetHitNumber(int hit_number);
       void SetLayerNumber(int layer_number);
       void SetCellNumber(int cell_number);
       void SetChanNumber(int chan_number);
@@ -28,6 +31,7 @@ class Hit
       void SetDriftTime(double drift_time);
       void SetQ(double q);
       void SetAdc(int adc);
+      void SetPedestal(double ped);
       void SetT0(double t0);
       void SetZ(double z);
       void SetHitFlag(bool has_hit);
@@ -40,11 +44,13 @@ class Hit
       bool use_by_fit_;
       int layer_number_;
       int cell_number_;
+      int hit_number_;
       int chan_number_;
       int left_or_right_;
       double drift_time_;
       double q_;
       int adc_;
+      double ped_;
       double t0_;
       double z_;
 };

@@ -41,6 +41,7 @@ void Chamber::GetEvent(Event& event)
          }
          jhit++;
 
+         hit.SetHitNumber(jhit);
          hit.SetHitFlag(true);
          hit.SetLayerNumber(cid);
          hit.SetCellNumber(icell);
@@ -48,6 +49,7 @@ void Chamber::GetEvent(Event& event)
          hit.SetDriftTime(event.GetDriftTime(ch, ihit));
          hit.SetQ(event.GetQ(ch));
          hit.SetAdc(event.GetAdc(ch, sample));
+         hit.SetPedestal(event.GetPedestal(ch));
          hit.SetT0(GetT0(cid, icell));
          hit.SetZ(wiremap_.GetZRO());
       }

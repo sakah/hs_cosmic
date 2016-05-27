@@ -3,6 +3,7 @@
 
 Hit::Hit()
 {
+   hit_number_ = -1;
    layer_number_ = -1;
    cell_number_ = -1;
    chan_number_ = -1;
@@ -13,6 +14,11 @@ Hit::Hit()
    z_ = 0;
    has_hit_ = false;
    use_by_fit_ = true;
+}
+
+int Hit::GetHitNumber()
+{
+   return hit_number_;
 }
 
 int Hit::GetLayerNumber()
@@ -55,6 +61,11 @@ int Hit::GetAdc()
    return adc_;
 }
 
+double Hit::GetPedestal()
+{
+   return ped_;;
+}
+
 double Hit::GetT0()
 {
    return t0_;
@@ -78,6 +89,11 @@ bool Hit::UseByFit()
 double Hit::GetHitR(XTcurve& xt)
 {
    return xt.GetX(drift_time_ - t0_, left_or_right_);
+}
+
+void Hit::SetHitNumber(int hit_number)
+{
+   hit_number_ = hit_number;
 }
 
 void Hit::SetLayerNumber(int layer_number)
@@ -115,6 +131,11 @@ void Hit::SetAdc(int adc)
    adc_ = adc;
 }
 
+void Hit::SetPedestal(double ped)
+{
+   ped_ = ped;
+}
+
 void Hit::SetT0(double t0)
 {
    t0_ = t0;
@@ -139,7 +160,7 @@ void Hit::PrintHit(XTcurve& xt)
 {
    double dT = drift_time_- t0_;
    double hitR = xt.GetX(dT, left_or_right_);
-   printf("cid %2d icell %2d adc %d q %d t0 %3.2f drift_time %6.2f dT %6.2f --> hitR %6.2f hitZ %6.2f\n", 
-         layer_number_, cell_number_, adc_, q_, t0_, drift_time_, dT, hitR, z_);
+   printf("cid %2d icell %2d ped %5.2f adc %4d q %5.1f adchit-ped %5.2f t0 %3.2f drift_time %6.2f dT %6.2f --> hitR %6.2f hitZ %6.2f\n", 
+         layer_number_, cell_number_, ped_, adc_, q_, adc_-ped_, t0_, drift_time_, dT, hitR, z_);
 }
 
