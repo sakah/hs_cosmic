@@ -32,6 +32,7 @@ class OutputROOT
       int    etime_; // time from last event
 
       int    iev_;
+      int    trig_number_;
       int    hit_num_hitcells_[MAX_LAYER];
       int    hit_icell_[MAX_LAYER][MAX_CELL];
       double hit_q_[MAX_LAYER][MAX_CELL];

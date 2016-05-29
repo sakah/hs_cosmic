@@ -51,6 +51,7 @@ void OutputROOT::SetRootFile(const char* path)
    t_->Branch("etime",             &etime_,            "etime/I");
 
    t_->Branch("iev",               &iev_,              "iev/I");
+   t_->Branch("trig_number",       &trig_number_,      "trig_number/I");
    t_->Branch("hit_num_hitcells",   hit_num_hitcells_, "hit_num_hitcells[9]/I");
    t_->Branch("hit_icell",          hit_icell_,        "hit_icell[9][15]/I");
    t_->Branch("hit_q",              hit_q_,            "hit_q[9][15]/D");
@@ -77,6 +78,7 @@ void OutputROOT::SetRootFile(const char* path)
 void OutputROOT::SetHitData(Event& event, Chamber& chamber)
 {
    iev_ = event.GetEventNumber();
+   trig_number_ = event.GetTriggerNumber();
    for (int cid=0; cid<MAX_LAYER; cid++) {
       int nhits = chamber.GetNumHitCells(cid);
       hit_num_hitcells_[cid] = nhits;
