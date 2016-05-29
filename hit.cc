@@ -160,7 +160,7 @@ void Hit::PrintHit(XTcurve& xt)
 {
    double dT = drift_time_- t0_;
    double hitR = xt.GetX(dT, left_or_right_);
-   printf("cid %2d icell %2d ped %5.2f adc %4d q %5.1f adchit-ped %5.2f t0 %3.2f drift_time %6.2f dT %6.2f --> hitR %6.2f hitZ %6.2f\n", 
-         layer_number_, cell_number_, ped_, adc_, q_, adc_-ped_, t0_, drift_time_, dT, hitR, z_);
+   printf("ch %3d cid %2d icell %2d ped %6.2f adc %4d q %6.1f adchit-ped %6.2f t0 %3.2f drift_time %7.2f dT %6.2f --> hitR %6.2f hitZ %6.2f\n", 
+         chan_number_, layer_number_, cell_number_, ped_, adc_, q_-ped_*32, adc_-ped_, t0_, drift_time_, dT, hitR, z_);
 }
 

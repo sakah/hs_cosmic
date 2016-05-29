@@ -207,6 +207,7 @@ void Track::PrintTrackWithLine(WireMap& wiremap, XTcurve& xt, Line& line)
    Line& min_tangent = GetMinTangent(wiremap, xt);
    for (int cid=0; cid<MAX_LAYER; cid++) {
       Hit& hit = hits_[cid];
+      int chan = hit.GetChanNumber();
       if (!hit.HasHit()) continue;
       int icell = hit.GetCellNumber();
       Line& wire = wiremap.GetWire(cid, icell);
@@ -214,8 +215,11 @@ void Track::PrintTrackWithLine(WireMap& wiremap, XTcurve& xt, Line& line)
       double fitR = line.GetDistance(wire);
       double dT = hit.GetDriftTime() - hit.GetT0();
       double hitR = hit.GetHitR(xt);
-      printf("cid %2d icell %2d t0 %3.2f drift_time %6.2f dT %6.2f --> hitR %6.2f fitR %6.2f fitX %6.2f hitZ %6.2f fitR-hitR %6.2f\n",
-            cid, icell, hit.GetT0(), hit.GetDriftTime(), dT, hitR, fitR, fitX, hit.GetZ(), fitR-hitR);
+      int adc = hit.GetAdc();
+      double ped = hit.GetPedestal();
+      double q = hit.GetQ();
+      printf("ch %3d cid %2d icell %2d ped %6.2f adc %4d q %6.1f adchit-ped %6.2f t0 %3.2f drift_time %7.2f dT %6.2f --> hitR %6.2f fitR %6.2f fitX %6.2f hitZ %6.2f fitR-hitR %6.2f\n",
+            chan, cid, icell, ped, adc, q-ped*32, adc-ped, hit.GetT0(), hit.GetDriftTime(), dT, hitR, fitR, fitX, hit.GetZ(), fitR-hitR);
    }
 }
 

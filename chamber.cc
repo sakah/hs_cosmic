@@ -24,22 +24,30 @@ void Chamber::GetEvent(Event& event)
       int icell = wiremap_.GetCellNumber(ch);
       if (cid==-1) continue; // not connected to wire
       int nhits = event.GetTdcNhit(ch);
+      double ped = event.GetPedestal(ch);
       //printf("ch %d cid %d icell %d nhits %d\n", ch, cid, icell, nhits);
 
       int jhit=0;
       for (int ihit=0; ihit<nhits; ihit++) {
 
-         Hit& hit = hits_[cid][icell][jhit];
-
          // apply adc peak cut
+         // Check adc at next sample
          int sample = event.GetClockNumberDriftTime(ch, ihit);
-         int adc = event.GetAdc(ch, sample);
-         double ped = event.GetPedestal(ch);
-         //printf("sample %d adc %d\n", sample, adc);
-         if (adc-ped<adc_thre_) {
+         bool over_threshold = false;
+         for (int is=sample;  is<=sample+1; is++) {
+            int adc = event.GetAdc(ch, is);
+            //printf("sample %d adc %d\n", sample, adc);
+            if (adc-ped>adc_thre_) {
+               over_threshold = true;
+               sample = is;
+               break;
+            }
+         }
+         if (!over_threshold) {
             continue;
          }
-         jhit++;
+
+         Hit& hit = hits_[cid][icell][jhit];
 
          hit.SetHitNumber(jhit);
          hit.SetHitFlag(true);
@@ -52,6 +60,8 @@ void Chamber::GetEvent(Event& event)
          hit.SetPedestal(event.GetPedestal(ch));
          hit.SetT0(GetT0(cid, icell));
          hit.SetZ(wiremap_.GetZRO());
+
+         jhit++;
       }
    }
 }
@@ -109,6 +119,29 @@ int Chamber::GetNumHitsInCell(int cid, int icell)
    return num_hits;
 }
 
+int Chamber::GetHitCellNumberByMaxAdcPeak(int cid)
+{
+   int num_hit_cells = GetNumHitCells(cid);
+   if (num_hit_cells==0) {
+      return -1;
+   }
+
+   int max_adc = -1;
+   int max_icell = -1;
+   int num=0;
+   for (int icell=0; icell<MAX_CELL; icell++) {
+      bool has_hit = hits_[cid][icell][0].HasHit();
+      if (has_hit) {
+         int adc = hits_[cid][icell][0].GetAdc();
+         if (adc > max_adc) {
+            max_adc = adc;
+            max_icell = icell;
+         }
+      }
+   }
+   return max_icell;
+} 
+
 int Chamber::GetHitCellNumber(int cid, int icellhit)
 {
    int num_hit_cells = GetNumHitCells(cid);
@@ -143,7 +176,7 @@ void Chamber::PrintHits(XTcurve& xt)
       for (int icell=0; icell<MAX_CELL; icell++) {
          int nhits =  GetNumHitsInCell(cid, icell);
          if (nhits==0) continue;
-         printf("cid %2d icell %2d num_hits_in_cell %d\n", cid, icell, nhits);
+         //printf("cid %2d icell %2d num_hits_in_cell %d\n", cid, icell, nhits);
          for (int ihit=0; ihit<nhits; ihit++) {
             hits_[cid][icell][ihit].PrintHit(xt);
          }
