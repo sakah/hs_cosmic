@@ -48,7 +48,7 @@ void WireMap::Read(const char* path)
       board_numbers_[l][w] = b;
       num_cells_[l]++;
       zro_[l] = length/2.0;
-      zhv_[l] = -zro;
+      zhv_[l] = -zro_[l];
 
       wires_[l][w].MakeLine(TVector3(xro, yro, zro_[l]), TVector3(xhv, yhv, zhv_[l]));
    }

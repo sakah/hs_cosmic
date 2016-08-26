@@ -20,8 +20,8 @@ class WireMap
       Line& GetWire(int cid, int icell);
 
    private:
-      double zro_;
-      double zhv_;
+      double zro_[MAX_LAYER];
+      double zhv_[MAX_LAYER];
       int num_layers_;
       int num_cells_[MAX_LAYER];
       int layer_numbers_[MAX_CH];

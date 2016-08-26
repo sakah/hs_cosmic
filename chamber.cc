@@ -63,7 +63,7 @@ void Chamber::GetEvent(Event& event)
          hit.SetAdc(event.GetAdc(ch, sample));
          hit.SetPedestal(event.GetPedestal(ch));
          hit.SetT0(GetT0(cid, icell));
-         hit.SetZ(wiremap_.GetZRO());
+         hit.SetZ(wiremap_.GetZRO(cid));
 
          jhit++;
       }
@@ -207,7 +207,7 @@ void Chamber::DrawHits(Event& event, XTcurve& xt)
    for (int ch=0; ch<MAX_CH; ch++) {
       int cid = wiremap_.GetLayerNumber(ch);
       int icell = wiremap_.GetCellNumber(ch);
-      TVector3 pos = wiremap_.GetWire(cid, icell).GetPosAtZ(wiremap_.GetZRO());
+      TVector3 pos = wiremap_.GetWire(cid, icell).GetPosAtZ(wiremap_.GetZRO(cid));
       //printf("cid %d zpos %f\n", cid, zpos_[cid]);
       //pos.Print();
       TMarker* m = new TMarker(pos.X(), pos.Y(), 20);
