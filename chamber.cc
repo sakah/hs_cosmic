@@ -81,9 +81,9 @@ void Chamber::ClearEvent()
    }
 }
 
-void Chamber::ReadWireMap(const char* path)
+void Chamber::ReadWireMap(const char* path, double rot_deg)
 {
-   wiremap_.Read(path);
+   wiremap_.Read(path, rot_deg);
 }
 
 WireMap& Chamber::GetWireMap()
@@ -200,7 +200,7 @@ void Chamber::DrawHits(Event& event, XTcurve& xt)
 {
    TCanvas*c1 = new TCanvas("c1-chamber-drawhits", "", 700, 700);
    TH2F* h2 = new TH2F("h2", Form("%s Event# %lld", event.GetRootPath(), event.GetEventNumber()), 
-         100, -100, 100, 100, 480, 680);
+         100, -1000, 1000, 100, -1000, 1000);
    h2->SetStats(0);
    h2->Draw();
 
@@ -208,8 +208,7 @@ void Chamber::DrawHits(Event& event, XTcurve& xt)
       int cid = wiremap_.GetLayerNumber(ch);
       int icell = wiremap_.GetCellNumber(ch);
       TVector3 pos = wiremap_.GetWire(cid, icell).GetPosAtZ(wiremap_.GetZRO(cid));
-      //printf("cid %d zpos %f\n", cid, zpos_[cid]);
-      //pos.Print();
+      pos.Print();
       TMarker* m = new TMarker(pos.X(), pos.Y(), 20);
       m->SetMarkerSize(0.3);
       m->Draw();

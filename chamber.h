@@ -20,7 +20,7 @@ class Chamber
       void SetAdcPeakThreshold(int adc_thre);
       void GetEvent(Event& event);
       void ClearEvent();
-      void ReadWireMap(const char* path);
+      void ReadWireMap(const char* path, double rot_deg);
       WireMap& GetWireMap();
       int GetNumHitCells(int cid);
       int GetNumHitsInCell(int cid, int icell);

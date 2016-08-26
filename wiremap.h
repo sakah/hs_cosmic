@@ -3,12 +3,13 @@
 
 #include "param.h"
 #include "line.h"
+#include "TMath.h"
 
 class WireMap
 {
    public:
       WireMap();
-      void Read(const char* path);
+      void Read(const char* path, double rot_deg);
       double GetZRO(int cid);
       double GetZHV(int cid);
       int GetNumLayers();
@@ -29,6 +30,8 @@ class WireMap
       int chan_numbers_[MAX_LAYER][MAX_CELL];
       int board_numbers_[MAX_LAYER][MAX_CELL];
       Line wires_[MAX_LAYER][MAX_CELL];
+
+      void rotate(double x1, double y1, double &x2, double &y2, double rot_deg);
 };
 
 #endif

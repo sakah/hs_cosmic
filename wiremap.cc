@@ -7,8 +7,7 @@ WireMap::WireMap()
       cell_numbers_[ch] = -1;
    }
 }
-
-void WireMap::Read(const char* path)
+void WireMap::Read(const char* path, double rot_deg)
 {
    // PT4
    //zro_ = -299.585;
@@ -50,10 +49,18 @@ void WireMap::Read(const char* path)
       zro_[l] = length/2.0;
       zhv_[l] = -zro_[l];
 
-      wires_[l][w].MakeLine(TVector3(xro, yro, zro_[l]), TVector3(xhv, yhv, zhv_[l]));
+      double xro_rot=0;
+      double yro_rot=0;
+      double xhv_rot=0;
+      double yhv_rot=0;
+      rotate(xro, yro, xro_rot, yro_rot, rot_deg);
+      rotate(xhv, yhv, xhv_rot, yhv_rot, rot_deg);
+
+      wires_[l][w].MakeLine(TVector3(xro_rot, yro_rot, zro_[l]), TVector3(xhv_rot, yhv_rot, zhv_[l]));
    }
    fclose(fp);
 }
+
 
 double WireMap::GetZRO(int cid)
 {
@@ -98,4 +105,11 @@ int WireMap::GetBoardNumber(int cid, int icell)
 Line& WireMap::GetWire(int cid, int icell)
 {
    return wires_[cid][icell];
+}
+
+void WireMap::rotate(double x1, double y1, double &x2, double &y2, double rot_deg)
+{
+   double rot_rad = rot_deg/180.0*TMath::Pi();
+   x2 = x1*TMath::Cos(rot_rad) - y1*TMath::Sin(rot_rad);
+   y2 = x1*TMath::Sin(rot_rad) + y1*TMath::Cos(rot_rad);
 }
