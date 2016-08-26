@@ -23,7 +23,7 @@ class Run
       void SetT0(double t0_0, double t0_1);
       void SetVelocity(double vel);
       void SetAdcPeakThreshold(int adc_thre);
-      void PrintHits();
+      void PrintHits(double adc_peak_thre);
       void DrawHits();
       void MakeTangents(int cid1, int cid2, double z1, double z2);
       void PrintTangents();

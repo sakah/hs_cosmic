@@ -8,10 +8,14 @@ WireMap::WireMap()
    }
 }
 
-void WireMap::Read(const char* path)
+void WireMap::Read(double zro, double zhv, const char* path)
 {
-   zro_ = -299.585;
-   zhv_ = +299.585;
+   // PT4
+   //zro_ = -299.585;
+   //zhv_ = +299.585;
+
+   zro_ = zro;
+   zhv_ = zhv;
 
    FILE* fp = fopen(path, "r");
    if (fp==NULL) {

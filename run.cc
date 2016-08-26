@@ -41,9 +41,9 @@ void Run::SetAdcPeakThreshold(int adc_thre)
    chamber_.SetAdcPeakThreshold(adc_thre);
 }
 
-void Run::PrintHits()
+void Run::PrintHits(double adc_peak_thre)
 {
-   chamber_.PrintHits(xt_);
+   chamber_.PrintHits(xt_, adc_peak_thre);
 }
 
 void Run::DrawHits()

@@ -8,7 +8,7 @@ class WireMap
 {
    public:
       WireMap();
-      void Read(const char* path);
+      void Read(double zro, double zhv, const char* path);
       double GetZRO();
       double GetZHV();
       int GetNumLayers();

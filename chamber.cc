@@ -31,7 +31,8 @@ void Chamber::GetEvent(Event& event)
       for (int ihit=0; ihit<nhits; ihit++) {
 
          // apply adc peak cut
-         // Check adc at next sample
+         // Compare adc @ clockNumber with adc @clockNumber+1
+         // and get higer one
          int sample = event.GetClockNumberDriftTime(ch, ihit);
          bool over_threshold = false;
          for (int is=sample;  is<=sample+1; is++) {
@@ -45,6 +46,9 @@ void Chamber::GetEvent(Event& event)
          }
          if (!over_threshold) {
             continue;
+         }
+         if (cid==7&& icell==7) {
+            printf("cid==7 && icel==7 ch %d sample %d adc %d\n", ch, sample, event.GetAdc(ch, sample));
          }
 
          Hit& hit = hits_[cid][icell][jhit];
@@ -119,27 +123,34 @@ int Chamber::GetNumHitsInCell(int cid, int icell)
    return num_hits;
 }
 
-int Chamber::GetHitCellNumberByMaxAdcPeak(int cid)
+void Chamber::GetHitCellNumberByMaxAdcPeak(int cid, int& max_icell, int& max_ihit)
 {
    int num_hit_cells = GetNumHitCells(cid);
    if (num_hit_cells==0) {
-      return -1;
+      return;
    }
 
-   int max_adc = -1;
-   int max_icell = -1;
+   double max_adc_peak = -1000;
+   max_icell = -1;
+   max_ihit = -1;
    int num=0;
    for (int icell=0; icell<MAX_CELL; icell++) {
-      bool has_hit = hits_[cid][icell][0].HasHit();
-      if (has_hit) {
-         int adc = hits_[cid][icell][0].GetAdc();
-         if (adc > max_adc) {
-            max_adc = adc;
+      int num_tdc_hits_ov_threshold = GetNumHitsInCell(cid, icell);
+      if (num_tdc_hits_ov_threshold==0) continue;
+      for (int ihit=0; ihit<num_tdc_hits_ov_threshold; ihit++) {
+         Hit& hit = hits_[cid][icell][ihit];
+         int adc = hit.GetAdc();
+         double ped = hit.GetPedestal();
+         double adc_peak = adc-ped;
+         //if (cid==7) printf("cid %d icell %d ihit %d adc %d ped %f adc_peak %lf\n", cid, icell, hit, adc, ped, adc_peak);
+         if (adc_peak > max_adc_peak) {
+            max_adc_peak = adc_peak;
             max_icell = icell;
+            max_ihit = ihit;
          }
       }
    }
-   return max_icell;
+   //if (cid==7) printf("max_icell %d max_ihit %d\n", max_icell, max_ihit);
 } 
 
 int Chamber::GetHitCellNumber(int cid, int icellhit)
@@ -167,7 +178,7 @@ Hit& Chamber::GetHit(int cid, int icell, int ihit)
    return hits_[cid][icell][ihit];
 }
 
-void Chamber::PrintHits(XTcurve& xt)
+void Chamber::PrintHits(XTcurve& xt, double adc_peak_thre)
 {
    for (int cid=0; cid<MAX_LAYER; cid++) {
       printf("cid %2d num_hit_cells %d\n", cid, GetNumHitCells(cid));
@@ -178,7 +189,7 @@ void Chamber::PrintHits(XTcurve& xt)
          if (nhits==0) continue;
          //printf("cid %2d icell %2d num_hits_in_cell %d\n", cid, icell, nhits);
          for (int ihit=0; ihit<nhits; ihit++) {
-            hits_[cid][icell][ihit].PrintHit(xt);
+            hits_[cid][icell][ihit].PrintHit(xt, adc_peak_thre);
          }
       }
       printf("----\n");

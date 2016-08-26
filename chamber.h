@@ -25,9 +25,9 @@ class Chamber
       int GetNumHitCells(int cid);
       int GetNumHitsInCell(int cid, int icell);
       int GetHitCellNumber(int cid, int icellhit);
-      int GetHitCellNumberByMaxAdcPeak(int cid);
+      void GetHitCellNumberByMaxAdcPeak(int cid, int& icell, int& ihit);
       Hit& GetHit(int cid, int icell, int ihit);
-      void PrintHits(XTcurve& xt);
+      void PrintHits(XTcurve& xt, double adc_peak_thre);
       void DrawHits(Event& event, XTcurve& xt);
       void DrawTrack(Event& event, XTcurve& xt, Track& track, Line& line);
       void SetT0(int bd, double t0);

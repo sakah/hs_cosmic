@@ -37,7 +37,7 @@ class Hit
       void SetHitFlag(bool has_hit);
       void SetUseByFitFlag(bool use_by_fit);
 
-      void PrintHit(XTcurve& xt);
+      void PrintHit(XTcurve& xt, double adc_peak_thre);
 
    private:
       bool has_hit_;
