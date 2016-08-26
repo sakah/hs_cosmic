@@ -22,10 +22,13 @@ void Chamber::GetEvent(Event& event)
    for (int ch=0; ch<MAX_CH; ch++) {
       int cid = wiremap_.GetLayerNumber(ch);
       int icell = wiremap_.GetCellNumber(ch);
+     // printf("ch %d cid %d icell %d\n", ch, cid, icell);
       if (cid==-1) continue; // not connected to wire
       int nhits = event.GetTdcNhit(ch);
       double ped = event.GetPedestal(ch);
-      //printf("ch %d cid %d icell %d nhits %d\n", ch, cid, icell, nhits);
+      if (nhits>0) {
+         printf("ch %d cid %d icell %d nhits %d\n", ch, cid, icell, nhits);
+      }
 
       int jhit=0;
       for (int ihit=0; ihit<nhits; ihit++) {
@@ -51,7 +54,8 @@ void Chamber::GetEvent(Event& event)
             printf("cid==7 && icel==7 ch %d sample %d adc %d\n", ch, sample, event.GetAdc(ch, sample));
          }
 
-         Hit& hit = hits_[cid][icell][jhit];
+         int side  = wiremap_.GetLayerSide(cid, icell);
+         Hit& hit = hits_[side][cid][icell][jhit];
 
          hit.SetHitNumber(jhit);
          hit.SetHitFlag(true);
@@ -63,7 +67,7 @@ void Chamber::GetEvent(Event& event)
          hit.SetAdc(event.GetAdc(ch, sample));
          hit.SetPedestal(event.GetPedestal(ch));
          hit.SetT0(GetT0(cid, icell));
-         hit.SetZ(wiremap_.GetZRO(cid));
+         hit.SetZ(wiremap_.GetZ0(cid));
 
          jhit++;
       }
@@ -72,10 +76,12 @@ void Chamber::GetEvent(Event& event)
 
 void Chamber::ClearEvent()
 {
-   for (int cid=0; cid<MAX_LAYER; cid++) {
-      for (int icell=0; icell<MAX_CELL; icell++) {
-         for (int ihit=0; ihit<MAX_CELL_HIT; ihit++) {
-            hits_[cid][icell][ihit].SetHitFlag(false);
+   for (int side=0; side<2; side++) {
+      for (int cid=0; cid<MAX_LAYER; cid++) {
+         for (int icell=0; icell<MAX_CELL; icell++) {
+            for (int ihit=0; ihit<MAX_CELL_HIT; ihit++) {
+               hits_[side][cid][icell][ihit].SetHitFlag(false);
+            }
          }
       }
    }
@@ -91,13 +97,13 @@ WireMap& Chamber::GetWireMap()
    return wiremap_;
 }
 
-int Chamber::GetNumHitCells(int cid)
+int Chamber::GetNumHitCells(int side, int cid)
 {
    int num_hits = 0;
    for (int icell=0; icell<MAX_CELL; icell++) {
       bool has_hit = false;
       for (int ihit=0; ihit<MAX_CELL_HIT; ihit++) {
-         has_hit = hits_[cid][icell][ihit].HasHit();
+         has_hit = hits_[side][cid][icell][ihit].HasHit();
          if (has_hit) {
             has_hit = true;
             break;
@@ -110,12 +116,12 @@ int Chamber::GetNumHitCells(int cid)
    return num_hits;
 }
 
-int Chamber::GetNumHitsInCell(int cid, int icell)
+int Chamber::GetNumHitsInCell(int side, int cid, int icell)
 {
    int num_hits = 0;
-   int num_hit_cells = GetNumHitCells(cid);
+   int num_hit_cells = GetNumHitCells(side, cid);
    for (int ihit=0; ihit<num_hit_cells; ihit++) {
-      bool has_hit = hits_[cid][icell][ihit].HasHit();
+      bool has_hit = hits_[side][cid][icell][ihit].HasHit();
       if (has_hit) {
          num_hits++;
       }
@@ -123,9 +129,9 @@ int Chamber::GetNumHitsInCell(int cid, int icell)
    return num_hits;
 }
 
-void Chamber::GetHitCellNumberByMaxAdcPeak(int cid, int& max_icell, int& max_ihit)
+void Chamber::GetHitCellNumberByMaxAdcPeak(int side, int cid, int& max_icell, int& max_ihit)
 {
-   int num_hit_cells = GetNumHitCells(cid);
+   int num_hit_cells = GetNumHitCells(side, cid);
    if (num_hit_cells==0) {
       return;
    }
@@ -135,10 +141,10 @@ void Chamber::GetHitCellNumberByMaxAdcPeak(int cid, int& max_icell, int& max_ihi
    max_ihit = -1;
    int num=0;
    for (int icell=0; icell<MAX_CELL; icell++) {
-      int num_tdc_hits_ov_threshold = GetNumHitsInCell(cid, icell);
+      int num_tdc_hits_ov_threshold = GetNumHitsInCell(side, cid, icell);
       if (num_tdc_hits_ov_threshold==0) continue;
       for (int ihit=0; ihit<num_tdc_hits_ov_threshold; ihit++) {
-         Hit& hit = hits_[cid][icell][ihit];
+         Hit& hit = hits_[side][cid][icell][ihit];
          int adc = hit.GetAdc();
          double ped = hit.GetPedestal();
          double adc_peak = adc-ped;
@@ -153,16 +159,16 @@ void Chamber::GetHitCellNumberByMaxAdcPeak(int cid, int& max_icell, int& max_ihi
    //if (cid==7) printf("max_icell %d max_ihit %d\n", max_icell, max_ihit);
 } 
 
-int Chamber::GetHitCellNumber(int cid, int icellhit)
+int Chamber::GetHitCellNumber(int side, int cid, int icellhit)
 {
-   int num_hit_cells = GetNumHitCells(cid);
+   int num_hit_cells = GetNumHitCells(side, cid);
    if (num_hit_cells==0) {
       return -1;
    }
 
    int num=0;
    for (int icell=0; icell<MAX_CELL; icell++) {
-      bool has_hit = hits_[cid][icell][0].HasHit();
+      bool has_hit = hits_[side][cid][icell][0].HasHit();
       if (has_hit) {
          if (num==icellhit) {
             return icell;
@@ -173,32 +179,65 @@ int Chamber::GetHitCellNumber(int cid, int icellhit)
    return -1;
 }
 
-Hit& Chamber::GetHit(int cid, int icell, int ihit)
+Hit& Chamber::GetHit(int side, int cid, int icell, int ihit)
 {
-   return hits_[cid][icell][ihit];
+   return hits_[side][cid][icell][ihit];
+}
+
+int Chamber::GetNumLayerHits(int side, int cid)
+{
+   int nhits = 0;
+   for (int icell=0; icell<MAX_CELL; icell++) {
+      if (wiremap_.GetLayerSide(cid, icell)==side) {
+         nhits += GetNumHitsInCell(side, cid, icell);
+      }
+   }
+   return nhits;
+}
+bool Chamber::isLayerUsed(int side, int cid)
+{
+   return wiremap_.isLayerUsed(side, cid);
+}
+bool Chamber::hasAllLayerHits()
+{
+   for (int side=0; side<2; side++) {
+      for (int cid=0; cid<MAX_LAYER; cid++) {
+         bool used = wiremap_.isLayerUsed(side, cid);
+         //printf("### side %d cid %d used %d\n", side, cid, used);
+         if (used) {
+            int nhits = GetNumLayerHits(side, cid);
+            if (nhits==0) return false;
+         }
+      }
+   }
+   return true;
 }
 
 void Chamber::PrintHits(XTcurve& xt, double adc_peak_thre)
 {
-   for (int cid=0; cid<MAX_LAYER; cid++) {
-      printf("cid %2d num_hit_cells %d\n", cid, GetNumHitCells(cid));
-   }
-   for (int cid=0; cid<MAX_LAYER; cid++) {
-      for (int icell=0; icell<MAX_CELL; icell++) {
-         int nhits =  GetNumHitsInCell(cid, icell);
-         if (nhits==0) continue;
-         //printf("cid %2d icell %2d num_hits_in_cell %d\n", cid, icell, nhits);
-         for (int ihit=0; ihit<nhits; ihit++) {
-            hits_[cid][icell][ihit].PrintHit(xt, adc_peak_thre);
-         }
+   for (int side=0; side<MAX_SIDE; side++) {
+      for (int cid=0; cid<MAX_LAYER; cid++) {
+         printf("side %d cid %2d num_hit_cells %d\n", side, cid, GetNumHitCells(side, cid));
       }
-      printf("----\n");
+   }
+   for (int side=0; side<MAX_SIDE; side++) {
+      for (int cid=0; cid<MAX_LAYER; cid++) {
+         for (int icell=0; icell<MAX_CELL; icell++) {
+            int nhits =  GetNumHitsInCell(side, cid, icell);
+            if (nhits==0) continue;
+            //printf("cid %2d icell %2d num_hits_in_cell %d\n", cid, icell, nhits);
+            for (int ihit=0; ihit<nhits; ihit++) {
+               hits_[side][cid][icell][ihit].PrintHit(xt, adc_peak_thre);
+            }
+         }
+         printf("----\n");
+      }
    }
 }
 
 void Chamber::DrawHits(Event& event, XTcurve& xt)
 {
-   TCanvas*c1 = new TCanvas("c1-chamber-drawhits", "", 700, 700);
+   //TCanvas*c1 = new TCanvas("c1-chamber-drawhits", "a", 700, 700);
    TH2F* h2 = new TH2F("h2", Form("%s Event# %lld", event.GetRootPath(), event.GetEventNumber()), 
          100, -1000, 1000, 100, -1000, 1000);
    h2->SetStats(0);
@@ -207,37 +246,40 @@ void Chamber::DrawHits(Event& event, XTcurve& xt)
    for (int ch=0; ch<MAX_CH; ch++) {
       int cid = wiremap_.GetLayerNumber(ch);
       int icell = wiremap_.GetCellNumber(ch);
-      TVector3 pos = wiremap_.GetWire(cid, icell).GetPosAtZ(wiremap_.GetZRO(cid));
-      pos.Print();
+      if (cid==-1) continue;
+      //printf("### ch %d cid %d icell %d\n", ch, cid, icell);
+      TVector3 pos = wiremap_.GetWire(cid, icell).GetPosAtZ(wiremap_.GetZ0(cid));
+      //pos.Print();
       TMarker* m = new TMarker(pos.X(), pos.Y(), 20);
       m->SetMarkerSize(0.3);
       m->Draw();
    }
 
-   for (int cid=0; cid<MAX_LAYER; cid++) {
-      for (int icell=0; icell<MAX_CELL; icell++) {
-         int nhits = GetNumHitsInCell(cid, icell);
-         if (nhits==0) continue;
-         for (int ihit=0; ihit<nhits; ihit++) {
-            Hit& hit = hits_[cid][icell][ihit];
-            int cid = hit.GetLayerNumber();
-            int icell = hit.GetCellNumber();
-            double hitR = hit.GetHitR(xt);
-            double hitZ = hit.GetZ();
-            //printf("ihit %d cid %d z %f\n", ihit, cid,z);
-            if (hitR<0) {
-               printf("skip this hit due to negative hitR %f @cid %d icell %d\n", hitR, cid, icell);
-               continue;
+   for (int side=0; side<MAX_SIDE; side++) {
+      for (int cid=0; cid<MAX_LAYER; cid++) {
+         for (int icell=0; icell<MAX_CELL; icell++) {
+            int nhits = GetNumHitsInCell(side, cid, icell);
+            if (nhits==0) continue;
+            for (int ihit=0; ihit<nhits; ihit++) {
+               Hit& hit = hits_[side][cid][icell][ihit];
+               //int cid = hit.GetLayerNumber();
+               //int icell = hit.GetCellNumber();
+               double hitR = hit.GetHitR(xt);
+               double hitZ = hit.GetZ();
+               if (hitR<0) {
+                  printf("skip this hit due to negative hitR %f @cid %d icell %d\n", hitR, cid, icell);
+                  continue;
+               }
+               TVector3 pos = wiremap_.GetWire(cid, icell).GetPosAtZ(hitZ);
+               TEllipse* e = new TEllipse(pos.X(), pos.Y(), hitR);
+               if (ihit==0) {
+                  e->SetLineColor(kBlue);
+               } else {
+                  e->SetLineColor(kRed);
+               }
+               e->SetFillStyle(4000);
+               e->Draw();
             }
-            TVector3 pos = wiremap_.GetWire(cid, icell).GetPosAtZ(hitZ);
-            TEllipse* e = new TEllipse(pos.X(), pos.Y(), hitR);
-            if (ihit==0) {
-               e->SetLineColor(kBlue);
-            } else {
-               e->SetLineColor(kRed);
-            }
-            e->SetFillStyle(4000);
-            e->Draw();
          }
       }
    }
@@ -251,34 +293,36 @@ void Chamber::DrawTrack(Event& event, XTcurve& xt, Track& track, Line& line)
    h2->SetStats(0);
    h2->Draw();
 
-   for (int cid=0; cid<MAX_LAYER; cid++) {
-      Hit& hit = track.GetHit(cid);
-      if (!hit.HasHit()) continue;
-      //hit.PrintHit(xt);
-      int icell = hit.GetCellNumber();
-      Line& wire = wiremap_.GetWire(cid, icell);
-      line.DrawLine(kRed);
-      TVector3 pA;
-      TVector3 pB;
-      wire.GetClosestPoints(line, pA, pB);
-      double zA = pA.Z();
-      //if (cid==1) zA=100;
-      //if (cid==7) zA=200;
-      //printf("--pA--\n");
-      //pA.Print();
-      //printf("--pB--\n");
-      //pB.Print();
-      TVector3 pos = wire.GetPosAtZ(zA);
+   for (int side=0; side<MAX_SIDE; side++) {
+      for (int cid=0; cid<MAX_LAYER; cid++) {
+         Hit& hit = track.GetHit(side, cid);
+         if (!hit.HasHit()) continue;
+         //hit.PrintHit(xt);
+         int icell = hit.GetCellNumber();
+         Line& wire = wiremap_.GetWire(cid, icell);
+         line.DrawLine(kRed);
+         TVector3 pA;
+         TVector3 pB;
+         wire.GetClosestPoints(line, pA, pB);
+         double zA = pA.Z();
+         //if (cid==1) zA=100;
+         //if (cid==7) zA=200;
+         //printf("--pA--\n");
+         //pA.Print();
+         //printf("--pB--\n");
+         //pB.Print();
+         TVector3 pos = wire.GetPosAtZ(zA);
 
-      double hitR = hit.GetHitR(xt);
-      if (hitR<0) {
-         printf("skip this hit due to negative hitR %f @cid %d icell %d\n", hitR, cid, icell);
-         continue;
+         double hitR = hit.GetHitR(xt);
+         if (hitR<0) {
+            printf("skip this hit due to negative hitR %f @cid %d icell %d\n", hitR, cid, icell);
+            continue;
+         }
+         TEllipse* e = new TEllipse(pos.X(), pos.Y(), hitR);
+         e->SetLineColor(kBlue);
+         e->SetFillStyle(4000);
+         e->Draw();
       }
-      TEllipse* e = new TEllipse(pos.X(), pos.Y(), hitR);
-      e->SetLineColor(kBlue);
-      e->SetFillStyle(4000);
-      e->Draw();
    }
 }
 
@@ -302,3 +346,4 @@ double Chamber::GetT0(int cid, int icell)
    int bd = wiremap_.GetBoardNumber(cid, icell);
    return t0_[bd];
 }
+

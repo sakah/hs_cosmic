@@ -22,11 +22,14 @@ class Chamber
       void ClearEvent();
       void ReadWireMap(const char* path, double rot_deg);
       WireMap& GetWireMap();
-      int GetNumHitCells(int cid);
-      int GetNumHitsInCell(int cid, int icell);
-      int GetHitCellNumber(int cid, int icellhit);
-      void GetHitCellNumberByMaxAdcPeak(int cid, int& icell, int& ihit);
-      Hit& GetHit(int cid, int icell, int ihit);
+      int GetNumHitCells(int side, int cid);
+      int GetNumHitsInCell(int side, int cid, int icell);
+      int GetHitCellNumber(int side, int cid, int icellhit);
+      void GetHitCellNumberByMaxAdcPeak(int side, int cid, int& icell, int& ihit);
+      Hit& GetHit(int side, int cid, int icell, int ihit);
+      int GetNumLayerHits(int side, int cid);
+      bool hasAllLayerHits();
+      bool isLayerUsed(int side, int cid);
       void PrintHits(XTcurve& xt, double adc_peak_thre);
       void DrawHits(Event& event, XTcurve& xt);
       void DrawTrack(Event& event, XTcurve& xt, Track& track, Line& line);
@@ -37,7 +40,7 @@ class Chamber
       
    private:
       WireMap wiremap_;
-      Hit hits_[MAX_LAYER][MAX_CELL][MAX_CELL_HIT];
+      Hit hits_[MAX_SIDE][MAX_LAYER][MAX_CELL][MAX_CELL_HIT];
       double t0_[MAX_BOARD];
       double vel_;
       int adc_thre_; // rough cut on raw adc count. If adc<adc_thre, then corresponding tdc is not considerded as hit

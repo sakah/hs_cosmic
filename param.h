@@ -7,6 +7,7 @@
 
 enum
 {
+   MAX_SIDE=2,
    MAX_BOARD=104,
    MAX_CH=384,
    MAX_DATA_CH=384,

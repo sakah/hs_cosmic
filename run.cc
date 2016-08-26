@@ -54,6 +54,7 @@ void Run::DrawHits()
 
 void Run::MakeTangents(int cid1, int cid2, double z1, double z2)
 {
+   /*
    bool alllayerhit=true;
    for (int cid=1; cid<=7; cid++) {
       int n =  chamber_.GetNumHitCells(cid);
@@ -78,6 +79,7 @@ void Run::MakeTangents(int cid1, int cid2, double z1, double z2)
 
    WireMap& wiremap = chamber_.GetWireMap();
    track_.MakeTangents(wiremap, xt_, cid1, cid2, z1, z2);
+   */
 }
 
 void Run::PrintTangents()
@@ -92,7 +94,7 @@ void Run::DrawTangents()
    track_.DrawTangents();
 }
 
-bool Run::FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_step)
+bool Run::FindBestTangent(Long64_t event_number, int side1, int side2, int cid1, int cid2, double z_step)
 {
    if (event_number>=0) {
       GetEntry(event_number);
@@ -105,14 +107,14 @@ bool Run::FindBestTangent(Long64_t event_number, int cid1, int cid2, double z_st
    if (num_tracks==0) {
       return false;
    }
-   finder_.FindBestTrack(chamber_, xt_, cid1, cid2, z_step);
+   finder_.FindBestTrack(chamber_, xt_, side1, side2, cid1, cid2, z_step);
    finder_.PrintTracks(wiremap, xt_);
    return true;
 }
 
-void Run::DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_step)
+void Run::DrawBestTangent(Long64_t event_number, int side1, int side2, int cid1, int cid2, double z_step)
 {
-   bool found = FindBestTangent(event_number, cid1, cid2, z_step);
+   bool found = FindBestTangent(event_number, side1, side2, cid1, cid2, z_step);
    if (!found) {
       printf("tangent cannot be found...\n");
       return;
@@ -124,7 +126,7 @@ void Run::DrawBestTangent(Long64_t event_number, int cid1, int cid2, double z_st
    chamber_.DrawTrack(event_, xt_, min_track, min_tangent);
 }
 
-bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid)
+bool Run::DoFit(Long64_t event_number, int side1, int side2, int cid1, int cid2, double z_step, int test_side, int test_cid)
 {
    WireMap& wiremap = chamber_.GetWireMap();
 
@@ -134,7 +136,7 @@ bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int te
       GetNext();
    }
 
-   bool found = FindBestTangent(event_number, cid1, cid2, z_step);
+   bool found = FindBestTangent(event_number, side1, side2, cid1, cid2, z_step);
    if (!found) {
       printf("tangent cannot be found...\n");
       return false;
@@ -142,16 +144,16 @@ bool Run::DoFit(Long64_t event_number, int cid1, int cid2, double z_step, int te
    Track& min_track = finder_.GetBestTrack();
    min_track.PrintTrackWithLine(wiremap, xt_, min_track.GetMinTangent(wiremap, xt_));
 
-   min_track.InitFit(wiremap, xt_, test_cid);
+   min_track.InitFit(wiremap, xt_, test_side, test_cid);
    min_track.DoFit(wiremap, xt_);
    min_track.PrintFitResults();
    min_track.PrintTrackWithLine(wiremap, xt_, min_track.GetFitLine());
    return true;
 }
 
-void Run::DrawFit(Long64_t event_number, int cid1, int cid2, double z_step, int test_cid)
+void Run::DrawFit(Long64_t event_number, int side1, int side2, int cid1, int cid2, double z_step, int test_side, int test_cid)
 {
-   bool done = DoFit(event_number, cid1, cid2, z_step, test_cid);
+   bool done = DoFit(event_number, side1, side2, cid1, cid2, z_step, test_side, test_cid);
    if (!done) {
       printf("fit cannot be done\n");
       return;
@@ -172,8 +174,11 @@ void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_i
    //double t0_0 = -900;
    //double t0_1 = -900;
 
-   int cid1 = 1;
-   int cid2 = 7;
+   int side1 = WireMap::SIDE_TOP;
+   int side2 = WireMap::SIDE_BOTTOM;
+
+   int cid1 = 19;
+   int cid2 = 19;
    double z_step = 10.0; // 10 mm
    WireMap& wiremap = chamber_.GetWireMap();
 
@@ -206,7 +211,7 @@ void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_i
       output_.SetTrackFinderData(finder_);
 
       if (num_tracks>0) {
-         finder_.FindBestTrack(chamber_, xt_, cid1, cid2, z_step);
+         finder_.FindBestTrack(chamber_, xt_, side1, side2, cid1, cid2, z_step);
          Track& track = finder_.GetBestTrack();
          for (int test_cid=1; test_cid<=7; test_cid++) {
             //printf("test_cid %d\n", test_cid);

@@ -6,12 +6,13 @@ static Track *Track_obj;
 Track::Track()
 {
    sigma_ = 0.2; // 200um
+   test_side_ = -1;  // use all of hits in fitting
    test_cid_ = -1;  // use all of hits in fitting
 } 
 
-void Track::SetHit(int cid, Hit& hit)
+void Track::SetHit(int side, int cid, Hit& hit)
 {
-   hits_[cid] = hit;
+   hits_[side][cid] = hit;
 }
 
 void Track::SetSigma(double sigma)
@@ -21,14 +22,16 @@ void Track::SetSigma(double sigma)
 
 void Track::SetHitZWithLine(WireMap& wiremap, Line& line)
 {
-   for (int cid=0; cid<MAX_LAYER; cid++) {
-      Hit& hit = hits_[cid];
-      int icell = hit.GetCellNumber();
-      Line& wire = wiremap.GetWire(cid, icell);
-      TVector3 pA;
-      TVector3 pB;
-      wire.GetClosestPoints(line, pA, pB);
-      hit.SetZ(pA.Z());
+   for (int side=0; side<2; side++) {
+      for (int cid=0; cid<MAX_LAYER; cid++) {
+         Hit& hit = hits_[side][cid];
+         int icell = hit.GetCellNumber();
+         Line& wire = wiremap.GetWire(cid, icell);
+         TVector3 pA;
+         TVector3 pB;
+         wire.GetClosestPoints(line, pA, pB);
+         hit.SetZ(pA.Z());
+      }
    }
 }
 void Track::SetHitZWithMinTangent(WireMap& wiremap, XTcurve& xt)
@@ -36,11 +39,12 @@ void Track::SetHitZWithMinTangent(WireMap& wiremap, XTcurve& xt)
    SetHitZWithLine(wiremap, GetMinTangent(wiremap, xt));
 }
 
-void Track::MakeTangents(WireMap& wiremap, XTcurve& xt, int cid1, int cid2, double z1, double z2)
+void Track::MakeTangents(WireMap& wiremap, XTcurve& xt, int side1, int side2, int cid1, int cid2, double z1, double z2)
 {
    // Transform in new coordinate
-   Hit& hit1 = hits_[cid1];
-   Hit& hit2 = hits_[cid2];
+   Hit& hit1 = hits_[side1][cid1];
+   Hit& hit2 = hits_[side2][cid2];
+
    //hit1.SetZ(z1);
    //hit2.SetZ(z2);
    Line& wire1 = wiremap.GetWire(hit1.GetLayerNumber(), hit1.GetCellNumber());
@@ -99,23 +103,25 @@ Line& Track::GetTangent(int itan)
 double Track::GetChi2OfLine(WireMap& wiremap, XTcurve& xt, Line& line)
 {
    double chi2 = 0.0;
-   for (int cid=0; cid<MAX_LAYER; cid++) {
-      Hit& hit = hits_[cid];
-      if (!hit.HasHit()) continue;
-      if (!hit.UseByFit()) continue;
-      int icell = hit.GetCellNumber();
-      Line& wire = wiremap.GetWire(cid, icell);
-      TVector3 pA;
-      TVector3 pB;
-      wire.GetClosestPoints(line, pA, pB);
-      hit.SetZ(pA.Z());
-      double fitR = line.GetDistance(wire);
-      double hitR = hit.GetHitR(xt);
-      double dr = fitR - hitR;
-      double hitZ = hit.GetZ();
-      double fitZ = pA.Z();
-      //printf("cid %d hitR %f fitR %f hitZ %f fitZ %f dr %f chi2 %f\n", cid, hitR, fitR, hitZ, fitZ, dr, chi2);
-      chi2 += (dr/sigma_)*(dr/sigma_);
+   for (int side=0; side<2; side++) {
+      for (int cid=0; cid<MAX_LAYER; cid++) {
+         Hit& hit = hits_[side][cid];
+         if (!hit.HasHit()) continue;
+         if (!hit.UseByFit()) continue;
+         int icell = hit.GetCellNumber();
+         Line& wire = wiremap.GetWire(cid, icell);
+         TVector3 pA;
+         TVector3 pB;
+         wire.GetClosestPoints(line, pA, pB);
+         hit.SetZ(pA.Z());
+         double fitR = line.GetDistance(wire);
+         double hitR = hit.GetHitR(xt);
+         double dr = fitR - hitR;
+         double hitZ = hit.GetZ();
+         double fitZ = pA.Z();
+         //printf("cid %d hitR %f fitR %f hitZ %f fitZ %f dr %f chi2 %f\n", cid, hitR, fitR, hitZ, fitZ, dr, chi2);
+         chi2 += (dr/sigma_)*(dr/sigma_);
+      }
    }
    //printf("==> chi2 %f\n", chi2);
    return chi2;
@@ -141,9 +147,9 @@ double Track::GetSigma()
    return sigma_;
 }
 
-Hit& Track::GetHit(int cid)
+Hit& Track::GetHit(int side, int cid)
 {
-   return hits_[cid];
+   return hits_[side][cid];
 }
 
 void Track::PrintTangents(WireMap& wiremap, XTcurve& xt)
@@ -163,9 +169,9 @@ void Track::DrawTangents()
    }
 }
 
-double Track::GetXFromLine(WireMap& wiremap, int cid, Line& line)
+double Track::GetXFromLine(WireMap& wiremap, int side, int cid, Line& line)
 {
-   Hit& hit = hits_[cid];
+   Hit& hit = hits_[side][cid];
    if (!hit.HasHit()) return -1000;
    int icell = hit.GetCellNumber();
    Line& wire = wiremap.GetWire(cid, icell);
@@ -185,49 +191,51 @@ double Track::GetXFromLine(WireMap& wiremap, int cid, Line& line)
    return dist;
 }
 
-double Track::GetXFromMinTangent(WireMap& wiremap, XTcurve& xt, int cid)
+double Track::GetXFromMinTangent(WireMap& wiremap, XTcurve& xt, int side, int cid)
 {
-   return GetXFromLine(wiremap, cid, GetMinTangent(wiremap, xt));
+   return GetXFromLine(wiremap, side, cid, GetMinTangent(wiremap, xt));
 }
 
-double Track::GetResidualOfLine(WireMap& wiremap, XTcurve& xt, int cid, Line& line)
+double Track::GetResidualOfLine(WireMap& wiremap, XTcurve& xt, int side, int cid, Line& line)
 {
-   Hit& hit = hits_[cid];
-   return TMath::Abs(GetXFromLine(wiremap, cid, line)) - hit.GetHitR(xt);
+   Hit& hit = hits_[side][cid];
+   return TMath::Abs(GetXFromLine(wiremap, side, cid, line)) - hit.GetHitR(xt);
 }
 
-double Track::GetResidualOfMinTangent(WireMap& wiremap, XTcurve& xt, int cid)
+double Track::GetResidualOfMinTangent(WireMap& wiremap, XTcurve& xt, int side, int cid)
 {
-   return GetResidualOfLine(wiremap, xt, cid, GetMinTangent(wiremap, xt));
+   return GetResidualOfLine(wiremap, xt, side, cid, GetMinTangent(wiremap, xt));
 }
 
 void Track::PrintTrackWithLine(WireMap& wiremap, XTcurve& xt, Line& line)
 {
    printf("line's chi2  %lf\n", GetChi2OfLine(wiremap, xt, line));
    Line& min_tangent = GetMinTangent(wiremap, xt);
-   for (int cid=0; cid<MAX_LAYER; cid++) {
-      Hit& hit = hits_[cid];
-      int chan = hit.GetChanNumber();
-      if (!hit.HasHit()) continue;
-      int icell = hit.GetCellNumber();
-      int ihit = hit.GetHitNumber();
-      Line& wire = wiremap.GetWire(cid, icell);
-      double fitX = GetXFromLine(wiremap, cid, line);
-      double fitR = line.GetDistance(wire);
-      double dT = hit.GetDriftTime() - hit.GetT0();
-      double hitR = hit.GetHitR(xt);
-      int adc = hit.GetAdc();
-      double ped = hit.GetPedestal();
-      double q = hit.GetQ();
-      printf("ch %3d cid %2d icell %2d ihit %d ped %6.2f adc %4d q %6.1f adchit-ped %6.2f t0 %3.2f drift_time %7.2f dT %6.2f --> hitR %6.2f fitR %6.2f fitX %6.2f hitZ %6.2f fitR-hitR %6.2f\n",
-            chan, cid, icell, ihit, ped, adc, q-ped*32, adc-ped, hit.GetT0(), hit.GetDriftTime(), dT, hitR, fitR, fitX, hit.GetZ(), fitR-hitR);
+   for (int side=0; side<2; side++) {
+      for (int cid=0; cid<MAX_LAYER; cid++) {
+         Hit& hit = hits_[side][cid];
+         int chan = hit.GetChanNumber();
+         if (!hit.HasHit()) continue;
+         int icell = hit.GetCellNumber();
+         int ihit = hit.GetHitNumber();
+         Line& wire = wiremap.GetWire(cid, icell);
+         double fitX = GetXFromLine(wiremap, side, cid, line);
+         double fitR = line.GetDistance(wire);
+         double dT = hit.GetDriftTime() - hit.GetT0();
+         double hitR = hit.GetHitR(xt);
+         int adc = hit.GetAdc();
+         double ped = hit.GetPedestal();
+         double q = hit.GetQ();
+         printf("ch %3d cid %2d icell %2d ihit %d ped %6.2f adc %4d q %6.1f adchit-ped %6.2f t0 %3.2f drift_time %7.2f dT %6.2f --> hitR %6.2f fitR %6.2f fitX %6.2f hitZ %6.2f fitR-hitR %6.2f\n",
+               chan, cid, icell, ihit, ped, adc, q-ped*32, adc-ped, hit.GetT0(), hit.GetDriftTime(), dT, hitR, fitR, fitX, hit.GetZ(), fitR-hitR);
+      }
    }
 }
 
 WireMap* g_wiremap_ptr;
 XTcurve* g_xt_ptr;
 Line* g_fit_line;
-void Track::InitFit(WireMap& wiremap, XTcurve& xt, int test_cid, bool verbose)
+void Track::InitFit(WireMap& wiremap, XTcurve& xt, int test_side, int test_cid, bool verbose)
 {
    Track_obj = this;
    minuit_ = new TFitter(4);
@@ -239,7 +247,7 @@ void Track::InitFit(WireMap& wiremap, XTcurve& xt, int test_cid, bool verbose)
    }
 
    minuit_->SetFCN(Track::MinuitFunction);
-   SetTestLayerNumber(test_cid);
+   SetTestLayerNumber(test_side, test_cid);
 
    g_wiremap_ptr = &wiremap;
    g_xt_ptr = &xt;
@@ -294,10 +302,10 @@ void Track::DoFit(WireMap& wiremap, XTcurve& xt)
 #endif
 
    // update line (extend line) for drawing purpose
-   Hit& hit1 = hits_[1];
-   Hit& hit7 = hits_[7];
-   Line& wire1 = wiremap.GetWire(1, hit1.GetCellNumber());
-   Line& wire7 = wiremap.GetWire(7, hit7.GetCellNumber());
+   Hit& hit1 = hits_[WireMap::SIDE_TOP][19];
+   Hit& hit7 = hits_[WireMap::SIDE_BOTTOM][19];
+   Line& wire1 = wiremap.GetWire(19, hit1.GetCellNumber());
+   Line& wire7 = wiremap.GetWire(19, hit7.GetCellNumber());
    TVector3 pA1;
    TVector3 pB1;
    TVector3 pA7;
@@ -342,8 +350,10 @@ void Track::PrintFitResults()
 int Track::GetNumHits()
 {
    int num_hits = 0;
-   for (int cid=0; cid<MAX_LAYER; cid++) {
-      num_hits += hits_[cid].HasHit();
+   for (int side=0; side<2; side++) {
+      for (int cid=0; cid<MAX_LAYER; cid++) {
+         num_hits += hits_[side][cid].HasHit();
+      }
    }
    return num_hits;
 }
@@ -351,11 +361,13 @@ int Track::GetNumHits()
 int Track::GetNumHitsUseByFit()
 {
    int num_hits = 0;
-   for (int cid=0; cid<MAX_LAYER; cid++) {
-      bool has_hit = hits_[cid].HasHit();
-      bool use_by_fit = hits_[cid].UseByFit();
-      if (has_hit && use_by_fit) {
-         num_hits++;
+   for (int side=0; side<2; side++) {
+      for (int cid=0; cid<MAX_LAYER; cid++) {
+         bool has_hit = hits_[side][cid].HasHit();
+         bool use_by_fit = hits_[side][cid].UseByFit();
+         if (has_hit && use_by_fit) {
+            num_hits++;
+         }
       }
    }
    return num_hits;
@@ -426,18 +438,25 @@ void Track::CalcPointsOnTangentials(
    }
 }
 
-void Track::SetTestLayerNumber(int test_cid)
+void Track::SetTestLayerNumber(int test_side, int test_cid)
 {
+    test_side_ = test_side;
     test_cid_ = test_cid;
-    for (int cid=0; cid<MAX_LAYER; cid++) {
-       // clear 
-       hits_[cid].SetUseByFitFlag(true);
-       if (test_cid!=-1) {
-          hits_[test_cid_].SetUseByFitFlag(false);
+    for (int side=0; side<MAX_SIDE; side++) {
+       for (int cid=0; cid<MAX_LAYER; cid++) {
+          // clear 
+          hits_[side][cid].SetUseByFitFlag(true);
+          if (test_cid!=-1) {
+             hits_[side][test_cid_].SetUseByFitFlag(false);
+          }
        }
     }
 }
 
+int Track::GetTestLayerSide()
+{
+   return test_side_;
+}
 int Track::GetTestLayerNumber()
 {
    return test_cid_;

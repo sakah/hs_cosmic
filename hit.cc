@@ -162,7 +162,7 @@ void Hit::PrintHit(XTcurve& xt, double adc_peak_thre)
    double hitR = xt.GetX(dT, left_or_right_);
    double adc_peak = adc_ - ped_;
    if (adc_peak >=adc_peak_thre) {
-      printf("ch %3d cid %2d icell %2d ped %6.2f adc %4d q %6.1f adchit-ped %6.2f t0 %3.2f drift_time %7.2f dT %6.2f --> hitR %6.2f hitZ %6.2f\n", 
+      printf("ch %3d cid %2d icell %3d ped %6.2f adc %4d q %6.1f adchit-ped %6.2f t0 %3.2f drift_time %8.2f dT %6.2f --> hitR %6.2f hitZ %6.2f\n", 
             chan_number_, layer_number_, cell_number_, ped_, adc_, q_-ped_*32, adc_-ped_, t0_, drift_time_, dT, hitR, z_);
    }
 }

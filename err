@@ -1,0 +1,66 @@
+run.cc:228:65: warning: invalid conversion specifier ' ' [-Wformat-invalid-specifier]
+      printf("iev %lld num_tracks %d etime %d atime %d rate %3.2 Hz\n", iev, num_tracks, etime, atime, rate);
+                                                            ~~~~^
+1 warning generated.
+trackfinder.cc:295:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:311:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:346:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:355:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:360:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:365:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:374:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:379:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:384:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:389:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:394:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:399:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:404:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:409:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:414:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:419:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:424:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:429:1: error: function definition is not allowed here
+{
+^
+trackfinder.cc:432:1: error: expected '}'
+^
+trackfinder.cc:165:57: note: to match this '{'
+   for (int icellhit22=0; icellhit22<m22; icellhit22++) { int icell22 = chamber.GetHitCellNumber(1, 11, icellhit22); Hit& hit22 = chamber.GetHit(1,  11, icell22, 0);
+                                                        ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+make: *** [main] Error 1

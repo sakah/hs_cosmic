@@ -12,12 +12,13 @@ void plot(int iev, int cid1, int cid2, double z1, double z2, int itan, double z_
    xt.SetDriftVelocity(0.025);
 
    Chamber chamber;
-   double rot_deg = 90+11.25; // degree
-   chamber.ReadWireMap("/gpfs/home/had/hideyuki/private/genfit2/KEKCC/hs_cosmic/wirepos_20160814.txt", rot_deg);
+   double rot_deg = -90-11.25; // degree
+   chamber.ReadWireMap("wirepos_20160814.txt", rot_deg);
    WireMap& wiremap = chamber.GetWireMap();
 
-   Event event("/group/had/muon/CDC/CRT//root/run_000052.root");
+   Event event("test/run_000052.root");
    event.GetEntry(iev);
+   event.PrintEvent();
    for (int bd=0; bd<104; bd++) {
       chamber.SetT0(bd, -1050);
    }
@@ -27,28 +28,31 @@ void plot(int iev, int cid1, int cid2, double z1, double z2, int itan, double z_
    chamber.PrintHits(xt, adc_peak_thre);
    chamber.DrawHits(event, xt);
 
-   return;
+   bool alllayerhit = chamber.hasAllLayerHits();
+   if (!alllayerhit) {
+      printf("iev %d --> alllayehit false\n", iev);
+      return;
+   } else {
+      printf("iev %d --> alllayehit true \n", iev);
+   }
+   printf("side1 %d cid1 %d z1 %f | side2 %d cid2 %d z2 %lf\n", side1, cid1, z1, side2, cid2, z2);
+
    Track track;
-   bool alllayerhit=true;
-   for (int cid=1; cid<=7; cid++) {
-      int n =  chamber.GetNumHitCells(cid);
-      if (n==0) {
-         alllayerhit = false;
-         break;
+   for (int side=0; side<2; side++) {
+      for (int cid=0; cid<20; cid++) {
+         if (!chamber.isLayerUsed(side, cid)) {
+            continue;
+         }
+         int icell = chamber.GetHitCellNumber(cid, 0);
+         Hit& hit = chamber.GetHit(cid, icell, 0);
+         hit.PrintHit(xt, adc_peak_thre);
+         track.SetHit(side, cid, hit);
       }
    }
-   if (!alllayerhit) {
-      return;
-   }
 
-   for (int cid=1; cid<=7; cid++) {
-      int icell = chamber.GetHitCellNumber(cid, 0);
-      Hit& hit = chamber.GetHit(cid, icell, 0);
-      track.SetHit(cid, hit);
-   }
-
-   track.MakeTangents(wiremap, xt, cid1, cid2, z1, z2);
+   track.MakeTangents(wiremap, xt, side1, side2, cid1, cid2, z1, z2);
    track.PrintTangents(wiremap, xt);
+#if 0
 
    TrackFinder finder;
    finder.MakeTracks(chamber, xt, cid1, cid2, z1, z2);
@@ -68,5 +72,6 @@ void plot(int iev, int cid1, int cid2, double z1, double z2, int itan, double z_
       int min_itan = min_track.GetMinTangentNumber();
       chamber.DrawHitsWithTrack(event, xt, min_track, min_itan);
    }
+#endif
 
 }
