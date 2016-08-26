@@ -8,9 +8,9 @@ class WireMap
 {
    public:
       WireMap();
-      void Read(double zro, double zhv, const char* path);
-      double GetZRO();
-      double GetZHV();
+      void Read(const char* path);
+      double GetZRO(int cid);
+      double GetZHV(int cid);
       int GetNumLayers();
       int GetNumCells(int cid);
       int GetLayerNumber(int ch);

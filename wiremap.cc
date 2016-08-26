@@ -8,14 +8,11 @@ WireMap::WireMap()
    }
 }
 
-void WireMap::Read(double zro, double zhv, const char* path)
+void WireMap::Read(const char* path)
 {
    // PT4
    //zro_ = -299.585;
    //zhv_ = +299.585;
-
-   zro_ = zro;
-   zhv_ = zhv;
 
    FILE* fp = fopen(path, "r");
    if (fp==NULL) {
@@ -35,33 +32,37 @@ void WireMap::Read(double zro, double zhv, const char* path)
    double yc;
    double xro;
    double yro;
+   double length;
 
    num_layers_ = MAX_LAYER;
    for (int cid=0; cid<MAX_LAYER; cid++) {
       num_cells_[cid] = 0;
    }
    while(fgets(line, sizeof(line), fp)) {
-      sscanf(line, "%d %d %d %d %d %lf %lf %lf %lf %lf %lf",
-            &b, &ch, &l, &h, &w, &xhv, &yhv, &xc, &yc, &xro, &yro);
+      sscanf(line, "%d %d %d %d %d %lf %lf %lf %lf %lf %lf %lf",
+            &b, &ch, &l, &h, &w, &xhv, &yhv, &xc, &yc, &xro, &yro, &length);
       int gch = ch + b*48;
       layer_numbers_[gch] = l;
       cell_numbers_[gch] = w;
       chan_numbers_[l][w] = gch;
       board_numbers_[l][w] = b;
       num_cells_[l]++;
-      wires_[l][w].MakeLine(TVector3(xro, yro, zro_), TVector3(xhv, yhv, zhv_));
+      zro_[l] = length/2.0;
+      zhv_[l] = -zro;
+
+      wires_[l][w].MakeLine(TVector3(xro, yro, zro_[l]), TVector3(xhv, yhv, zhv_[l]));
    }
    fclose(fp);
 }
 
-double WireMap::GetZRO()
+double WireMap::GetZRO(int cid)
 {
-   return zro_;
+   return zro_[cid];
 }
 
-double WireMap::GetZHV()
+double WireMap::GetZHV(int cid)
 {
-   return zhv_;
+   return zhv_[cid];
 }
 
 int WireMap::GetNumLayers()
