@@ -17,6 +17,7 @@ class Line
       double GetClosestPoints(Line& other, TVector3& pA, TVector3& pB);
       double GetDistance(Line& other);
       TVector3 GetPosAtZ(double z);
+      TVector3 GetPosAtY(double y);
       void GetABCDEF(double& A, double&B, double& C, double&D, double& E, double& F);
       void GetACDF(double& A, double& C, double& D, double& F);
       TVector3& GetP1();

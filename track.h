@@ -38,6 +38,8 @@ class Track
       int GetNumHitsUseByFit();
       int GetNumParameters();
       int GetNDF();
+      double GetChi2();
+      double GetRedChi2();
       Line& GetInitialLine();
       Line& GetFitLine();
       void SetTestLayerNumber(int test_side, int test_cid);

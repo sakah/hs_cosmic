@@ -5,9 +5,9 @@ TrackFinder::TrackFinder()
 {
    num_tracks_ = 0;
    min_itrack_ = -1;
-   max_r_ = 10.0; // 10.0 mm
-   min_z_ = -400;
-   max_z_ = +400;
+   max_r_ = 14.0; // mm, drift distance
+   min_z_ = -200; //mm 
+   max_z_ = +200; //mm
    min_z1_ = 0;
    min_z2_ = 0;
    max_tracks_ = 4;
@@ -118,7 +118,7 @@ int TrackFinder::SetTracksByHitCells(Chamber& chamber, XTcurve& xt)
 {
    num_tracks_ = 0;
 
-   int m11 = chamber.GetNumHitCells(0,19);
+   //int m11 = chamber.GetNumHitCells(0,19);
    int m12 = chamber.GetNumHitCells(0,18);
    int m13 = chamber.GetNumHitCells(0,17);
    int m14 = chamber.GetNumHitCells(0,16);
@@ -130,9 +130,9 @@ int TrackFinder::SetTracksByHitCells(Chamber& chamber, XTcurve& xt)
    int m1a = chamber.GetNumHitCells(0,10);
    int m1b = chamber.GetNumHitCells(0, 9);
    int m1c = chamber.GetNumHitCells(0, 8);
-   int m1d = chamber.GetNumHitCells(0, 7);
+   //int m1d = chamber.GetNumHitCells(0, 7);
 
-   int m21 = chamber.GetNumHitCells(1,10);
+   //int m21 = chamber.GetNumHitCells(1,10);
    int m22 = chamber.GetNumHitCells(1,11);
    int m23 = chamber.GetNumHitCells(1,12);
    int m24 = chamber.GetNumHitCells(1,13);
@@ -141,13 +141,13 @@ int TrackFinder::SetTracksByHitCells(Chamber& chamber, XTcurve& xt)
    int m27 = chamber.GetNumHitCells(1,16);
    int m28 = chamber.GetNumHitCells(1,17);
    int m29 = chamber.GetNumHitCells(1,18);
-   int m2a = chamber.GetNumHitCells(1,19);
-   if (g_debug_trackfinder) {
-      printf("#/hits@layer [ 7-19] => %d %d %d %d %d %d %d %d %d %d %d %d %d\n", m11, m12, m13, m14, m15, m16, m17, m18, m19, m1a, m1b, m1c, m1d);
-      printf("#/hits@layer [10-19] => %d %d %d %d %d %d %d %d %d %d\n", m21, m22, m23, m24, m25, m26, m27, m28, m29, m2a);
-   }
+   //int m2a = chamber.GetNumHitCells(1,19);
+   //if (g_debug_trackfinder) {
+      printf("#/hits@layer [ 8-20] => %d %d %d %d %d %d %d %d %d %d %d\n", m12, m13, m14, m15, m16, m17, m18, m19, m1a, m1b, m1c);
+      printf("#/hits@layer [11-20] => %d %d %d %d %d %d %d %d\n", m22, m23, m24, m25, m26, m27, m28, m29);
+   //}
 
-   for (int icellhit11=0; icellhit11<m11; icellhit11++) { int icell11 = chamber.GetHitCellNumber(0, 19, icellhit11); Hit& hit11 = chamber.GetHit(0,  19, icell11, 0);
+   //for (int icellhit11=0; icellhit11<m11; icellhit11++) { int icell11 = chamber.GetHitCellNumber(0, 19, icellhit11); Hit& hit11 = chamber.GetHit(0,  19, icell11, 0);
    for (int icellhit12=0; icellhit12<m12; icellhit12++) { int icell12 = chamber.GetHitCellNumber(0, 18, icellhit12); Hit& hit12 = chamber.GetHit(0,  18, icell12, 0);
    for (int icellhit13=0; icellhit13<m13; icellhit13++) { int icell13 = chamber.GetHitCellNumber(0, 17, icellhit13); Hit& hit13 = chamber.GetHit(0,  17, icell13, 0);
    for (int icellhit14=0; icellhit14<m14; icellhit14++) { int icell14 = chamber.GetHitCellNumber(0, 16, icellhit14); Hit& hit14 = chamber.GetHit(0,  16, icell14, 0);
@@ -159,9 +159,9 @@ int TrackFinder::SetTracksByHitCells(Chamber& chamber, XTcurve& xt)
    for (int icellhit1a=0; icellhit1a<m1a; icellhit1a++) { int icell1a = chamber.GetHitCellNumber(0, 10, icellhit1a); Hit& hit1a = chamber.GetHit(0,  10, icell1a, 0);
    for (int icellhit1b=0; icellhit1b<m1b; icellhit1b++) { int icell1b = chamber.GetHitCellNumber(0,  9, icellhit1b); Hit& hit1b = chamber.GetHit(0,   9, icell1b, 0);
    for (int icellhit1c=0; icellhit1c<m1c; icellhit1c++) { int icell1c = chamber.GetHitCellNumber(0,  8, icellhit1c); Hit& hit1c = chamber.GetHit(0,   8, icell1c, 0);
-   for (int icellhit1d=0; icellhit1d<m1d; icellhit1d++) { int icell1d = chamber.GetHitCellNumber(0,  7, icellhit1d); Hit& hit1d = chamber.GetHit(0,   7, icell1d, 0);
+   //for (int icellhit1d=0; icellhit1d<m1d; icellhit1d++) { int icell1d = chamber.GetHitCellNumber(0,  7, icellhit1d); Hit& hit1d = chamber.GetHit(0,   7, icell1d, 0);
 
-   for (int icellhit21=0; icellhit21<m21; icellhit21++) { int icell21 = chamber.GetHitCellNumber(1, 10, icellhit21); Hit& hit21 = chamber.GetHit(1,  10, icell21, 0);
+   //for (int icellhit21=0; icellhit21<m21; icellhit21++) { int icell21 = chamber.GetHitCellNumber(1, 10, icellhit21); Hit& hit21 = chamber.GetHit(1,  10, icell21, 0);
    for (int icellhit22=0; icellhit22<m22; icellhit22++) { int icell22 = chamber.GetHitCellNumber(1, 11, icellhit22); Hit& hit22 = chamber.GetHit(1,  11, icell22, 0);
    for (int icellhit23=0; icellhit23<m23; icellhit23++) { int icell23 = chamber.GetHitCellNumber(1, 12, icellhit23); Hit& hit23 = chamber.GetHit(1,  12, icell23, 0);
    for (int icellhit24=0; icellhit24<m24; icellhit24++) { int icell24 = chamber.GetHitCellNumber(1, 13, icellhit24); Hit& hit24 = chamber.GetHit(1,  13, icell24, 0);
@@ -170,9 +170,9 @@ int TrackFinder::SetTracksByHitCells(Chamber& chamber, XTcurve& xt)
    for (int icellhit27=0; icellhit27<m27; icellhit27++) { int icell27 = chamber.GetHitCellNumber(1, 16, icellhit27); Hit& hit27 = chamber.GetHit(1,  16, icell27, 0);
    for (int icellhit28=0; icellhit28<m28; icellhit28++) { int icell28 = chamber.GetHitCellNumber(1, 17, icellhit28); Hit& hit28 = chamber.GetHit(1,  17, icell28, 0);
    for (int icellhit29=0; icellhit29<m29; icellhit29++) { int icell29 = chamber.GetHitCellNumber(1, 18, icellhit29); Hit& hit29 = chamber.GetHit(1,  18, icell29, 0);
-   for (int icellhit2a=0; icellhit2a<m2a; icellhit2a++) { int icell2a = chamber.GetHitCellNumber(1, 19, icellhit2a); Hit& hit2a = chamber.GetHit(1,  19, icell2a, 0);
+   //for (int icellhit2a=0; icellhit2a<m2a; icellhit2a++) { int icell2a = chamber.GetHitCellNumber(1, 19, icellhit2a); Hit& hit2a = chamber.GetHit(1,  19, icell2a, 0);
 
-      hit11.SetT0(chamber.GetT0(19, icell11));
+      //hit11.SetT0(chamber.GetT0(19, icell11));
       hit12.SetT0(chamber.GetT0(18, icell12));
       hit13.SetT0(chamber.GetT0(17, icell13));
       hit14.SetT0(chamber.GetT0(16, icell14));
@@ -184,9 +184,9 @@ int TrackFinder::SetTracksByHitCells(Chamber& chamber, XTcurve& xt)
       hit1a.SetT0(chamber.GetT0(10, icell1a));
       hit1b.SetT0(chamber.GetT0( 9, icell1b));
       hit1c.SetT0(chamber.GetT0( 8, icell1c));
-      hit1d.SetT0(chamber.GetT0( 7, icell1d));
+      //hit1d.SetT0(chamber.GetT0( 7, icell1d));
 
-      hit21.SetT0(chamber.GetT0(10, icell21));
+      //hit21.SetT0(chamber.GetT0(10, icell21));
       hit22.SetT0(chamber.GetT0(11, icell22));
       hit23.SetT0(chamber.GetT0(12, icell23));
       hit24.SetT0(chamber.GetT0(13, icell24));
@@ -195,9 +195,9 @@ int TrackFinder::SetTracksByHitCells(Chamber& chamber, XTcurve& xt)
       hit27.SetT0(chamber.GetT0(16, icell27));
       hit28.SetT0(chamber.GetT0(17, icell28));
       hit29.SetT0(chamber.GetT0(18, icell29));
-      hit2a.SetT0(chamber.GetT0(19, icell2a));
+      //hit2a.SetT0(chamber.GetT0(19, icell2a));
 
-      double hitR11 = hit11.GetHitR(xt);
+      //double hitR11 = hit11.GetHitR(xt);
       double hitR12 = hit12.GetHitR(xt);
       double hitR13 = hit13.GetHitR(xt);
       double hitR14 = hit14.GetHitR(xt);
@@ -209,8 +209,8 @@ int TrackFinder::SetTracksByHitCells(Chamber& chamber, XTcurve& xt)
       double hitR1a = hit1a.GetHitR(xt);
       double hitR1b = hit1b.GetHitR(xt);
       double hitR1c = hit1c.GetHitR(xt);
-      double hitR1d = hit1d.GetHitR(xt);
-      double hitR21 = hit21.GetHitR(xt);
+      //double hitR1d = hit1d.GetHitR(xt);
+      //double hitR21 = hit21.GetHitR(xt);
       double hitR22 = hit22.GetHitR(xt);
       double hitR23 = hit23.GetHitR(xt);
       double hitR24 = hit24.GetHitR(xt);
@@ -219,27 +219,27 @@ int TrackFinder::SetTracksByHitCells(Chamber& chamber, XTcurve& xt)
       double hitR27 = hit27.GetHitR(xt);
       double hitR28 = hit28.GetHitR(xt);
       double hitR29 = hit29.GetHitR(xt);
-      double hitR2a = hit2a.GetHitR(xt);
+      //double hitR2a = hit2a.GetHitR(xt);
 
-      if (g_debug_trackfinder) {
-         printf("hitR11 %f hitR12 %f hitR13 %f hitR14 %f hitR15 %f hitR16 %f hitR17 %f hitR18 %f hitR19 %f hitR1a %f hitR1b %f hitR1c %f hitR1d %f\n", 
-               hitR11, hitR12, hitR13, hitR14, hitR15, hitR16, hitR17, hitR18, hitR19, hitR1a, hitR1b, hitR1c, hitR1d);
-         printf("hitR21 %f hitR22 %f hitR23 %f hitR24 %f hitR25 %f hitR26 %f hitR27 %f hitR28 %f hitR29 %f hitR2a %f\n",
-               hitR21, hitR22, hitR23, hitR24, hitR25, hitR26, hitR27, hitR28, hitR29, hitR2a);
-      }
+      //if (g_debug_trackfinder) {
+         printf("hitR12 %f hitR13 %f hitR14 %f hitR15 %f hitR16 %f hitR17 %f hitR18 %f hitR19 %f hitR1a %f hitR1b %f hitR1c %f\n", 
+               hitR12, hitR13, hitR14, hitR15, hitR16, hitR17, hitR18, hitR19, hitR1a, hitR1b, hitR1c);
+         printf("hitR22 %f hitR23 %f hitR24 %f hitR25 %f hitR26 %f hitR27 %f hitR28 %f hitR29 %f\n",
+               hitR22, hitR23, hitR24, hitR25, hitR26, hitR27, hitR28, hitR29);
+      //}
 
-      if (hitR11<0 || hitR12<0 || hitR13<0 ||hitR14<0 || hitR15<0 || hitR16<0 || hitR17<0 || hitR18<0 || hitR19<0 || hitR1a<0 || hitR1b<0 || hitR1c<0 ||hitR1d<0) {
+      if (hitR12<0 || hitR13<0 ||hitR14<0 || hitR15<0 || hitR16<0 || hitR17<0 || hitR18<0 || hitR19<0 || hitR1a<0 || hitR1b<0 || hitR1c<0 ) {
          continue;
       }
-      if (hitR21<0 || hitR22<0 || hitR23<0 ||hitR24<0 || hitR25<0 || hitR26<0 || hitR27<0 || hitR28<0 || hitR29<0 || hitR2a<0) {
-         continue;
-      }
-
-      if (hitR11>max_r_ || hitR12>max_r_ || hitR13>max_r_ ||hitR14>max_r_ || hitR15>max_r_ || hitR16>max_r_ || hitR17>max_r_ || hitR18>max_r_ || hitR19>max_r_ || hitR1a>max_r_ || hitR1b>max_r_ || hitR1c>max_r_ || hitR1d>max_r_) {
+      if (hitR22<0 || hitR23<0 ||hitR24<0 || hitR25<0 || hitR26<0 || hitR27<0 || hitR28<0 || hitR29<0)  {
          continue;
       }
 
-      if (hitR21>max_r_ || hitR22>max_r_ || hitR23>max_r_ ||hitR24>max_r_ || hitR25>max_r_ || hitR26>max_r_ || hitR27>max_r_ || hitR28>max_r_ || hitR29>max_r_ || hitR2a>max_r_) {
+      if (hitR12>max_r_ || hitR13>max_r_ ||hitR14>max_r_ || hitR15>max_r_ || hitR16>max_r_ || hitR17>max_r_ || hitR18>max_r_ || hitR19>max_r_ || hitR1a>max_r_ || hitR1b>max_r_ || hitR1c>max_r_ ) {
+         continue;
+      }
+
+      if (hitR22>max_r_ || hitR23>max_r_ ||hitR24>max_r_ || hitR25>max_r_ || hitR26>max_r_ || hitR27>max_r_ || hitR28>max_r_ || hitR29>max_r_) {
          continue;
       }
 
@@ -248,7 +248,7 @@ int TrackFinder::SetTracksByHitCells(Chamber& chamber, XTcurve& xt)
       }
 
       Track& track = tracks_[num_tracks_];
-      track.SetHit(0, 19, hit11);
+      //track.SetHit(0, 19, hit11);
       track.SetHit(0, 18, hit12);
       track.SetHit(0, 17, hit13);
       track.SetHit(0, 16, hit14);
@@ -260,9 +260,9 @@ int TrackFinder::SetTracksByHitCells(Chamber& chamber, XTcurve& xt)
       track.SetHit(0, 10, hit1a);
       track.SetHit(0,  9, hit1b);
       track.SetHit(0,  8, hit1c);
-      track.SetHit(0,  7, hit1d);
+      //track.SetHit(0,  7, hit1d);
 
-      track.SetHit(1, 10, hit21);
+      //track.SetHit(1, 10, hit21);
       track.SetHit(1, 11, hit22);
       track.SetHit(1, 12, hit23);
       track.SetHit(1, 13, hit24);
@@ -271,11 +271,12 @@ int TrackFinder::SetTracksByHitCells(Chamber& chamber, XTcurve& xt)
       track.SetHit(1, 16, hit27);
       track.SetHit(1, 17, hit28);
       track.SetHit(1, 18, hit29);
-      track.SetHit(1, 19, hit2a);
+      //track.SetHit(1, 19, hit2a);
 
       //printf("num_tracks %d time %d max_tracks %d\n", num_tracks_, time(NULL), max_tracks_);
       num_tracks_++;
 
+   //} 
    } 
    } 
    } 
@@ -287,9 +288,9 @@ int TrackFinder::SetTracksByHitCells(Chamber& chamber, XTcurve& xt)
    } 
    } 
    } 
-   } 
-   } 
+   //} 
 
+   //} 
    } 
    } 
    } 
@@ -298,8 +299,7 @@ int TrackFinder::SetTracksByHitCells(Chamber& chamber, XTcurve& xt)
    } 
    } 
    } 
-   } 
-   } 
+   //} 
 end:
 
    if (g_debug_trackfinder) {

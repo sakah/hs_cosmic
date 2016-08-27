@@ -219,6 +219,22 @@ TVector3 Line::GetPosAtZ(double z)
    return TVector3(x, y, z);
 }
 
+TVector3 Line::GetPosAtY(double y)
+{
+   double x1 = p1_.X();
+   double y1 = p1_.Y();
+   double z1 = p1_.Z();
+   double x2 = p2_.X();
+   double y2 = p2_.Y();
+   double z2 = p2_.Z();
+   double dx = x2-x1;
+   double dy = y2-y1;
+   double dz = z2-z1;
+   double x = x1 + (y-y1)/(y2-y1)*(x2-x1);
+   double z = z1 + (y-y1)/(y2-y1)*(z2-z1);
+   return TVector3(x, y, z);
+}
+
 void Line::GetACDF(double& A, double& C, double& D, double& F)
 {
    double B;

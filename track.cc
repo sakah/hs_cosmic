@@ -51,6 +51,10 @@ void Track::MakeTangents(WireMap& wiremap, XTcurve& xt, int side1, int side2, in
    Line& wire2 = wiremap.GetWire(hit2.GetLayerNumber(), hit2.GetCellNumber());
    TVector3 wirepos1 = wire1.GetPosAtZ(z1);
    TVector3 wirepos2 = wire2.GetPosAtZ(z2);
+   //printf("=== Track::MakeTrangents ====\n");
+   //wirepos1.Print();
+   //wirepos2.Print();
+
    // Consider in 2D plane
    TVector3 wirepos1_2D = wirepos1;
    TVector3 wirepos2_2D = wirepos2;
@@ -302,10 +306,10 @@ void Track::DoFit(WireMap& wiremap, XTcurve& xt)
 #endif
 
    // update line (extend line) for drawing purpose
-   Hit& hit1 = hits_[WireMap::SIDE_TOP][19];
-   Hit& hit7 = hits_[WireMap::SIDE_BOTTOM][19];
-   Line& wire1 = wiremap.GetWire(19, hit1.GetCellNumber());
-   Line& wire7 = wiremap.GetWire(19, hit7.GetCellNumber());
+   Hit& hit1 = hits_[WireMap::SIDE_TOP][18];
+   Hit& hit7 = hits_[WireMap::SIDE_BOTTOM][18];
+   Line& wire1 = wiremap.GetWire(18, hit1.GetCellNumber());
+   Line& wire7 = wiremap.GetWire(18, hit7.GetCellNumber());
    TVector3 pA1;
    TVector3 pB1;
    TVector3 pA7;
@@ -365,6 +369,7 @@ int Track::GetNumHitsUseByFit()
       for (int cid=0; cid<MAX_LAYER; cid++) {
          bool has_hit = hits_[side][cid].HasHit();
          bool use_by_fit = hits_[side][cid].UseByFit();
+         printf("GetNumHitsUseByFit: side %d cid %d has_hit %d use_by_fit %d\n", side, cid, has_hit, use_by_fit);
          if (has_hit && use_by_fit) {
             num_hits++;
          }
@@ -382,6 +387,16 @@ int Track::GetNumParameters()
 int Track::GetNDF()
 {
    return GetNumHitsUseByFit() - GetNumParameters();
+}
+
+double Track::GetChi2()
+{
+   return fit_chi2_;
+}
+
+double Track::GetRedChi2()
+{
+   return fit_chi2_/GetNDF();
 }
 
 Line& Track::GetInitialLine()

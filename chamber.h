@@ -29,10 +29,14 @@ class Chamber
       Hit& GetHit(int side, int cid, int icell, int ihit);
       int GetNumLayerHits(int side, int cid);
       bool hasAllLayerHits();
+      bool isGuardLayer(int side, int cid);
       bool isLayerUsed(int side, int cid);
       void PrintHits(XTcurve& xt, double adc_peak_thre);
       void DrawHits(Event& event, XTcurve& xt);
       void DrawTrack(Event& event, XTcurve& xt, Track& track, Line& line);
+      void drawCDCup(Event& event);
+      void drawCDCbottom(Event& event);
+      void drawTrack(Event& event, XTcurve& xt, Track& track, Line& line);
       void SetT0(int bd, double t0);
       void SetVelocity(double vel);
       double GetT0(int bd);

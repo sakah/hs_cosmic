@@ -5,6 +5,8 @@
 #include "TCanvas.h"
 #include "TH2F.h"
 #include "TEllipse.h"
+#include "TPad.h"
+#include "TPaveText.h"
 
 Chamber::Chamber()
 {
@@ -26,9 +28,9 @@ void Chamber::GetEvent(Event& event)
       if (cid==-1) continue; // not connected to wire
       int nhits = event.GetTdcNhit(ch);
       double ped = event.GetPedestal(ch);
-      if (nhits>0) {
-         printf("ch %d cid %d icell %d nhits %d\n", ch, cid, icell, nhits);
-      }
+      //if (nhits>0) {
+      //   printf("ch %d cid %d icell %d nhits %d\n", ch, cid, icell, nhits);
+      //}
 
       int jhit=0;
       for (int ihit=0; ihit<nhits; ihit++) {
@@ -194,6 +196,18 @@ int Chamber::GetNumLayerHits(int side, int cid)
    }
    return nhits;
 }
+
+bool Chamber::isGuardLayer(int side, int cid)
+{
+   if (side==WireMap::SIDE_TOP) {
+      if (cid==19 || cid==7) return true;
+   }
+   if (side==WireMap::SIDE_BOTTOM) {
+      if (cid==19 || cid==10) return true;
+   }
+   return false;
+}
+
 bool Chamber::isLayerUsed(int side, int cid)
 {
    return wiremap_.isLayerUsed(side, cid);
@@ -287,12 +301,61 @@ void Chamber::DrawHits(Event& event, XTcurve& xt)
 
 void Chamber::DrawTrack(Event& event, XTcurve& xt, Track& track, Line& line)
 {
-   TCanvas*c1 = new TCanvas("c1-chamber-drawhitswithtrack", "", 700, 700);
-   TH2F* h2 = new TH2F("h2", Form("%s Event# %lld", event.GetRootPath(), event.GetEventNumber()), 
-         100, -100, 100, 100, 480, 680);
+   int ndf = track.GetNDF();
+   double chi2 = track.GetChi2();
+   double red_chi2 = track.GetRedChi2();
+
+   double ypos_S1 = 1900/2.0; // mm
+   double ypos_S2 = -ypos_S1;
+   TVector3 pos_s1 = line.GetPosAtY(ypos_S1);
+   TVector3 pos_s2 = line.GetPosAtY(ypos_S2);
+
+
+   TCanvas*c1 = new TCanvas("c1-chamber-drawhitswithtrack", "", 500, 1250);
+   TPad* p1 = new TPad("p1", "p1", 0, 0.8, 1, 1);
+   TPad* p2 = new TPad("p2", "p2", 0, 0, 1, 0.8);
+   
+   p1->Draw();
+   p2->Draw();
+
+   p1->cd();
+   TPaveText* pt = new TPaveText(0, 0, 1, 1);
+
+   pt->AddText(Form("%s", event.GetRootPath()));
+   pt->AddText(Form("Event# %lld", event.GetEventNumber()));
+   pt->AddText(Form("Trigger# %d", event.GetTriggerNumber()));
+   pt->AddText(Form("chi2/NDF= %5.2f/%d (%5.2f)", chi2, ndf, red_chi2));
+   pt->AddText(Form("S1: x= %6.2f , y= %6.2f , z= %6.2f [mm]", pos_s1.X(),pos_s1.Y(),pos_s1.Z() ));
+   pt->AddText(Form("S2: x= %6.2f , y= %6.2f , z= %6.2f [mm]", pos_s2.X(),pos_s2.Y(),pos_s2.Z() ));
+   pt->Draw();
+
+   p2->Divide(2,1);
+
+   p2->cd(1);
+   drawCDCup(event);
+   drawTrack(event, xt, track, line);
+
+   p2->cd(2);
+   drawCDCbottom(event);
+   drawTrack(event, xt, track, line);
+}
+
+void Chamber::drawCDCup(Event& event)
+{
+   TH2F* h2 = new TH2F("h2-up", "", 100, -50, 50, 100, 600, 850);
    h2->SetStats(0);
    h2->Draw();
+}
 
+void Chamber::drawCDCbottom(Event& event)
+{
+   TH2F* h2 = new TH2F("h2-bottom", "", 100, -50, 50, 100, -850, -600);
+   h2->SetStats(0);
+   h2->Draw();
+}
+
+void Chamber::drawTrack(Event& event, XTcurve& xt, Track& track, Line& line)
+{
    for (int side=0; side<MAX_SIDE; side++) {
       for (int cid=0; cid<MAX_LAYER; cid++) {
          Hit& hit = track.GetHit(side, cid);
