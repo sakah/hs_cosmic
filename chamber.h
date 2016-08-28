@@ -33,7 +33,7 @@ class Chamber
       bool isLayerUsed(int side, int cid);
       void PrintHits(XTcurve& xt, double adc_peak_thre);
       void DrawHits(Event& event, XTcurve& xt);
-      void DrawTrack(Event& event, XTcurve& xt, Track& track, Line& line);
+      void DrawTrack(Event& event, XTcurve& xt, Track& track, Line& line, int test_side, int test_cid, char* pdf_dir=NULL);
       void drawCDCup(Event& event);
       void drawCDCbottom(Event& event);
       void drawTrack(Event& event, XTcurve& xt, Track& track, Line& line);

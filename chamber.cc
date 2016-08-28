@@ -7,6 +7,7 @@
 #include "TEllipse.h"
 #include "TPad.h"
 #include "TPaveText.h"
+#include "TText.h"
 
 Chamber::Chamber()
 {
@@ -299,8 +300,15 @@ void Chamber::DrawHits(Event& event, XTcurve& xt)
    }
 }
 
-void Chamber::DrawTrack(Event& event, XTcurve& xt, Track& track, Line& line)
+void Chamber::DrawTrack(Event& event, XTcurve& xt, Track& track, Line& line, int test_side, int test_cid, char* pdf_dir)
 {
+   char side_name[32];
+   if (test_side==WireMap::SIDE_TOP) {
+      strcpy(side_name, "up");
+   } else {
+      strcpy(side_name, "bottom");
+   }
+
    int ndf = track.GetNDF();
    double chi2 = track.GetChi2();
    double red_chi2 = track.GetRedChi2();
@@ -324,6 +332,7 @@ void Chamber::DrawTrack(Event& event, XTcurve& xt, Track& track, Line& line)
    pt->AddText(Form("%s", event.GetRootPath()));
    pt->AddText(Form("Event# %lld", event.GetEventNumber()));
    pt->AddText(Form("Trigger# %d", event.GetTriggerNumber()));
+   pt->AddText(Form("Test layer %d (%s)", test_cid, side_name));
    pt->AddText(Form("chi2/NDF= %5.2f/%d (%5.2f)", chi2, ndf, red_chi2));
    pt->AddText(Form("S1: x= %6.2f , y= %6.2f , z= %6.2f [mm]", pos_s1.X(),pos_s1.Y(),pos_s1.Z() ));
    pt->AddText(Form("S2: x= %6.2f , y= %6.2f , z= %6.2f [mm]", pos_s2.X(),pos_s2.Y(),pos_s2.Z() ));
@@ -338,6 +347,10 @@ void Chamber::DrawTrack(Event& event, XTcurve& xt, Track& track, Line& line)
    p2->cd(2);
    drawCDCbottom(event);
    drawTrack(event, xt, track, line);
+
+   if (pdf_dir) {
+      c1->Print(Form("%s/iev_%04lld_tn_%04d.pdf", pdf_dir, event.GetEventNumber(), event.GetTriggerNumber()));
+   }
 }
 
 void Chamber::drawCDCup(Event& event)
@@ -345,6 +358,13 @@ void Chamber::drawCDCup(Event& event)
    TH2F* h2 = new TH2F("h2-up", "", 100, -50, 50, 100, 600, 850);
    h2->SetStats(0);
    h2->Draw();
+
+   TPaveText* pt = new TPaveText(0.08793507,0.9052217,0.2552711,0.9356514,"brNDC");
+   pt->SetTextSize(0.1);
+   pt->SetFillColor(0);
+   pt->SetBorderSize(0);
+   pt->AddText("Up");
+   pt->Draw();
 }
 
 void Chamber::drawCDCbottom(Event& event)
@@ -352,6 +372,13 @@ void Chamber::drawCDCbottom(Event& event)
    TH2F* h2 = new TH2F("h2-bottom", "", 100, -50, 50, 100, -850, -600);
    h2->SetStats(0);
    h2->Draw();
+
+   TPaveText* pt = new TPaveText(0.08793507,0.9052217,0.2552711,0.9356514,"brNDC");
+   pt->SetTextSize(0.1);
+   pt->SetFillColor(0);
+   pt->SetBorderSize(0);
+   pt->AddText("Bottom");
+   pt->Draw();
 }
 
 void Chamber::drawTrack(Event& event, XTcurve& xt, Track& track, Line& line)
@@ -385,6 +412,10 @@ void Chamber::drawTrack(Event& event, XTcurve& xt, Track& track, Line& line)
          e->SetLineColor(kBlue);
          e->SetFillStyle(4000);
          e->Draw();
+
+         TText* txt = new TText(pos.X(), pos.Y(), Form("(%d-%d)", cid, icell));
+         txt->SetTextSize(0.04);
+         txt->Draw();
       }
    }
 }

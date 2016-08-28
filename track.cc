@@ -104,12 +104,15 @@ Line& Track::GetTangent(int itan)
    return tangents_[itan];
 }
 
-double Track::GetChi2OfLine(WireMap& wiremap, XTcurve& xt, Line& line)
+double Track::GetChi2OfLine(WireMap& wiremap, XTcurve& xt, Line& line, bool verbose)
 {
    double chi2 = 0.0;
    for (int side=0; side<2; side++) {
       for (int cid=0; cid<MAX_LAYER; cid++) {
          Hit& hit = hits_[side][cid];
+         if (verbose) {
+            printf("GetChi2OfLine: side %d cid %d has_hit %d use_by_fit %d\n", side, cid, hit.HasHit(), hit.UseByFit());
+         }
          if (!hit.HasHit()) continue;
          if (!hit.UseByFit()) continue;
          int icell = hit.GetCellNumber();
@@ -123,7 +126,9 @@ double Track::GetChi2OfLine(WireMap& wiremap, XTcurve& xt, Line& line)
          double dr = fitR - hitR;
          double hitZ = hit.GetZ();
          double fitZ = pA.Z();
-         //printf("cid %d hitR %f fitR %f hitZ %f fitZ %f dr %f chi2 %f\n", cid, hitR, fitR, hitZ, fitZ, dr, chi2);
+         if (verbose) {
+            printf("cid %d hitR %f fitR %f hitZ %f fitZ %f dr %f chi2 %f\n", cid, hitR, fitR, hitZ, fitZ, dr, chi2);
+         }
          chi2 += (dr/sigma_)*(dr/sigma_);
       }
    }
@@ -263,6 +268,9 @@ void Track::DoFit(WireMap& wiremap, XTcurve& xt)
    ini_line_ = GetMinTangent(wiremap, xt);
    ini_line_.GetACDF(ini_pars_[0], ini_pars_[1], ini_pars_[2], ini_pars_[3]);
 
+   printf("ini_line==\n");
+   GetChi2OfLine(wiremap, xt, ini_line_, true);
+
    double A_ini = ini_pars_[0];
    double C_ini = ini_pars_[1];
    double D_ini = ini_pars_[2];
@@ -288,6 +296,7 @@ void Track::DoFit(WireMap& wiremap, XTcurve& xt)
       fit_err_pars_[i] = minuit_->GetParError(i);
    }
    minuit_->GetStats(fit_chi2_,fit_edm_,fit_errdef_,fit_nvpar_,fit_nparx_);
+
 
 #if 0
    double a,b,c,d,e,f;
@@ -329,6 +338,9 @@ void Track::DoFit(WireMap& wiremap, XTcurve& xt)
    //printf("dx1 %f dy1 %f dz1 %f dy1/dx1 %f dy1/dx1 %f\n", dx1, dy1, dz1, dy1/dx1, dy1/dz1);
    //printf("dx2 %f dy2 %f dz1 %f dy2/dx2 %f dy1/dx1 %f\n", dx2, dy2, dz2, dy2/dx2, dy2/dz2);
    fit_line_ = newline;
+
+   printf("fit_line====\n");
+   GetChi2OfLine(wiremap, xt, fit_line_, true);
 
    //printf("comapre with iniline and fitline\n");
    //ini_line_.PrintLine();
@@ -462,7 +474,7 @@ void Track::SetTestLayerNumber(int test_side, int test_cid)
           // clear 
           hits_[side][cid].SetUseByFitFlag(true);
           if (test_cid!=-1) {
-             hits_[side][test_cid_].SetUseByFitFlag(false);
+             hits_[test_side_][test_cid_].SetUseByFitFlag(false);
           }
        }
     }

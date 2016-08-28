@@ -27,8 +27,11 @@ void loop()
       printf("iev %d alllayerhit %d\n", iev, alllayerhit);
    }
 }
-void plot(int iev, int side1, int side2, int cid1, int cid2, double z1, double z2, int itan, double z_step)
+void plot(int iev, int side1, int side2, int cid1, int cid2, double z1, double z2, int itan, double z_step, char* pdf_dir=NULL)
 {
+   int test_side=0;
+   int test_cid=15;
+
    ConstXTcurve xt;
    xt.SetDriftVelocity(0.025);
 
@@ -88,18 +91,20 @@ void plot(int iev, int side1, int side2, int cid1, int cid2, double z1, double z
    finder.MakeTangents(chamber, xt, side1, side2, cid1, cid2, z1, z2);
    finder.PrintTracks(wiremap, xt);
 
-   finder.FindBestTrack(chamber, xt, side1, side2, cid1, cid2, z1, z2);
+   if (!finder.FindBestTrack(chamber, xt, side1, side2, cid1, cid2, z1, z2)) {
+      printf("FindBestTrack failed\n");
+      return;
+   }
    Track& min_track = finder.GetBestTrack();
    //min_track.PrintTrack(wiremap, xt);
    Line& min_line = min_track.GetMinTangent(wiremap, xt);
-   chamber.DrawTrack(event, xt, min_track, min_line);
+   chamber.DrawTrack(event, xt, min_track, min_line, test_side, test_cid);
 
-   finder.FindBestTrack(chamber, xt, side1, side2, cid1, cid2, z_step);
-   {
+   if (finder.FindBestTrack(chamber, xt, side1, side2, cid1, cid2, z_step)) {
       Track& min_track = finder.GetBestTrack();
       //min_track.PrintTrack(wiremap, xt);
       Line& min_line = min_track.GetMinTangent(wiremap, xt);
-      chamber.DrawTrack(event, xt, min_track, min_line);
+      chamber.DrawTrack(event, xt, min_track, min_line, test_side, test_cid);
 
       double ypos_S1 = 1900/2.0; // mm
       double ypos_S2 = -ypos_S1;
@@ -108,17 +113,44 @@ void plot(int iev, int side1, int side2, int cid1, int cid2, double z1, double z
       printf("pos_s1: [mm] "); pos_s1.Print();
       printf("pos_s2: [mm] "); pos_s2.Print();
 
-      int test_side=0;
-      int test_cid=15;
       min_track.InitFit(wiremap, xt, test_side, test_cid);
       min_track.DoFit(wiremap, xt);
       min_track.PrintFitResults();
 
       Line& fit_line = min_track.GetFitLine();
-      chamber.DrawTrack(event, xt, min_track, fit_line);
-
-
+      chamber.DrawTrack(event, xt, min_track, fit_line, test_side, test_cid, pdf_dir);
+   } else {
+      printf("FindBestTrack failed\n");
    }
-
+}
+void good_run52()
+{
+   std::vector<int> list;
+   list.push_back(83);
+   list.push_back(245);
+   list.push_back(295);
+   list.push_back(392);
+   list.push_back(426);
+   list.push_back(527);
+   list.push_back(580);
+   list.push_back(593);
+   list.push_back(611);
+   list.push_back(779);
+   list.push_back(834);
+   list.push_back(1067);
+   list.push_back(1077);
+   list.push_back(1091);
+   list.push_back(1104);
+   list.push_back(1124);
+   list.push_back(1425);
+   list.push_back(1594);
+   list.push_back(1646);
+   list.push_back(1678);
+   list.push_back(1709);
+   char* pdf_dir = "run52/";
+   for (int i=0; i<list.size(); i++) {
+      int iev = list[i];
+      plot(iev, 0, 1, 18, 18, 0, 0, 0, 10, pdf_dir);
+   }
 }
 

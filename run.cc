@@ -123,7 +123,7 @@ void Run::DrawBestTangent(Long64_t event_number, int side1, int side2, int cid1,
    Track& min_track = finder_.GetBestTrack();
    min_track.PrintTrackWithLine(wiremap, xt_, min_track.GetMinTangent(wiremap, xt_));
    Line& min_tangent = min_track.GetMinTangent(wiremap, xt_);
-   chamber_.DrawTrack(event_, xt_, min_track, min_tangent);
+   chamber_.DrawTrack(event_, xt_, min_track, min_tangent, -1, -1);
 }
 
 bool Run::DoFit(Long64_t event_number, int side1, int side2, int cid1, int cid2, double z_step, int test_side, int test_cid)
@@ -162,7 +162,7 @@ void Run::DrawFit(Long64_t event_number, int side1, int side2, int cid1, int cid
    WireMap& wiremap = chamber_.GetWireMap();
    Track& min_track = finder_.GetBestTrack();
    Line& fit_line = min_track.GetFitLine();
-   chamber_.DrawTrack(event_, xt_, min_track, fit_line);
+   chamber_.DrawTrack(event_, xt_, min_track, fit_line, test_side, test_cid);
 }
 
 void Run::Loop(const char* output_root_path, Long64_t start_iev, Long64_t last_iev)

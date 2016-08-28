@@ -19,7 +19,7 @@ class Track
       void SetHitZWithMinTangent(WireMap& wiremap, XTcurve& xt);
       void MakeTangents(WireMap& wiremap, XTcurve& xt, int side1, int side2, int cid1, int cid2, double z1, double z2);
       Line& GetTangent(int itan);
-      double GetChi2OfLine(WireMap& wiremap, XTcurve& xt, Line& line);
+      double GetChi2OfLine(WireMap& wiremap, XTcurve& xt, Line& line, bool verbose=false);
       Line& GetMinTangent(WireMap& wiremap, XTcurve& xt);
       double GetSigma();
       Hit& GetHit(int side, int cid);
